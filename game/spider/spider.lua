@@ -1,8 +1,11 @@
-require("../input")
+require("../engine/lclass")
+
+require("../engine/input")
 require("../engine/fsm/fsm")
 require("../engine/collision/boxcollider")
+require("../engine/collision/circlecollider")
 
-local Vec = require("../math/vector")
+local Vec = require("../engine/math/vector")
 
 class "Spider" ("GameObject")
 
@@ -16,14 +19,14 @@ function Spider:Spider(positionX, positionY)
   self.collider  = nil
 
   self:configure()
-  
+
   --//TODO add states and animations
 end
 
 function Spider:update(dt)
 
   --//TODO movement in state
- 
+
   self.collider:update(dt, self.position.x, self.position.y)
 end
 
@@ -42,5 +45,6 @@ function Spider:getCollider()
 end
 
 function Spider:configure()
-  self.collider = BoxCollider(self.position.x, self.position.y, 30, 10, -15, 0)
+  --self.collider = BoxCollider(self.position.x, self.position.y, 30, 10, -15, 0)
+  self.collider = CircleCollider(self.position.x, self.position.y, 16, 0, 0)
 end

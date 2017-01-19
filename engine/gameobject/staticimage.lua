@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 -- simple static image 
 -------------------------------------------------------------------------------
-require("lclass")
+require("../engine/lclass")
 
 require ("../engine/gameobject/gameobject")
 require ("../engine/materials/normalmaterial")

@@ -1,4 +1,4 @@
-require ("lclass")
+require("../engine/lclass")
 
 class "ComplexAnimation"
 
@@ -27,7 +27,7 @@ function ComplexAnimation:setCurrentAnimation(index, start)
   start = start or false
 
   self.currentAnimation = self.animations[index]
-  
+
   if (start) then
     self.currentAnimation:start()
   end

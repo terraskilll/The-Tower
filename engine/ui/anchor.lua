@@ -19,10 +19,11 @@ the offset for anchoring is relative to the alignment, so it behaves
 differently in different anchoring . the general rule is that positive
 offsets brings the element close to center, and negative
 offsets push it further from center. in center alignments (north, south,
-east, west), only one offset is used. the element position is added to the 
+east, west), only one offset is used. the element position is added to the
 anchored aligmnent position
 
 --//TODO : testar "enums" com table
+--//TODO : considerar posição/offset da camera no alinhamento
 
 https://forums.coronalabs.com/topic/1792-does-lua-support-enums/
 
@@ -41,7 +42,7 @@ function getAnchoredPosition(anchor, positionX, positionY, offsetX, offsetY, ele
 
   local finalPositionX = 0
   local finalPositionY = 0
-  
+
   if ( anchor == 0 ) then -- center
 
       finalPositionX = (screenWidth / 2) - halfElementW + offsetX + positionX
@@ -81,13 +82,13 @@ function getAnchoredPosition(anchor, positionX, positionY, offsetX, offsetY, ele
 
       finalPositionX = (screenWidth / 2) - halfElementW + positionX
       finalPositionY = offsetY + positionY
-      
+
     elseif ( anchor == 8 ) then -- northeast
 
       finalPositionX = screenWidth - elementWidth - offsetX + positionX
       finalPositionY = offsetY + positionY
 
   end
-  
+
   return finalPositionX, finalPositionY
 end

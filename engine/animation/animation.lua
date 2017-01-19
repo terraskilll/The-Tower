@@ -1,7 +1,7 @@
-require ("lclass")
+require("../engine/lclass")
+require("../engine/animation/frame")
 
 require("../resources")
-require("../engine/animation/frame")
 
 class "Animation"
 

@@ -1,8 +1,8 @@
-require("lclass")
-
-require("../resources")
+require("../engine/lclass")
 require("../engine/animation/animation")
 require("../game/player/animation/walkinganimation")
+
+require("../resources")
 
 class "WalkingState" ("State")
 
@@ -19,11 +19,11 @@ function WalkingState:onUpdate(dt)
 end
 
 function WalkingState:onExit()
-  
+
 end
 
 function WalkingState:onMessage(message)
-  
+
 end
 
 function WalkingState:configure()

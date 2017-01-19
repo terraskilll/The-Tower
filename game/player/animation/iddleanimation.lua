@@ -1,8 +1,8 @@
-require ("lclass")
-
-require("../resources")
+require("../engine/lclass")
 require("../engine/animation/animation")
 require("../engine/animation/complexanimation")
+
+require("../resources")
 
 class "IddleAnimation" ("ComplexAnimation")
 
@@ -14,16 +14,16 @@ end
 function IddleAnimation:configure()
   -- a big clunky method
   -- TODO: get better
- 
+
   local w = i_character:getWidth()
   local h = i_character:getHeight()
-  
+
   local toSouth = Animation()
   toSouth:addFrame(1, 60, 30, 158, 342, w, h)
 
   local toWest = Animation()
   toWest:addFrame(1, 268, 70, 158, 342, w, h)
-  
+
   local toNorth = Animation()
   toNorth:addFrame(1, 476, 30, 158, 342, w, h)
 

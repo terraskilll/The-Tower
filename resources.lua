@@ -24,7 +24,6 @@ i_box = love.graphics.newImage("res/box.png")
 ib_uibutton1 = loadImage("res/ui/uibutton1.png")
 
 
-
 -------------------------------------------------------------------------------
 -- others stuff
 -------------------------------------------------------------------------------
@@ -32,3 +31,6 @@ ib_uibutton1 = loadImage("res/ui/uibutton1.png")
 
 i_deffloor = loadImage("res/floor/floor1.png")
 
+i__me = loadImage("res/_me.png") --//TODO temporary
+
+i__tree = loadImage("res/_tree.png") --//TODO temporary

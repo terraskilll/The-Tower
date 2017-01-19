@@ -1,4 +1,4 @@
-require("lclass")
+require("../engine/lclass")
 
 class "State"
 

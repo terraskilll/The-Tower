@@ -1,38 +1,40 @@
 --[[
 
-an area is a isolated part of a map
+an area is a isolated part of a map (a room, for example)
+
+only one area is rendered at a time, instead of the whole map
 
 ]]
 
-require ("lclass")
+require("../engine/lclass")
 
-require("../input")
+require("../engine/input")
 
 class "Area"
 
-function Area:Area()
+function Area:Area( areaName )
+  self.name   = areaName
   self.floors = {}
-  self.staticObjects = {}
+end
+
+function Area:getName()
+  return self.name
 end
 
 function Area:draw()
-  for _,f in ipairs(self.floors)  do
-    f:draw()
-  end
-
-  for  _,so in ipairs(self.staticObjects)  do
-    so:draw()
+  for i,fl in pairs(self.floors) do
+    fl:draw()
   end
 end
 
-function Area:addFloor(floorToAdd)
-  table.insert(self.floors, floorToAdd)
+function Area:addFloor( floorName, floor)
+  self.floors[floorName] = floor
 end
 
-function Area:addStaticObject(staticObjectToAdd)
-  table.insert(self.staticObjects, staticObjectToAdd)
+function Area:getFloors()
+  return self.floors
 end
 
-function Area:canWalk()
-  
+function Area:getFloorByName ( floorName )
+  return self.floors[floorName]
 end

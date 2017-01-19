@@ -1,4 +1,4 @@
-require("lclass")
+require("../engine/lclass")
 
 require("../engine/fsm/state")
 

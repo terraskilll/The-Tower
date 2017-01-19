@@ -1,21 +1,21 @@
 -------------------------------------------------------------------------------
 -- gameobject base class
 -------------------------------------------------------------------------------
-require ("lclass")
+require ("../engine/lclass")
 
-local Vec = require("../math/vector")
+local Vec = require("../engine/math/vector")
 
 class "GameObject"
 
-function GameObject:GameObject()
-  self.position = Vec(0,0)
+function GameObject:GameObject(positionX, positionY)
+  self.position = Vec(positionX, positionY)
 end
 
 function GameObject:update(dt)
   print("default gameboject update method : need override")
 end
 
-function GameObject:draw()  
+function GameObject:draw()
   print("default gameboject draw method : need override")
 end
 

@@ -1,6 +1,7 @@
 
-require("../globalconf")
-require("../input")
+require("../engine/globalconf")
+require("../engine/input")
+
 require("../game")
 
 local game
@@ -18,7 +19,7 @@ function love.update(dt)
 end
 
 function love.keypressed(key, scancode, isrepeat)
-	devModeCheck(key)
+	glob.devMode.check(key)
 
   Input:keyPressed(key, scancode, isrepeat)
 end
@@ -53,4 +54,8 @@ end
 
 function love.joystickreleased(joystick, button)
 	Input:joystickReleased(joystick, button)
+end
+
+function love.textinput(t)
+  Input:textInput( t ) --//TODO
 end

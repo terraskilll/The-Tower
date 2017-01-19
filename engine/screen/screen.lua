@@ -2,16 +2,17 @@
 -- gamescreen base class
 -------------------------------------------------------------------------------
 
-require ("lclass")
+require ("../engine/lclass")
 
-require("resources")
-require("../input")
+require("../resources")
+require("../engine/input")
 
 class "Screen"
 
 function Screen:Screen()
   self.game = nil
   self.backgroundImage = nil
+  self.camera = nil
 end
 
 function Screen:onEnter()
@@ -42,3 +43,6 @@ function Screen:setBackgroundImage(newImage)
   self.backgroundImage = newImage
 end
 
+function Screen:setCamera(cameraToSet)
+  self.camera = cameraToSet
+end

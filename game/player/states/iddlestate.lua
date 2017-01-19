@@ -1,7 +1,7 @@
-require("lclass")
+require("../engine/lclass")
+require("../engine/animation/animation")
 
 require("../resources")
-require("../engine/animation/animation")
 
 require("../game/player/animation/iddleanimation")
 require("../game/player/animation/noanimation") --//TODO
@@ -21,11 +21,11 @@ function IddleState:onUpdate(dt)
 end
 
 function IddleState:onExit()
-  
+
 end
 
 function IddleState:onMessage(message)
-  
+
 end
 
 function IddleState:configure()
