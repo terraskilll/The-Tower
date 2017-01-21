@@ -14,7 +14,8 @@ require("../editor/mapeditor")
 local options = {
   "F1 - Edit Resources",
   "F2 - Edit Static Objects",
-  "F3 - Edit Maps"
+  "F3 - Edit Maps",
+  "F4 - Edit Animations"
 }
 
 class "Editor" ("Screen")

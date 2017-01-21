@@ -34,13 +34,13 @@ function BoundingBox:changePosition( movementVector )
   self.positionY = self.positiony + movementVector.y
 end
 
-function BoundingBox:setPosition(newX, newY)
-  self.positionX = newX
-  self.positionY = newY
+function BoundingBox:setPosition( newX, newY )
+  self.positionX = newX or self.positionX
+  self.positionY = newY or self.positionY
 end
 
-function BoundingBox:setScale(newScale)
-  self.scale = newScale
+function BoundingBox:setScale( newScale )
+  self.scale = newScale or 1
 end
 
 function BoundingBox:getBounds()
