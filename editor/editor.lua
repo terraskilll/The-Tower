@@ -13,7 +13,7 @@ require("../editor/mapeditor")
 
 local options = {
   "F1 - Edit Resources",
-  "F2 - Edit Static Objects",
+  "F2 - Edit Simple Objects",
   "F3 - Edit Maps",
   "F4 - Edit Animations"
 }
@@ -82,12 +82,12 @@ end
 
 function Editor:checkKey(key, scancode, isrepeat)
   if ( key == "f1" ) then
-    self.currentEditor = ResourceList()
+    self.currentEditor = ResourceList(self)
     self.currentEditor:onEnter()
   end
 
   if ( key == "f2" ) then
-    self.currentEditor = ObjectList()
+    self.currentEditor = ObjectList(self)
     self.currentEditor:onEnter()
   end
 
@@ -95,4 +95,9 @@ function Editor:checkKey(key, scancode, isrepeat)
 
   end
 
+end
+
+function Editor:backFromEdit()
+  self.currentEditor:onExit()
+  self.currentEditor = nil
 end

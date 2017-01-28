@@ -22,3 +22,7 @@ end
 function GameObject:getPositionXY()
   return self.position.x, self.position.y
 end
+
+function GameObject:incPosition(incVector)
+  self.position = self.position + incVector
+end

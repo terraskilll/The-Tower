@@ -4,7 +4,7 @@
 
 --[[
 
-a navmesh is the walkable part of an area
+a navmesh is the walkable part of an floor
 
 ]]
 
@@ -17,12 +17,16 @@ local Vec = require("../engine/math/vector")
 class "NavMesh"
 
 function NavMesh:NavMesh()
+  self.owner = nil
+
   self.coords     = {} --pairs of points of the mesh (polygon)
   self.lines      = {} -- precomputed for speed
-  self.totalLines = 0
+  self.lineCount  = 0
 
-  self.staticColliders      = {}
-  self.staticCollidersCount = 0
+  self.mobile = false
+
+  self.simpleColliders      = {}
+  self.simpleCollidersCount = 0
 end
 
 function NavMesh:draw()
@@ -35,30 +39,91 @@ function NavMesh:draw()
   end
 end
 
+function NavMesh:setOwner( newOwner )
+  self.owner = newOwner
+end
+
+function NavMesh:getOwner()
+  return self.owner
+end
+
 function NavMesh:addPoint(pointX, pointY)
 
   table.insert(self.coords, pointX)
   table.insert(self.coords, pointY)
 
-  -- create a line between the last 2 points
+  self:recomputeLines()
+end
+
+function NavMesh:recomputeLines()
+  --//TODO refactor make a better name and check for a better calling moment
+
+  -- each time a point is created this is called
+
+  -- create a line between the points
   if ( #self.coords >= 4 ) then
-    local line = {
-      self.coords[#self.coords - 3],
-      self.coords[#self.coords - 2],
+
+    self.lines = {}
+
+    self.lineCount = 0
+
+    for i = 1, #self.coords - 2, 2 do
+
+      local line = {
+        self.coords[i],
+        self.coords[i + 1],
+        self.coords[i + 2],
+        self.coords[i + 3]
+      }
+
+      table.insert(self.lines, line)
+
+      self.lineCount = self.lineCount + 1
+
+    end
+
+    line = {
       self.coords[#self.coords - 1],
-      self.coords[#self.coords]
+      self.coords[#self.coords],
+      self.coords[1],
+      self.coords[2]
     }
 
     table.insert(self.lines, line)
 
-    self.totalLines = self.totalLines + 1
+    self.lineCount = #self.lines
+
   end
 
 end
 
-function NavMesh:addStaticCollider( colliderToAdd )
-  table.insert( self.staticColliders, colliderToAdd )
-  self.staticCollidersCount = #self.staticColliders
+function NavMesh:changePosition( movementVector )
+
+  for i=1, #self.coords, 2 do
+    self.coords[i]   = self.coords[i] + movementVector.x
+    self.coords[i+1] = self.coords[i+1] + movementVector.y
+  end
+
+  for i=1, #self.lines do
+    self.lines[i][1] = self.lines[i][1] + movementVector.x
+    self.lines[i][2] = self.lines[i][2] + movementVector.y
+    self.lines[i][3] = self.lines[i][3] + movementVector.x
+    self.lines[i][4] = self.lines[i][4] + movementVector.y
+  end
+
+end
+
+function NavMesh:addSimpleCollider( colliderToAdd )
+  table.insert( self.simpleColliders, colliderToAdd )
+  self.simpleCollidersCount = #self.simpleColliders
+end
+
+function NavMesh:setMobile( isMobile )
+  self.mobile = isMobile
+end
+
+function NavMesh:isMobile()
+  return self.mobile
 end
 
 function NavMesh:getCollisionCheckedPosition ( currentPosition, movementVector, objectCollider )
@@ -72,10 +137,10 @@ function NavMesh:getCollisionCheckedPosition ( currentPosition, movementVector, 
 
   local collIndex = 1
 
-  local checkedAll = self.staticCollidersCount == 0 -- if no colliders, no check
+  local checkedAll = self.simpleCollidersCount == 0 -- if no colliders, no check
 
   while not checkedAll do
-    collided = collision.check( futureCollider, self.staticColliders[collIndex])
+    collided = collision.check( futureCollider, self.simpleColliders[collIndex])
 
     if ( collided ) then
       movementVector:set(0,0) --//TODO change to check the collision and keep moving?
@@ -97,13 +162,13 @@ function NavMesh:getCollisionCheckedPosition ( currentPosition, movementVector, 
 
     collIndex = collIndex + 1
 
-    checkedAll = collIndex > self.staticCollidersCount
+    checkedAll = collIndex > self.simpleCollidersCount
   end
 
   return movementVector
 end
 
-function NavMesh:orientedCollisionCheck( coll1, coll2, movementVector)
+function NavMesh:orientedCollisionCheck( coll1, coll2, movementVector )
   -- checks whether a collided object can keep moving on in one direction
   -- at least, if the movement is diagonal (x not equal 0, y not equal 0)
 
@@ -132,44 +197,47 @@ function NavMesh:orientedCollisionCheck( coll1, coll2, movementVector)
 
 end
 
-function NavMesh:getInsidePosition(currentPosition, movementVector)
+function NavMesh:getInsidePosition( currentPosition, movementVector )
 
   local newX = currentPosition.x + movementVector.x
   local newY = currentPosition.y + movementVector.y
 
-  if self:isInside(newX, newY, 1) then
+  if self:isInside( newX, newY ) then
     return movementVector
   else
 
-    if (self:isInside(currentPosition.x, newY, 1)) then -- no change in X
+    if ( self:isInside( currentPosition.x, newY ) ) then -- no change in X
 
-      return Vec(0, movementVector.y)
+      return Vec(0, movementVector.y )
 
-    elseif (self:isInside(newX, currentPosition.y, 1)) then -- no change in Y
+    elseif ( self:isInside( newX, currentPosition.y ) ) then -- no change in Y
 
-      return Vec(movementVector.x, 0)
+      return Vec( movementVector.x, 0 )
 
     else -- cant go where it wants
-      return Vec(0,0)
+
+      return Vec( 0, 0 )
 
     end
 
   end
+
 end
 
-function NavMesh:isInside(centerX, centerY, radius)
-  --local endx, endy = 1000000000, centerY -- far ended horizontal line (to the right)
+function NavMesh:isInside( centerX, centerY )
+  -- far ended horizontal line to the right
+  --//TODO check if 1000000000 is enough :D
+  local intersections = self:countIntersections(centerX, centerY, 1000000000, centerY)
 
-  --//TODO check if 1000000000 is enough
-  return self:countIntersections(centerX, centerY, 1000000000, centerY, radius) % 2 == 1
+  return (intersections % 2) == 1
 end
 
-function NavMesh:countIntersections(centerX, centerY, endx, endy, radius)
+function NavMesh:countIntersections(centerX, centerY, endx, endy)
   local total = 0
 
   -- data from other line
 
-  for i = 1, self.totalLines do
+  for i = 1, self.lineCount do
     local lx1, ly1, lx2, ly2 =
       self.lines[i][1], self.lines[i][2], self.lines[i][3], self.lines[i][4]
 
@@ -182,16 +250,16 @@ function NavMesh:countIntersections(centerX, centerY, endx, endy, radius)
   return total
 end
 
-function linesIntersect(x1, y1, x2, y2, x3, y3, x4, y4)
+function linesIntersect( x1, y1, x2, y2, x3, y3, x4, y4 )
 
   return (
     (relativeCCW(x1, y1, x2, y2, x3, y3) * relativeCCW(x1, y1, x2, y2, x4, y4) <= 0) and
-    (relativeCCW(x3, y3, x4, y4, x1, y1) *relativeCCW(x3, y3, x4, y4, x2, y2) <= 0)
+    (relativeCCW(x3, y3, x4, y4, x1, y1) * relativeCCW(x3, y3, x4, y4, x2, y2) <= 0)
   )
 
 end
 
-function relativeCCW(x1, y1, x2, y2, px, py)
+function relativeCCW( x1, y1, x2, y2, px, py )
 
   x2 = x2 - x1;
   y2 = y2 - y1;

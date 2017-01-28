@@ -11,9 +11,11 @@ require ("../engine/lclass")
 
 local Vec = require("../engine/math/vector")
 
-class "StaticObject" ("GameObject")
+class "SimpleObject" ("GameObject")
 
-function StaticObject:StaticObject(positionX, positionY, objectSprite, drawQuad, objectScale)
+function SimpleObject:SimpleObject(objectName, positionX, positionY, objectSprite, drawQuad, objectScale)
+  self.name     = objectName
+
   self.position = Vec(positionX, positionY)
   self.image    = objectSprite
   self.quad     = drawQuad or nil
@@ -25,7 +27,7 @@ function StaticObject:StaticObject(positionX, positionY, objectSprite, drawQuad,
   self.boundingbox = nil
 end
 
-function StaticObject:update(dt)
+function SimpleObject:update(dt)
 
   if ( self.animation ~= nil ) then
     self.animation:update(dt)
@@ -33,7 +35,8 @@ function StaticObject:update(dt)
 
 end
 
-function StaticObject:draw()
+function SimpleObject:draw()
+
   if ( self.animation ~= nil ) then
     self:drawAnimated()
   else
@@ -47,9 +50,13 @@ function StaticObject:draw()
   if ( self.boundingbox ~= nil) then
     self.boundingbox:draw()
   end
+
+  if ( self.navmesh ~= nil) then
+    self.navmesh:draw()
+  end
 end
 
-function StaticObject:drawStatic()
+function SimpleObject:drawStatic()
 
   if ( self.quad ) then
     love.graphics.draw(self.image, self.quad, self.position.x, self.position.y, 0, self.scale, self.scale)
@@ -59,28 +66,45 @@ function StaticObject:drawStatic()
 
 end
 
-function StaticObject:drawAnimated()
+function SimpleObject:drawAnimated()
   self.animation:draw(self.position.x, self.position.y)
 end
 
-function StaticObject:setCollider(colliderToSet)
+function SimpleObject:getName()
+  return self.name
+end
+
+function SimpleObject:setCollider(colliderToSet)
   self.collider = colliderToSet
   self.collider:setScale(self.scale)
 end
 
-function StaticObject:getCollider()
+function SimpleObject:getCollider()
   return self.collider
 end
 
-function StaticObject:setBoundingBox(boundingboxToSet)
+function SimpleObject:setBoundingBox(boundingboxToSet)
   self.boundingbox = boundingboxToSet
   self.boundingbox:setScale(self.scale)
 end
 
-function StaticObject:getBoundingBox()
+function SimpleObject:getBoundingBox()
   return self.boundingbox
 end
 
-function StaticObject:setAnimation(animationToSet)
+function SimpleObject:setAnimation(animationToSet)
   self.animation = animationToSet
+end
+
+function SimpleObject:changePosition( movementVector )
+  self.position = self.position + movementVector
+
+  if ( self.collider ~= nil ) then
+    self.collider:changePosition( movementVector.x, movementVector.y )
+  end
+
+  if ( self.boundingbox ~= nil) then
+    self.boundingbox:setPosition( self.position.x, self.position.y )
+  end
+
 end

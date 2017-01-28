@@ -13,6 +13,7 @@ local Vec = require("../engine/math/vector")
 class "Player" ("GameObject")
 
 function Player:Player()
+  self.name      = "PLAYER"
   self.position  = Vec( 0, 0 )
   self.speed     = 150
 
@@ -33,10 +34,12 @@ function Player:Player()
   self:configure()
 end
 
+function Player:getName()
+  return self.name
+end
+
 function Player:update(dt)
   self.fsm:getCurrent():onUpdate(dt)
-
-  --//TODO movement in state ?
 
   local xv, yv = Input:getAxis()
 
@@ -44,7 +47,7 @@ function Player:update(dt)
 end
 
 function Player:draw()
-  --//TODO
+  --//TODO use player animations
   --self.fsm:getCurrent():getAnimation():draw(self:getPositionXY())
 
   local x, y = self:getPositionXY()
@@ -66,8 +69,8 @@ end
 function Player:changePosition( movementVector )
   self.position = self.position + movementVector
 
-  self.collider:changePosition(movementVector.x, movementVector.y)
-  self.boundingbox:setPosition(self.position.x, self.position.y)
+  self.collider:changePosition( movementVector.x, movementVector.y )
+  self.boundingbox:setPosition( self.position.x, self.position.y )
   self.navagent:changePosition( movementVector )
 end
 
@@ -100,7 +103,8 @@ function Player:setMap( newMap, newArea, newFloor, spawnPoint )
   self.area  = newArea
   self.floor = newFloor
 
-  self.navagent:setNavMesh(self.floor:getNavMesh())
+  self.navagent:setArea( newArea )
+  self.navagent:setNavMesh( self.floor:getNavMesh() )
 
   if ( spawnPoint ~= nil ) then
     local pos = spawnPoint:getPosition()
@@ -131,7 +135,7 @@ function Player:configure()
   self.fsm:start()
 
   -------------------------------------------
-  -- Collider
+  -- Collider, NavAgent, BoundingBox
   -------------------------------------------
 
   self.collider = CircleCollider(self.position.x, self.position.y, 12, 0, 10)

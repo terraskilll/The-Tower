@@ -8,7 +8,7 @@ require("../engine/collision/boxcollider")
 
 local Vec = require("../engine/math/vector")
 
-class "Ground" ("StaticObject")
+class "Ground" ("SimpleObject")
 
 function Ground:Ground(positionX, positionY, groundImage, groundQuad, objectScale)
   self.position = Vec(positionX, positionY)

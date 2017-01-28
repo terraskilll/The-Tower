@@ -20,7 +20,10 @@ local options = {
   "F1 - Add Resource",
   "F2 - Edit Resource",
   "F3 - Remove Resource",
+  "",
   "F9 - Save",
+  "F11 - Back",
+  "",
   "Pg Up - Previous Page",
   "Pg Down - Next Page"
 }
@@ -29,7 +32,9 @@ class "ResourceList"
 
 local allResources = {}
 
-function ResourceList:ResourceList()
+function ResourceList:ResourceList(ownerEditor)
+  self.editor    = ownerEditor
+
   self.pageIndex = 1
   self.selIndex  = 1
   self.listStart = 1
@@ -158,6 +163,12 @@ function ResourceList:onKeyPress(key, scancode, isrepeat)
 
   if ( key == "f9" ) then
     self:save()
+    return
+  end
+
+  if ( key == "f11" ) then
+    self.editor:backFromEdit()
+    return
   end
 end
 

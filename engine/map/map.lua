@@ -22,7 +22,7 @@ end
 
 function Map:update(dt)
 
-  for _,k in ipairs(self.areas) do
+  for _,k in pairs(self.areas) do
     k:update(dt)
   end
 

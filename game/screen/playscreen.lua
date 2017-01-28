@@ -6,7 +6,8 @@ require("../engine/ui/button/button")
 require("../engine/screen/screen")
 require("../engine/gameobject/gameobject")
 require("../engine/gameobject/staticimage")
-require("../engine/gameobject/staticobject")
+require("../engine/gameobject/simpleobject")
+require("../engine/gameobject/movingobject")
 require("../engine/gameobject/ground")
 require("../engine/map/map")
 require("../engine/map/area")
@@ -18,6 +19,8 @@ require("../engine/navigation/navmesh")
 require("../resources")
 
 require("../game/spider/spider")
+
+local Vec = require("../engine/math/vector")
 
 class "PlayScreen" ("Screen")
 
@@ -143,6 +146,8 @@ function PlayScreen:updateInGame(dt)
 
   self.camera:update(dt)
 
+  self.currentMap:update(dt)
+
   local coll = collision.check( self.game:getPlayer():getCollider(), self.spider:getCollider() )
 end
 
@@ -165,6 +170,7 @@ function PlayScreen:createTestMap()
   floor:addGround("grd8", Ground(700, 400, i_deffloor))
 
   local nav = NavMesh()
+
   nav:addPoint(110, 110)
   nav:addPoint(110, 490)
   nav:addPoint(710, 490)
@@ -179,34 +185,55 @@ function PlayScreen:createTestMap()
 
   floor:setNavMesh(nav)
 
-  self.tree = StaticObject(400, 300, i__tree)
+  self.tree = SimpleObject( "onetree", 400, 300, i__tree )
   self.tree:setBoundingBox( BoundingBox(400, 300, 60, 64, 0, 2, 0) )
   self.tree:setCollider( BoxCollider(400, 300, 20, 22, 23, 42) )
 
-  floor:addStaticObject( self.tree )
+  floor:addSimpleObject( self.tree:getName(), self.tree )
 
-  local spawnpt = SpawnPoint("Inicio", 400, 200)
+  local spawnpt = SpawnPoint( "Inicio", 200, 400 )
 
   floor:addSpawnPoint( spawnpt:getName(), spawnpt )
 
   local area = Area("TestArea")
 
-  area:addFloor(floor:getName(), floor)
+  area:addFloor( floor:getName(), floor )
 
   local mapa = Map("TestMap")
 
   mapa:addArea(area:getName(), area)
   mapa:setCurrentAreaByName("TestArea")
 
-  local m = nil
+  local movingPlate = MovingObject("Moving", -100, -100, i__mov)
+  movingPlate:addPoint( Vec (-100, -100) )
+  movingPlate:addPoint( Vec (200, -100) )
+  movingPlate:addPoint( Vec (200, -5) )
+  movingPlate:setSpeed(100)
+
+  local plateNav = NavMesh()
+  plateNav:addPoint(-100, -100)
+  plateNav:addPoint(28, -100)
+  plateNav:addPoint(28, 28)
+  plateNav:addPoint(-100, 28)
+  --plateNav:addPoint(-100, -100)
+
+  plateNav:setMobile( true )
+
+  movingPlate:setNavMesh( plateNav )
+
+  area:addMovingObject( movingPlate:getName(), movingPlate )
+
+  movingPlate:start()
+
+  --local m = nil
 
   -- lots of trees:
   --[[
   for i = -50, 50 do
     for j = -50, 50 do
-      m = StaticObject( i * 60, j * 60, i__tree)
+      m = SimpleObject( i * 60, j * 60, i__tree)
       m:setBoundingBox( BoundingBox(i * 60, j * 60, 20, 20, 0, 23, 42) )
-      area:addStaticObject(m)
+      area:addSimpleObject(m)
       self.game:getDrawManager():addObject(m)
     end
   end
@@ -214,9 +241,8 @@ function PlayScreen:createTestMap()
 
   self:changeMap(mapa, area, floor, spawnpt)
 
-  --self.game:getPlayer():setMap(mapa)
-
-  self.game:getDrawManager():addObject(self.game:getPlayer())
-  self.game:getDrawManager():addObject(self.tree)
-  self.game:getDrawManager():addAllFloors(area:getFloors())
+  self.game:getDrawManager():addObject( self.game:getPlayer() )
+  self.game:getDrawManager():addObject( self.tree )
+  self.game:getDrawManager():addAllFloors( area:getFloors() )
+  self.game:getDrawManager():addAllMovingObjects( area:getMovingObjects() )
 end

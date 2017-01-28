@@ -14,8 +14,8 @@ function Floor:Floor( floorName )
   self.name    = floorName
   self.grounds = {}
   self.spawns  = {}
-  self.staticObjects = {}
-  self.platforms     = {}
+
+  self.simpleObjects = {}
 
   self.navmesh = nil
 end
@@ -41,20 +41,16 @@ function Floor:addGround( groundName, ground )
   self.grounds[groundName] = ground
 end
 
-function Floor:addSpawnPoint( spanwName, spawn )
-  self.spawns[spanwName] = spawn
+function Floor:addSpawnPoint( spanwName, spawnPoint )
+  self.spawns[spanwName] = spawnPoint
 end
 
-function Floor:addStaticObject( staticObjectToAdd )
-  table.insert( self.staticObjects, staticObjectToAdd )
+function Floor:addSimpleObject( objectName, simpleObjectToAdd )
+  self.simpleObjects[objectName] = simpleObjectToAdd
 
   if ( self.navmesh ~= nil ) then
-    self.navmesh:addStaticCollider( staticObjectToAdd:getCollider() )
+    self.navmesh:addSimpleCollider( simpleObjectToAdd:getCollider() )
   end
-
-end
-
-function Floor:addPlatForm()
 
 end
 
@@ -76,6 +72,7 @@ end
 
 function Floor:setNavMesh( newNavMesh )
   self.navmesh = newNavMesh
+  self.navmesh:setOwner( self )
 end
 
 function Floor:getNavMesh()

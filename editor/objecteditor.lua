@@ -41,17 +41,17 @@ local colliderOptions = {
   "Numpad 5 - Use all image",
   "Numpad 2,4,6,8 - Increase on direction",
   "Numpad+Ctrl - Decrease on direction",
-  "C - Change collider type"
+  "C - Change collider type",
+  "R - Change radius (circle only)"
 }
 
 local options = mainOptions
 
-function ObjectEditor:ObjectEditor( objectListOwner, objectIndex, objectName, objectData )
+function ObjectEditor:ObjectEditor( objectListOwner, objectIndex, objectName )
   self.objectList = objectListOwner
 
   self.index = objectIndex
   self.name  = objectName
-  self.data  = objectData
 
   self.showQuad = true
 
@@ -65,6 +65,8 @@ function ObjectEditor:ObjectEditor( objectListOwner, objectIndex, objectName, ob
 
   self.textInput = nil
 
+  self:loadObject( objectName )
+
   self.updatefunction = self.updateNone
   self.keypressfunction = self.keypressNone
 end
@@ -74,7 +76,7 @@ function ObjectEditor:onEnter()
 end
 
 function ObjectEditor:onExit()
-  self.resmanager = nil
+  self.resourceManager = nil
 end
 
 function ObjectEditor:draw()
@@ -106,7 +108,7 @@ function ObjectEditor:printObject()
 
   if ( self.showQuad == true ) then
     if ( self.object.quad ~= nil ) then
-      love.graphics.draw(self.object.image, self.object.quad, 300, 100, 0, self.object.scale, self.object.scale)
+      love.graphics.draw(self.image, self.object.quad, 300, 100, 0, self.object.scale, self.object.scale)
 
       local x, y = self.object.quaddata[1], self.object.quaddata[2]
       local w, h = self.object.quaddata[3], self.object.quaddata[4]
@@ -115,11 +117,11 @@ function ObjectEditor:printObject()
       love.graphics.rectangle("line", x + 300, y + 100, w, h)
       love.graphics.setColor(glob.defaultColor)
     else
-      love.graphics.draw(self.object.image, 300, 100, 0, self.object.scale, self.object.scale)
+      love.graphics.draw(self.image, 300, 100, 0, self.object.scale, self.object.scale)
     end
 
   else
-    love.graphics.draw(self.object.image, 300, 100, 0, self.object.scale, self.object.scale)
+    love.graphics.draw(self.image, 300, 100, 0, self.object.scale, self.object.scale)
   end
 
   if  ( self.object.boundingbox ~= nil ) then
@@ -148,22 +150,25 @@ function ObjectEditor:updateGetResource(dt)
     local resname, restype, respath = self.resourceManager:getResourceByName(self.textInput:getText())
 
     if ( restype == "image" ) then
-      self.object = {}
-      self.object.resourceName = resname
-      self.object.resourceType = restype
-      self.object.resourcePath = respath
+      self.image = self.resourceManager:loadImage(respath)
 
-      self.object.image       = self.resourceManager:loadImage(respath)
+      self.object = {}
+      self.object.resourcename = resname
+
       self.object.scale       = 1
       self.object.quad        = nil
       self.object.boundingbox = nil
       self.object.collider    = nil
 
-      local w, h = self.object.image:getWidth(), self.object.image:getHeight()
+      local w, h = self.image:getWidth(), self.image:getHeight()
 
       self.object.quaddata = { 0, 0, w, h, w, h }
 
       self.object.bboxdata = { 0, 0, w, h, 0, 0, 0, 1 }
+
+      self.object.colldata = { 0, 0, w, h, 0, 0, 1, w / 2 } -- last parameter is radius for circle
+
+      self.object.colltype = "box"
     end
 
     self.textInput = nil
@@ -182,6 +187,7 @@ function ObjectEditor:updateEditBoundinBox(dt)
 end
 
 function ObjectEditor:updateEditCollider(dt)
+
 end
 
 function ObjectEditor:doTextInput ( t )
@@ -206,8 +212,6 @@ function ObjectEditor:onKeyPress( key, scancode, isrepeat )
       end
     end
 
-    print(" IncModifier : " .. self.incModifier)
-
   end
 
   if ( key == "kp-" ) then
@@ -218,8 +222,6 @@ function ObjectEditor:onKeyPress( key, scancode, isrepeat )
       self.incModifier = self.incModifier - 5
     end
 
-    print(" IncModifier : " .. self.incModifier)
-
   end
 
   if ( key == "f8" ) then
@@ -229,7 +231,7 @@ function ObjectEditor:onKeyPress( key, scancode, isrepeat )
   end
 
   if ( key == "f9" ) then
-    self:saveObject()
+    self:saveObject(self.name)
 
     return
   end
@@ -309,6 +311,26 @@ function ObjectEditor:keypressNone( key )
 
     options = colliderOptions
 
+    local cd = self.object.colldata
+
+    if ( self.object.colltype == "box" ) then
+
+      if ( self.object.quad ~= nil) then
+        self.object.collider = BoxCollider(cd[1] + 300, cd[2] + 100, self.object.quaddata[3], self.object.quaddata[4], cd[5], cd[6], cd[7])
+      else
+        self.object.collider = BoxCollider(cd[1] + 300, cd[2] + 100, cd[3], cd[4], cd[5], cd[6], cd[7])
+      end
+
+    else
+
+      if ( self.object.quad ~= nil) then
+        self.object.collider = CircleCollider(cd[1] + 300, cd[2] + 100, self.object.quaddata[3], self.object.quaddata[4], cd[5], cd[6], cd[7])
+      else
+        self.object.collider = CircleCollider(cd[1] + 300, cd[2] + 100, cd[3], cd[4], cd[5], cd[6], cd[7])
+      end
+
+    end
+
     self.updatefunction   = self.updateEditCollider
     self.keypressfunction = self.keypressEditCollider
 
@@ -324,7 +346,7 @@ end
 
 function ObjectEditor:keypressEditQuad ( key )
   if ( key == "kp5" ) then
-    local w, h = self.object.image:getWidth(), self.object.image:getHeight()
+    local w, h = self.image:getWidth(), self.image:getHeight()
 
     self.object.quaddata = { 0, 0, w, h, w, h }
 
@@ -381,18 +403,14 @@ function ObjectEditor:keypressEditQuad ( key )
     self.object.quaddata[2] = self.object.quaddata[2] + inc
   end
 
-  local d = self.object.quaddata
+  local qd = self.object.quaddata
 
-  self.object.quad = love.graphics.newQuad( d[1], d[2], d[3], d[4], d[5], d[6] )
+  self.object.quad = love.graphics.newQuad( qd[1], qd[2], qd[3], qd[4], qd[5], qd[6] )
 end
 
 function ObjectEditor:keypressEditBoundinBox ( key )
-
-  -- "Numpad 2,4,6,8 - Increase on direction",
-  -- "Numpad+Ctrl - Decrease on direction"
-
   if ( key == "kp5" ) then
-    local w, h = self.object.image:getWidth(), self.object.image:getHeight()
+    local w, h = self.image:getWidth(), self.image:getHeight()
 
     if ( self.object.quad ~= nil ) then
       self.object.bboxdata = {0, 0, self.object.quaddata[3], self.object.quaddata[4], 0, 0, 0, 1}
@@ -455,13 +473,143 @@ function ObjectEditor:keypressEditBoundinBox ( key )
   local bb = self.object.bboxdata
 
   self.object.boundingbox = BoundingBox(bb[1] + 300, bb[2] + 100, bb[3], bb[4], bb[5], bb[6], bb[7], bb[8])
-  --self.object.boundingbox = BoundingBox(b[1] + 300, b[2] + 100, b[3], b[4], b[5], b[6], b[7], b[8])
 end
 
 function ObjectEditor:keypressEditCollider ( key )
+  if ( key == "kp5" ) then
+    local w, h = self.image:getWidth(), self.image:getHeight()
+
+    if ( self.object.quad ~= nil) then
+      self.object.colldata = {0, 0, self.object.quaddata[3], self.object.quaddata[4], 0, 0, 1, self.object.quaddata[3] / 2 } -- last parameter is radius for circle
+    else
+      self.object.colldata = {0, 0, w, h, 0, 0, 1, w / 2} -- last parameter is radius for circle
+    end
+
+  end
+
+  local inc = 1
+
+  if ( Input:isKeyDown("lctrl") ) then
+    inc = -1
+  end
+
+  inc = inc * self.incModifier
+
+  if  ( key == "kp2" ) then -- h
+    self.object.colldata[4] = self.object.colldata[4] + inc
+  end
+
+  if  ( key == "kp4" ) then -- off x, w
+    self.object.colldata[5] = self.object.colldata[5] - inc
+    self.object.colldata[3] = self.object.colldata[3] + inc
+  end
+
+  if  ( key == "kp6" ) then -- w
+    self.object.colldata[3] = self.object.colldata[3] + inc
+  end
+
+  if  ( key == "kp8" ) then -- off y, h
+    self.object.colldata[6] = self.object.colldata[6] - inc
+    self.object.colldata[4] = self.object.colldata[4] + inc
+  end
+
+  if  ( key == "left" ) then -- off x
+    inc = absfun(inc)
+
+    self.object.colldata[5] = self.object.colldata[5] - inc
+  end
+
+  if  ( key == "right" ) then -- off x
+    inc = absfun(inc)
+
+    self.object.colldata[5] = self.object.colldata[5] + inc
+  end
+
+  if  ( key == "up" ) then -- off y
+    inc = absfun(inc)
+
+    self.object.colldata[6] = self.object.colldata[6] - inc
+  end
+
+  if  ( key == "down" ) then -- off y
+    inc = absfun(inc)
+
+    self.object.colldata[6] = self.object.colldata[6] + inc
+  end
+
+  if  ( key == "c" ) then -- change type
+
+    if ( self.object.colltype == "box" ) then
+      self.object.colltype = "circle"
+    else
+      self.object.colltype = "box"
+    end
+
+  end
+
+  if  ( key == "r" ) then -- radius
+    self.object.colldata[8] = self.object.colldata[8] + inc
+  end
+
+  local cd = self.object.colldata
+
+  if ( self.object.colltype == "box" ) then
+    self.object.collider = BoxCollider(cd[1] + 300, cd[2] + 100, cd[3], cd[4], cd[5], cd[6], cd[7])
+  else
+    self.object.collider = CircleCollider(cd[1] + 300, cd[2] + 100, cd[8], cd[5], cd[6], cd[7])
+  end
 
 end
 
-function ObjectEditor:saveObject()
-  print("save to a file")
+function ObjectEditor:saveObject(objectFileName)
+  saveFile("__objects/" .. objectFileName, self.object)
+
+  print("Saved " .. self.name)
+end
+
+function ObjectEditor:loadObject(objectFileName)
+
+  local obj, err = loadFile("__objects/" .. objectFileName)
+
+  if ( obj  == nil ) then
+    self.object = nil
+
+    print("Load error for " .. objectFileName)
+  else
+    self.object = obj
+
+    local resname, restype, respath = self.resourceManager:getResourceByName(self.object.resourcename)
+
+    self.image = self.resourceManager:loadImage(respath)
+
+    if ( self.object.quaddata ~= nil ) then
+
+      local qd = self.object.quaddata
+
+      self.object.quad = love.graphics.newQuad( qd[1], qd[2], qd[3], qd[4], qd[5], qd[6] )
+
+    end
+
+    if ( self.object.bboxdata ~= nil ) then
+
+      local bb = self.object.bboxdata
+
+      self.object.boundingbox = BoundingBox(bb[1] + 300, bb[2] + 100, bb[3], bb[4], bb[5], bb[6], bb[7], bb[8])
+
+    end
+
+    if ( self.object.colldata ~= nil ) then
+
+      local cd = self.object.colldata
+
+      if ( self.object.colltype == "box" ) then
+        self.object.collider = BoxCollider(cd[1] + 300, cd[2] + 100, cd[3], cd[4], cd[5], cd[6], cd[7])
+      else
+        self.object.collider = CircleCollider(cd[1] + 300, cd[2] + 100, cd[8], cd[5], cd[6], cd[7])
+      end
+
+    end
+
+    print("Loaded " .. objectFileName)
+  end
 end

@@ -43,6 +43,9 @@ function DrawManager:DrawManager(gameCamera)
   self.objectCount = 0
   self.objects     = {} -- objects currently being managed
 
+  self.movingCount   = 0
+  self.movingObjects = {} -- moving objects
+
   self.floorCount  = 0
   self.floors      = {}
 end
@@ -55,23 +58,38 @@ end
 
 function DrawManager:update(dt)
   --//TODO sort less times
-  table.sort(self.objects, sortByY)
+  table.sort( self.objects, sortByY )
 end
 
-function DrawManager:addObject(objectToAdd)
-  table.insert(self.objects, objectToAdd)
+function DrawManager:addObject( objectToAdd )
+  table.insert( self.objects, objectToAdd )
   self.objectCount = #self.objects
 end
 
-function DrawManager:addFloorObject(objectToAdd)
-  table.insert(self.floors, objectToAdd)
+function DrawManager:addFloorObject( objectToAdd )
+  table.insert( self.floors, objectToAdd )
   self.floorCount = #self.floors
 end
 
-function DrawManager:addAllFloors(floorToAdd)
-  for _,f in ipairs(floorToAdd) do
+function DrawManager:addMovingObject ( objectToAdd )
+  table.insert( self.movingObjects, objectToAdd )
+  self.movingCount = #self.movingObjects
+end
+
+function DrawManager:addAllFloors( floorsToAdd )
+
+  for _,f in ipairs( floorsToAdd ) do
     self:addFloorObject(f)
   end
+
+end
+
+function DrawManager:addAllMovingObjects( objectsToAdd )
+
+  for _,o in pairs( objectsToAdd ) do
+    self:addMovingObject( o )
+  end
+
 end
 
 function DrawManager:sortObjects()
@@ -86,6 +104,11 @@ function DrawManager:draw()
       self.floors[i]:draw()
     --end
 
+  end
+
+  for i = 1, self.movingCount do
+
+    self.movingObjects[i]:draw()
   end
 
   for i = 1, self.objectCount do

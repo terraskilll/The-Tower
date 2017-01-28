@@ -19,7 +19,7 @@ local Vec = require("../engine/math/vector")
 
 class "NavAgent"
 
-function NavAgent:NavAgent(agentOwner, posX, posY, drawRadius, offX, offY)
+function NavAgent:NavAgent( agentOwner, posX, posY, drawRadius, offX, offY )
   self.owner    = agentOwner
   self.position = Vec(posX, posY)
   self.radius   = drawRadius
@@ -28,23 +28,46 @@ function NavAgent:NavAgent(agentOwner, posX, posY, drawRadius, offX, offY)
   self.speed    = 100
 
   self.navmesh = nil
+  self.area = nil
 end
 
-function NavAgent:setNavMesh(newNavMesh)
+function NavAgent:setNavMesh( newNavMesh )
   self.navmesh = newNavMesh
 end
 
-function NavAgent:setSpeed(newSpeed)
+function NavAgent:setArea( newArea )
+  self.area = newArea
+end
+
+function NavAgent:setSpeed( newSpeed )
   self.speed = newSpeed
 end
 
-function NavAgent:update(dt, axisVector)
-  local offsettedPosition = Vec(self.position.x + self.offsetX, self.position.y + self.offsetY)
+function NavAgent:update( dt, axisVector )
+  local offsettedPosition = Vec( self.position.x + self.offsetX, self.position.y + self.offsetY )
 
   local movement = axisVector * dt * self.speed
 
+  -- check if agent got into another navmesh
+  local changedNavMesh = self.area:checkChangedNavMesh( offsettedPosition, movement )
+
+  if ( changedNavMesh ~= nil ) and ( changedNavMesh ~= self.navmesh ) then
+
+      if ( changedNavMesh:isMobile() ) then
+        changedNavMesh:getOwner():addObjectOver( self.owner:getName(), self.owner )
+      end
+
+      if ( self.navmesh:isMobile() ) then
+        self.navmesh:getOwner():removeObjectOver( self.owner:getName() )
+      end
+
+      self.navmesh = changedNavMesh
+
+  end
+
   local boundedMov = self.navmesh:getInsidePosition( offsettedPosition, movement )
 
+  --//TODO allow movement if it is diagonal and collision is on one direction (x or y)
   local collisionCheckedMov = self.navmesh:getCollisionCheckedPosition( offsettedPosition, boundedMov, self.owner:getCollider() )
 
   --self.position = self.position + collisionCheckedMov
@@ -58,8 +81,8 @@ function NavAgent:changePosition( movementVector )
   self.position = self.position + movementVector
 end
 
-function NavAgent:setPosition(newX, newY)
-  self.position:set(newX, newY)
+function NavAgent:setPosition( newX, newY )
+  self.position:set( newX, newY )
 end
 
 function NavAgent:draw()
