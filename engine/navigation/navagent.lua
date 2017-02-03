@@ -19,10 +19,10 @@ local Vec = require("../engine/math/vector")
 
 class "NavAgent"
 
-function NavAgent:NavAgent( agentOwner, posX, posY, drawRadius, offX, offY )
+function NavAgent:NavAgent( agentOwner, posX, posY, agentRadius, offX, offY )
   self.owner    = agentOwner
   self.position = Vec(posX, posY)
-  self.radius   = drawRadius
+  self.radius   = agentRadius
   self.offsetX  = offX or 0
   self.offsetY  = offY or 0
   self.speed    = 100
@@ -41,6 +41,10 @@ end
 
 function NavAgent:setSpeed( newSpeed )
   self.speed = newSpeed
+end
+
+function NavAgent:getRadius()
+  return self.radius
 end
 
 function NavAgent:update( dt, axisVector )

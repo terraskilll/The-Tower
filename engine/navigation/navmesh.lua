@@ -12,12 +12,18 @@ require("../engine/lclass")
 
 require("../engine/globalconf")
 
+require("../engine/utl/funcs")
+
 local Vec = require("../engine/math/vector")
+
+local linesIntersect = linesIntersectFunc
 
 class "NavMesh"
 
 function NavMesh:NavMesh()
   self.owner = nil
+
+  self.bounds     = {}
 
   self.coords     = {} --pairs of points of the mesh (polygon)
   self.lines      = {} -- precomputed for speed
@@ -27,6 +33,10 @@ function NavMesh:NavMesh()
 
   self.simpleColliders      = {}
   self.simpleCollidersCount = 0
+
+  --//TODO obstacles and simple colliders are a bit redundant, no?
+  self.obstacles     = {}
+  self.obstacleCount = 0
 end
 
 function NavMesh:draw()
@@ -34,6 +44,13 @@ function NavMesh:draw()
     love.graphics.setColor(0, 255, 255)
 
     love.graphics.polygon( "line", self.coords )
+
+    love.graphics.setColor(0, 200, 255, 100 )
+
+    love.graphics.line( self.bounds[1], self.bounds[2], self.bounds[1], self.bounds[4] )
+    love.graphics.line( self.bounds[1], self.bounds[2], self.bounds[3], self.bounds[2] )
+    love.graphics.line( self.bounds[3], self.bounds[2], self.bounds[3], self.bounds[4] )
+    love.graphics.line( self.bounds[1], self.bounds[4], self.bounds[3], self.bounds[4] )
 
     love.graphics.setColor( glob.defaultColor )
   end
@@ -47,10 +64,36 @@ function NavMesh:getOwner()
   return self.owner
 end
 
-function NavMesh:addPoint(pointX, pointY)
-
+function NavMesh:addPoint( pointX, pointY )
   table.insert(self.coords, pointX)
   table.insert(self.coords, pointY)
+
+  if (#self.coords == 2) then
+
+    self.bounds[1] = pointX
+    self.bounds[2] = pointY
+    self.bounds[3] = pointX
+    self.bounds[4] = pointY
+
+  else
+
+    if ( pointX < self.bounds[1] ) then
+      self.bounds[1] = pointX
+    end
+
+    if ( pointY < self.bounds[2] ) then
+      self.bounds[2] = pointY
+    end
+
+    if ( pointX > self.bounds[3] ) then
+      self.bounds[3] = pointX
+    end
+
+    if ( pointY > self.bounds[4] ) then
+      self.bounds[4] = pointY
+    end
+
+  end
 
   self:recomputeLines()
 end
@@ -111,11 +154,39 @@ function NavMesh:changePosition( movementVector )
     self.lines[i][4] = self.lines[i][4] + movementVector.y
   end
 
+  self.bounds[1] = self.bounds[1] + movementVector.x
+  self.bounds[2] = self.bounds[2] + movementVector.y
+  self.bounds[3] = self.bounds[3] + movementVector.x
+  self.bounds[4] = self.bounds[4] + movementVector.y
+
 end
 
 function NavMesh:addSimpleCollider( colliderToAdd )
   table.insert( self.simpleColliders, colliderToAdd )
   self.simpleCollidersCount = #self.simpleColliders
+end
+
+function NavMesh:addObstacle( obstacleToAdd, addOffSet )
+  -- obstacle must be the rectangle of the objects boundingbox
+
+  -- create a offset in the rectangle
+  if ( addOffSet == true ) then
+    obstacleToAdd[1] = obstacleToAdd[1] - 2
+    obstacleToAdd[2] = obstacleToAdd[2] - 2
+    obstacleToAdd[3] = obstacleToAdd[3] + 2
+    obstacleToAdd[4] = obstacleToAdd[4] + 2
+  end
+
+  table.insert( self.obstacles, obstacleToAdd )
+  self.obstacleCount = self.obstacleCount + 1
+end
+
+function NavMesh:getObstacles()
+  return self.obstacles
+end
+
+function NavMesh:getBounds()
+  return self.bounds
 end
 
 function NavMesh:setMobile( isMobile )
@@ -248,67 +319,4 @@ function NavMesh:countIntersections(centerX, centerY, endx, endy)
   end
 
   return total
-end
-
-function linesIntersect( x1, y1, x2, y2, x3, y3, x4, y4 )
-
-  return (
-    (relativeCCW(x1, y1, x2, y2, x3, y3) * relativeCCW(x1, y1, x2, y2, x4, y4) <= 0) and
-    (relativeCCW(x3, y3, x4, y4, x1, y1) * relativeCCW(x3, y3, x4, y4, x2, y2) <= 0)
-  )
-
-end
-
-function relativeCCW( x1, y1, x2, y2, px, py )
-
-  x2 = x2 - x1;
-  y2 = y2 - y1;
-  px = px - x1;
-  py = py - y1;
-
-  local ccw = px * y2 - py * x2;
-
-  if (ccw == 0.0) then
-    --[[
-    The point is colinear, classify based on which side of
-    the segment the point falls on.  We can calculate a
-    relative value using the projection of px,py onto the
-    segment - a negative value indicates the point projects
-    outside of the segment in the direction of the particular
-    endpoint used as the origin for the projection.
-    ]]--
-
-    ccw = px * x2 + py * y2;
-
-    if (ccw > 0.0) then
-      --[[
-      Reverse the projection to be relative to the original x2,y2
-      x2 and y2 are simply negated.
-      px and py need to have (x2 - x1) or (y2 - y1) subtracted
-      from them (based on the original values)
-      Since we really want to get a positive answer when the
-      point is "beyond (x2,y2)", then we want to calculate
-      the inverse anyway - thus we leave x2 & y2 negated.
-      ]]--
-
-      px = px - x2;
-      py = py - y2;
-      ccw = px * x2 + py * y2;
-
-      if (ccw < 0.0) then
-        ccw = 0.0;
-      end
-
-    end
-
-  end
-
-  if (ccw < 0.0) then
-    return -1
-  elseif (ccw > 0.0) then
-    return 1
-  else
-    return 0
-  end
-
 end

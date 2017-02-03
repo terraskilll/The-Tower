@@ -42,20 +42,20 @@ function Selector:update(dt)
     return
   end
 
-  local xKey, yKey = Input:getAxis()
+  local keyVec = Input:getAxis()
 
-  if (xKey == 0) then
+  if (keyVec.x == 0) then
     self.altDelay = 0.16
   else
     self.altDelay = self.altDelay + dt
 
     if ( self.altDelay >= 0.16 ) then
-      if ( xKey == -1 ) then
+      if ( keyVec.x == -1 ) then
         self:selectPrevious()
         self.altDelay = 0
       end
 
-      if ( xKey == 1 ) then
+      if ( keyVec.x == 1 ) then
         self:selectNext()
         self.altDelay = 0
       end

@@ -18,74 +18,62 @@ local sqrt   = math.sqrt
 
 local joyid = nil
 
-local normalizee = function(v1, v2)
-	local mag = sqrt(v1 * v1 + v2 * v2)
-
-	if mag > 0 then
-    v1, v2 = v1/mag, v2/mag
-  end
-
-  return v1, v2
-end
-
 Input = {
 	overallListener = nil,
 	currentScreenListener = nil,
   camera = nil,
   joystick = nil,
   joyOffset = 0.5,
-  axisX = 0, --//TODO change to vetor?
-  axisY = 0
+	axis = Vec(0,0)
 }
 
 function Input:update(dt)
 
   --//TODO general refactor
 
-	Input.axisX = 0
-	Input.axisY = 0
+	Input.axis.x = 0
+	Input.axis.y = 0
 
   if (self.joystick ~= nil) then
-    Input.axisX = self.joystick:getAxis(1)
-    Input.axisY = self.joystick:getAxis(2)
+    Input.axis.x = self.joystick:getAxis(1)
+    Input.axis.y = self.joystick:getAxis(2)
 
-    if ( absfun(Input.axisX) > Input.joyOffset ) then
-      if (Input.axisX < 0) then
-        Input.axisX = -1
+    if ( absfun(Input.axis.x) > Input.joyOffset ) then
+      if (Input.axis.x < 0) then
+        Input.axis.x = -1
       else
-        Input.axisX = 1
+        Input.axis.x = 1
       end
 		else
-			Input.axisX = 0
+			Input.axis.x = 0
     end
 
-    if ( absfun(Input.axisY) > Input.joyOffset ) then
-      if (Input.axisY < 0) then
-        Input.axisY = -1
+    if ( absfun(Input.axis.y) > Input.joyOffset ) then
+      if (Input.axis.y < 0) then
+        Input.axis.y = -1
       else
-        Input.axisY = 1
+        Input.axis.y = 1
       end
 		else
-			Input.axisY = 0
+			Input.axis.y = 0
     end
 
   end
 
 	if (love.keyboard.isDown("down")) then
-		Input.axisY = 1
+		Input.axis.y = 1
 	elseif (love.keyboard.isDown("up")) then
-		Input.axisY = -1
+		Input.axis.y = -1
 	end
 
 	if (love.keyboard.isDown("right")) then
-		Input.axisX = 1
+		Input.axis.x = 1
 	elseif (love.keyboard.isDown("left")) then
-		Input.axisX = -1
+		Input.axis.x = -1
 	end
 
 	--normalize the axis values
-	--//TODO revise when using vector
-	Input.axisX , Input.axisY = normalizee(Input.axisX, Input.axisY)
+	Input.axis:normalize()
 end
 
 -- [[ TECLADO ]] --
@@ -166,5 +154,5 @@ function Input:joystickReleased(joystick, button)
 end
 
 function Input:getAxis()
-  return Input.axisX, Input.axisY
+  return Vec(Input.axis.x, Input.axis.y)
 end

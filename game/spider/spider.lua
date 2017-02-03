@@ -1,15 +1,16 @@
 require("../engine/lclass")
 
-require("../engine/input")
+require("../engine/gameobject/actor")
 require("../engine/fsm/fsm")
 require("../engine/collision/boxcollider")
 require("../engine/collision/circlecollider")
 
 local Vec = require("../engine/math/vector")
 
-class "Spider" ("GameObject")
+class "Spider" ("Actor")
 
-function Spider:Spider(positionX, positionY)
+function Spider:Spider( spiderName, positionX, positionY )
+  self.name      = spiderName
   self.position  = Vec(positionX, positionY)
   self.direction = Vec(0,0)
   self.speed     = 70
@@ -47,4 +48,10 @@ end
 function Spider:configure()
   --self.collider = BoxCollider(self.position.x, self.position.y, 30, 10, -15, 0)
   self.collider = CircleCollider(self.position.x, self.position.y, 16, 0, 0)
+
+  self:setNavAgent( NavAgent(self, self.position.x, self.position.y, 20, 0, 12) )
+end
+
+function Spider:getNavAgent()
+  return self.navagent
 end

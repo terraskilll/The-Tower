@@ -40,12 +40,13 @@ function MovingObject:MovingObject(objectName, positionX, positionY, platformIma
   self.initialPoint = nil
   self.finalPoint   = nil
 
-  self.navMesh  = nil --//TODO
+  self.navMesh  = nil
 
-  self.initialDelay = 1 --//TODO
+  self.initialDelay = 0
   self.middleDelay  = 0
-  self.finalDelay   = 1
+  self.finalDelay   = 0
 
+  self.stopDelay = 0
 end
 
 function MovingObject:setDelays( initial, middle, final )
@@ -66,6 +67,12 @@ end
 
 function MovingObject:start()
   self.targetPoint = self.points[self.currentTargetIndex]
+
+  if ( self.circular == true ) then
+    self.stopDelay = self.middleDelay
+  else
+    self.stopDelay = self.initialDelay
+  end
 end
 
 function MovingObject:setSpeed( newSpeed )
@@ -90,15 +97,21 @@ function MovingObject:isWalkable()
 end
 
 function MovingObject:update( dt )
-  local movement = self.targetPoint - self.position
+  local movement = Vec(0, 0)
 
-  movement:normalize()
+  if ( self.stopDelay > 0 ) then
+    self.stopDelay = self.stopDelay - dt
+  else
+    movement = self.targetPoint - self.position
 
-  movement = (movement * dt * self.speed)
+    movement:normalize()
 
-  self:updateObjectOver(movement)
+    movement = (movement * dt * self.speed)
+  end
 
   self.position = self.position + movement
+
+  self:updateObjectOver(movement)
 
   self:checkNextPoint()
 
@@ -109,7 +122,9 @@ function MovingObject:update( dt )
 end
 
 function MovingObject:checkNextPoint()
-  local dist = self.position:distSqTo(self.targetPoint)
+  local dist = self.position:distSqTo( self.targetPoint )
+
+  local oldIndex = self.currentTargetIndex
 
   if ( dist < 1 ) then
     self.currentTargetIndex = self.currentTargetIndex + self.incMove
@@ -132,6 +147,24 @@ function MovingObject:checkNextPoint()
       else
         self.incMove = 1
         self.currentTargetIndex = self.currentTargetIndex + self.incMove
+      end
+
+    end
+
+    if ( oldIndex ~= self.currentTargetIndex ) then
+
+      self.stopDelay = self.middleDelay
+
+      if ( self.circular == false ) then
+
+        if ( oldIndex == 1 ) then
+          self.stopDelay = self.initialDelay
+        end
+
+        if ( oldIndex == #self.points ) then
+          self.stopDelay = self.finalDelay
+        end
+
       end
 
     end

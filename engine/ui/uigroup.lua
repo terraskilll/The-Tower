@@ -13,21 +13,21 @@ function UIGroup:UIGroup()
 end
 
 function UIGroup:update(dt)
-  local xKey, yKey = Input:getAxis()
+  local keyVec = Input:getAxis()
 
-  if (yKey == 0) then
+  if (keyVec.y == 0) then
     self.altDelay = 0.16
   else
     self.altDelay = self.altDelay + dt
 
     if ( self.altDelay >= 0.16 ) then
 
-      if ( yKey == -1 ) then
+      if ( keyVec.y == -1 ) then
         self:selectPrevious()
         self.altDelay = 0
       end
 
-      if ( yKey == 1 ) then
+      if ( keyVec.y == 1 ) then
         self:selectNext()
         self.altDelay = 0
       end

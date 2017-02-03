@@ -15,6 +15,7 @@ require("../engine/map/floor")
 require("../engine/map/spawnpoint")
 require("../engine/collision/collision")
 require("../engine/navigation/navmesh")
+require("../engine/navigation/navmap")
 
 require("../resources")
 
@@ -27,12 +28,14 @@ class "PlayScreen" ("Screen")
 function PlayScreen:PlayScreen(game)
   self.game = game
   self.paused = false
-  self.spider = Spider(300, 200)
+  self.spider = Spider("Spider1", 300, 200)
   self.tree   = nil
 
   self.camera = game:getCamera()
   self.camera:setTarget( self.game:getPlayer() )
   self.currentMap  = nil
+
+  self.navmap = nil
 
   self:createPauseMenu()
 end
@@ -65,6 +68,8 @@ function PlayScreen:draw()
   --self.game:getPlayer():draw()
 
   self.spider:draw()
+
+  self.navmap:draw() --//TODO remove
 
   self.camera:unset()
 
@@ -204,18 +209,18 @@ function PlayScreen:createTestMap()
   mapa:addArea(area:getName(), area)
   mapa:setCurrentAreaByName("TestArea")
 
-  local movingPlate = MovingObject("Moving", -100, -100, i__mov)
-  movingPlate:addPoint( Vec (-100, -100) )
+  local movingPlate = MovingObject("Moving", -300, -100, i__mov)
+  movingPlate:addPoint( Vec (-300, -100) )
   movingPlate:addPoint( Vec (200, -100) )
   movingPlate:addPoint( Vec (200, -5) )
-  movingPlate:setSpeed(100)
+  movingPlate:setSpeed(150)
+  movingPlate:setDelays(1, 1, 1)
 
   local plateNav = NavMesh()
-  plateNav:addPoint(-100, -100)
-  plateNav:addPoint(28, -100)
-  plateNav:addPoint(28, 28)
-  plateNav:addPoint(-100, 28)
-  --plateNav:addPoint(-100, -100)
+  plateNav:addPoint(-300, -100)
+  plateNav:addPoint(-172, -100)
+  plateNav:addPoint(-172, 28)
+  plateNav:addPoint(-300, 28)
 
   plateNav:setMobile( true )
 
@@ -223,10 +228,35 @@ function PlayScreen:createTestMap()
 
   area:addMovingObject( movingPlate:getName(), movingPlate )
 
-  movingPlate:start()
+  -- another floor
+  local farFloor = Floor("FarFloor")
+
+  farFloor:addGround("grd100", Ground(-450, -100, i_deffloor))
+  farFloor:addGround("grd101", Ground(-650, -100, i_deffloor))
+  farFloor:addGround("grd103", Ground(-850, -100, i_deffloor))
+  farFloor:addGround("grd104", Ground(-450, -300, i_deffloor))
+  farFloor:addGround("grd105", Ground(-650, -300, i_deffloor))
+  farFloor:addGround("grd106", Ground(-850, -300, i_deffloor))
+
+  farFloor:addGround("grd107", Ground(-450, -500, i_deffloor))
+  farFloor:addGround("grd108", Ground(-650, -500, i_deffloor))
+  farFloor:addGround("grd109", Ground(-850, -500, i_deffloor))
+  farFloor:addGround("grd110", Ground(-450, -700, i_deffloor))
+  farFloor:addGround("grd111", Ground(-650, -700, i_deffloor))
+  farFloor:addGround("grd112", Ground(-850, -700, i_deffloor))
+
+  local farNav = NavMesh()
+
+  farNav:addPoint(-840, -690)
+  farNav:addPoint(-260, -690)
+  farNav:addPoint(-260, 90)
+  farNav:addPoint(-840, 90)
+
+  farFloor:setNavMesh(farNav)
+
+  area:addFloor( farFloor:getName(), farFloor)
 
   --local m = nil
-
   -- lots of trees:
   --[[
   for i = -50, 50 do
@@ -238,6 +268,13 @@ function PlayScreen:createTestMap()
     end
   end
   ]]
+
+  movingPlate:start()
+
+  self.navmap = NavMap(self.spider, self.spider:getNavAgent())
+  self.navmap:generateFromNavMesh(nav, self.spider:getNavAgent():getRadius())
+
+  print(self.navmap:getAgentCurrentCell( self.spider:getPosition(), self.spider:getNavAgent():getRadius() ))
 
   self:changeMap(mapa, area, floor, spawnpt)
 

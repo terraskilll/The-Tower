@@ -54,7 +54,7 @@ function Game:onKeyRelease(key, scancode, isrepeat)
 end
 
 function Game:configure()
-  self.player      = Player()
+  self.player      = Player("PLAYER", 0, 0)
   self.camera      = Camera()
   self.drawManager = DrawManager(self.camera)
 

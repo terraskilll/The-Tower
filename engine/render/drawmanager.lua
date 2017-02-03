@@ -79,6 +79,7 @@ end
 function DrawManager:addAllFloors( floorsToAdd )
 
   for _,f in ipairs( floorsToAdd ) do
+    print(f)
     self:addFloorObject(f)
   end
 

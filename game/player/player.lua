@@ -10,12 +10,11 @@ require("../game/player/states/walkingstate")
 
 local Vec = require("../engine/math/vector")
 
-class "Player" ("GameObject")
+class "Player" ("Actor")
 
-function Player:Player()
-  self.name      = "PLAYER"
-  self.position  = Vec( 0, 0 )
-  self.speed     = 150
+function Player:Player( playerName, positionX, positionY )
+  self.name      = playerName
+  self.position  = Vec( positionX, positionY )
 
   self.hasCamera = false
   self.hasTorch  = false
@@ -25,25 +24,19 @@ function Player:Player()
   self.map    = nil
   self.area   = nil
   self.floor  = nil
-  self.floor  = nil
 
-  self.navagent    = nil
   self.boundingbox = nil
   self.collider    = nil
 
   self:configure()
 end
 
-function Player:getName()
-  return self.name
-end
-
 function Player:update(dt)
   self.fsm:getCurrent():onUpdate(dt)
 
-  local xv, yv = Input:getAxis()
+  local xyVec = Input:getAxis()
 
-  self.navagent:update(dt, Vec(xv, yv))
+  self.navagent:update(dt, xyVec)
 end
 
 function Player:draw()
@@ -59,11 +52,6 @@ function Player:draw()
   self.collider:draw()
   self.navagent:draw()
   self.boundingbox:draw()
-end
-
-function Player:changeSpeed(newSpeed)
-  self.speed = newSpeed
-  self.navagent:setSpeed(self.speed)
 end
 
 function Player:changePosition( movementVector )
@@ -90,10 +78,6 @@ function Player:getCollider()
   return self.collider
 end
 
-function Player:getNavAgent()
-  return self.navagent
-end
-
 function Player:getBoundingBox()
   return self.boundingbox
 end
@@ -112,10 +96,6 @@ function Player:setMap( newMap, newArea, newFloor, spawnPoint )
     self:setPosition( pos.x, pos.y )
   end
 
-end
-
-function Player:getPosition()
-  return self.position
 end
 
 function Player:configure()
@@ -137,12 +117,9 @@ function Player:configure()
   -------------------------------------------
   -- Collider, NavAgent, BoundingBox
   -------------------------------------------
+  self:setNavAgent( NavAgent(self, self.position.x, self.position.y, 10, 0, 12), 150 )
 
   self.collider = CircleCollider(self.position.x, self.position.y, 12, 0, 10)
-
-  self.navagent = NavAgent(self, self.position.x, self.position.y, 10, 0, 12)
-
-  self.navagent:setSpeed(self.speed)
 
   self.boundingbox = BoundingBox(self.position.x, self.position.y, 32, 16, 0, -16, 10)
 end

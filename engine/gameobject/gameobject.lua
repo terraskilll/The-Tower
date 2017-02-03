@@ -18,11 +18,3 @@ end
 function GameObject:draw()
   print("default gameboject draw method : need override")
 end
-
-function GameObject:getPositionXY()
-  return self.position.x, self.position.y
-end
-
-function GameObject:incPosition(incVector)
-  self.position = self.position + incVector
-end
