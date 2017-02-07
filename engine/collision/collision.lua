@@ -3,24 +3,28 @@ local absfun = math.abs
 
 collision = {
 
-  check = function (collider1, collider2)
+  check = function ( collider1, collider2 )
+    local collided = false
+
     if ( collider1:getKind() == "box" and collider2:getKind() == "box" ) then
 
-      return collision.checkBoxToBox( collider1, collider2 )
+      collided = collision.checkBoxToBox( collider1, collider2 )
 
     elseif ( collider1:getKind() == "circle" and collider2:getKind() == "circle" ) then
 
-      return collision.checkCircleToCircle( collider1, collider2 )
+      collided = collision.checkCircleToCircle( collider1, collider2 )
 
     elseif ( collider1:getKind() == "box" and collider2:getKind() == "circle" ) then
 
-      return collision.checkBoxToCircle( collider1, collider2 )
+      collided = collision.checkBoxToCircle( collider1, collider2 )
 
     else
 
-      return collision.checkBoxToCircle( collider2, collider1 )
+      collided = collision.checkBoxToCircle( collider2, collider1 )
 
     end
+
+    return collided
 
   end,
 
@@ -68,9 +72,9 @@ collision = {
 
     if (distY <= (boxh / 2)) then return true; end
 
-    local dx = distX - boxw / 2;
-    local dy = distY - boxh / 2;
+    local dx = distX - (boxw / 2);
+    local dy = distY - (boxh / 2);
 
-    return (dx * dx + dy * dy <= (circler * circler));
+    return ( (dx * dx + dy * dy) <= (circler * circler) );
   end
 }

@@ -13,7 +13,7 @@ local absfun = math.abs
 
 class "MovingObject" ("SimpleObject")
 
-function MovingObject:MovingObject(objectName, positionX, positionY, platformImage, platformQuad, platformScale)
+function MovingObject:MovingObject( objectName, positionX, positionY, platformImage, platformQuad, platformScale )
   self.name     = objectName
 
   self.position = Vec(positionX, positionY)

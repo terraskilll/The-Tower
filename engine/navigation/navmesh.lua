@@ -201,7 +201,7 @@ function NavMesh:getCollisionCheckedPosition ( currentPosition, movementVector, 
   local movedPosition = Vec( currentPosition.x + movementVector.x,  currentPosition.y + movementVector.y)
 
   local futureCollider = objectCollider:clone()
-
+  futureCollider:setOwner( objectCollider:getOwner() )
   futureCollider:changePosition( movementVector.x , movementVector.y )
 
   local collided = false
@@ -211,9 +211,15 @@ function NavMesh:getCollisionCheckedPosition ( currentPosition, movementVector, 
   local checkedAll = self.simpleCollidersCount == 0 -- if no colliders, no check
 
   while not checkedAll do
-    collided = collision.check( futureCollider, self.simpleColliders[collIndex])
+
+    collided = collision.check( futureCollider, self.simpleColliders[collIndex] )
 
     if ( collided ) then
+      --//notifies collision to objects
+      --//TODO better collision management between agents/objects
+      self.simpleColliders[collIndex]:collisionEnter( objectCollider )
+      objectCollider:collisionEnter( self.simpleColliders[collIndex] )
+
       movementVector:set(0,0) --//TODO change to check the collision and keep moving?
 
       --[[ --FIX code below is not working properly, so we set vector to 0 for now

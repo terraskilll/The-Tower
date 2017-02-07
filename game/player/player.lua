@@ -117,9 +117,16 @@ function Player:configure()
   -------------------------------------------
   -- Collider, NavAgent, BoundingBox
   -------------------------------------------
+
   self:setNavAgent( NavAgent(self, self.position.x, self.position.y, 10, 0, 12), 150 )
 
   self.collider = CircleCollider(self.position.x, self.position.y, 12, 0, 10)
+  --self.collider = BoxCollider(self.position.x, self.position.y, 20, 22, 23, 42)
+  self.collider:setOwner( self )
 
   self.boundingbox = BoundingBox(self.position.x, self.position.y, 32, 16, 0, -16, 10)
+end
+
+function Player:onCollisionEnter( otherCollider )
+  print( "Player Collided with " .. otherCollider:getOwner():getName() )
 end

@@ -1,6 +1,6 @@
 --[[
 
-an actor is a interactive object (player, npc, enemy)
+an actor is a interactive gameobject object (player, npc, enemy)
 
 ]]
 require("../engine/lclass")
@@ -15,23 +15,11 @@ local Vec = require("../engine/math/vector")
 class "Actor" ("GameObject")
 
 function Actor:Actor( actorName, positionX, positionY )
-  self.name = actorName
+  self.name      = actorName
   self.position  = Vec( positionX, positionY )
 
   self.navagent = nil
-  self.navmap = nil
-end
-
-function Actor:getName()
-  return self.name
-end
-
-function Actor:getPositionXY()
-  return self.position.x, self.position.y
-end
-
-function Actor:getPosition()
-  return self.position
+  self.navmap   = nil
 end
 
 function Actor:getNavAgent()

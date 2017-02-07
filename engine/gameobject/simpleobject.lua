@@ -1,6 +1,6 @@
 --[[
 
-a simple object class, for imovable things like walls,
+a simple object class, for things like walls,
 tables, chairs, trees and the like
 
 TODO add shaders
@@ -13,7 +13,7 @@ local Vec = require("../engine/math/vector")
 
 class "SimpleObject" ("GameObject")
 
-function SimpleObject:SimpleObject(objectName, positionX, positionY, objectSprite, drawQuad, objectScale)
+function SimpleObject:SimpleObject( objectName, positionX, positionY, objectSprite, drawQuad, objectScale )
   self.name     = objectName
 
   self.position = Vec(positionX, positionY)
@@ -25,12 +25,14 @@ function SimpleObject:SimpleObject(objectName, positionX, positionY, objectSprit
 
   self.collider    = nil
   self.boundingbox = nil
+
+  self.onCollisionEnter = nil
 end
 
-function SimpleObject:update(dt)
+function SimpleObject:update( dt )
 
   if ( self.animation ~= nil ) then
-    self.animation:update(dt)
+    self.animation:update( dt )
   end
 
 end
@@ -70,20 +72,18 @@ function SimpleObject:drawAnimated()
   self.animation:draw(self.position.x, self.position.y)
 end
 
-function SimpleObject:getName()
-  return self.name
-end
-
-function SimpleObject:setCollider(colliderToSet)
+function SimpleObject:setCollider( colliderToSet )
   self.collider = colliderToSet
-  self.collider:setScale(self.scale)
+
+  self.collider:setOwner( self )
+  self.collider:setScale( self.scale )
 end
 
 function SimpleObject:getCollider()
   return self.collider
 end
 
-function SimpleObject:setBoundingBox(boundingboxToSet)
+function SimpleObject:setBoundingBox( boundingboxToSet )
   self.boundingbox = boundingboxToSet
   self.boundingbox:setScale(self.scale)
 end
@@ -92,7 +92,7 @@ function SimpleObject:getBoundingBox()
   return self.boundingbox
 end
 
-function SimpleObject:setAnimation(animationToSet)
+function SimpleObject:setAnimation( animationToSet )
   self.animation = animationToSet
 end
 
@@ -106,5 +106,9 @@ function SimpleObject:changePosition( movementVector )
   if ( self.boundingbox ~= nil) then
     self.boundingbox:setPosition( self.position.x, self.position.y )
   end
+
+end
+
+function SimpleObject:onCollisionEnter( otherCollider )
 
 end

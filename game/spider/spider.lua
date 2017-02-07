@@ -28,10 +28,11 @@ function Spider:update(dt)
 
   --//TODO movement in state
 
-  self.collider:update(dt, self.position.x, self.position.y)
+  self.collider:update( dt )
 end
 
 function Spider:draw()
+  --//TODO animations
   --self.fsm:getCurrent():getAnimation():draw(self:getPositionXY())
 
   local x, y = self:getPositionXY()
@@ -46,12 +47,8 @@ function Spider:getCollider()
 end
 
 function Spider:configure()
-  --self.collider = BoxCollider(self.position.x, self.position.y, 30, 10, -15, 0)
-  self.collider = CircleCollider(self.position.x, self.position.y, 16, 0, 0)
+  self.collider = CircleCollider( self.position.x, self.position.y, 16, 0, 0 )
+  self.collider:setOwner( self )
 
   self:setNavAgent( NavAgent(self, self.position.x, self.position.y, 20, 0, 12) )
-end
-
-function Spider:getNavAgent()
-  return self.navagent
 end

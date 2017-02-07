@@ -154,6 +154,12 @@ function PlayScreen:updateInGame(dt)
   self.currentMap:update(dt)
 
   local coll = collision.check( self.game:getPlayer():getCollider(), self.spider:getCollider() )
+
+  if (coll) then
+    self.game:getPlayer():getCollider():collisionEnter( self.spider:getCollider() )
+    self.spider:getCollider():collisionEnter( self.game:getPlayer():getCollider() )
+  end
+
 end
 
 function PlayScreen:exitButtonClick(sender)
@@ -190,9 +196,11 @@ function PlayScreen:createTestMap()
 
   floor:setNavMesh(nav)
 
+  local collTree = BoxCollider(400, 300, 20, 22, 23, 42)
+
   self.tree = SimpleObject( "onetree", 400, 300, i__tree )
   self.tree:setBoundingBox( BoundingBox(400, 300, 60, 64, 0, 2, 0) )
-  self.tree:setCollider( BoxCollider(400, 300, 20, 22, 23, 42) )
+  self.tree:setCollider( collTree )
 
   floor:addSimpleObject( self.tree:getName(), self.tree )
 
@@ -274,7 +282,7 @@ function PlayScreen:createTestMap()
   self.navmap = NavMap(self.spider, self.spider:getNavAgent())
   self.navmap:generateFromNavMesh(nav, self.spider:getNavAgent():getRadius())
 
-  print(self.navmap:getAgentCurrentCell( self.spider:getPosition(), self.spider:getNavAgent():getRadius() ))
+  --print(self.navmap:getAgentCurrentCell( self.spider:getPosition(), self.spider:getNavAgent():getRadius() ))
 
   self:changeMap(mapa, area, floor, spawnpt)
 

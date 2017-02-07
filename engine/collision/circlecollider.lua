@@ -4,22 +4,46 @@ require("../engine/globalconf")
 
 class "CircleCollider"
 
-function CircleCollider:CircleCollider(x, y, r, offX, offY, s)
+function CircleCollider:CircleCollider( x, y, r, offX, offY, s )
   self.positionX = x
   self.positionY = y
   self.radius    = r
   self.offsetX   = offX or 0
   self.offsetY   = offY or 0
   self.scale     = s or 1
+
+  self.solid = true
+
+  self.owner = nil
+
+  self.name = "Void Circle "
 end
 
-function CircleCollider:update(dt, ownerX, ownerY)
-  self.positionX = ownerX
-  self.positionY = ownerY
+function CircleCollider:update( dt )
+  local xo, yo = self.owner:getPositionXY()
+
+  self.positionX = xo
+  self.positionY = yo
 end
 
-function CircleCollider:setScale(newScale)
+function CircleCollider:setOwner( newOwner )
+  self.owner = newOwner
+end
+
+function CircleCollider:getOwner()
+  return self.owner
+end
+
+function CircleCollider:setScale( newScale )
   self.scale = newScale
+end
+
+function CircleCollider:setSolid(solidCollider)
+  self.solid = solidCollider
+end
+
+function CircleCollider:isSolid()
+  return self.solid
 end
 
 function CircleCollider:draw()
@@ -59,8 +83,17 @@ function CircleCollider:getRadius()
   return self.radius * self.scale
 end
 
-function CircleCollider:addTrigger(newTrigger)
-  table.insert(self.notifyList, newTrigger)
+function CircleCollider:collisionEnter( otherCollider )
+
+  if ( self:getOwner() == nil )  then
+    --print(self.name .. " has no owner")
+    return
+  end
+
+  if ( self.owner.onCollisionEnter ~= nil ) then
+    self.owner:onCollisionEnter( otherCollider )
+  end
+
 end
 
 function CircleCollider:clone()

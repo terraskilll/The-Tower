@@ -9,23 +9,15 @@ require("../engine/lclass")
 
 local Vec = require("../engine/math/vector")
 
-class "SpawnPoint"
+class "SpawnPoint" ("GameObject")
 
 function SpawnPoint:SpawnPoint( spawnPointName , positionX, positionY )
   self.name     = spawnPointName
   self.position = Vec( positionX, positionY )
 end
 
-function SpawnPoint:getName()
-  return self.name
-end
-
 function SpawnPoint:setPosition(newX, newY)
   self.position:set(newX, newY)
-end
-
-function SpawnPoint:getPosition()
-  return Vec( self.position.x, self.position.y )
 end
 
 function SpawnPoint:draw()

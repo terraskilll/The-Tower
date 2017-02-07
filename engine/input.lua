@@ -21,6 +21,7 @@ local joyid = nil
 Input = {
 	overallListener = nil,
 	currentScreenListener = nil,
+	inputByKeyboard = true,
   camera = nil,
   joystick = nil,
   joyOffset = 0.5,
@@ -39,49 +40,64 @@ function Input:update(dt)
     Input.axis.y = self.joystick:getAxis(2)
 
     if ( absfun(Input.axis.x) > Input.joyOffset ) then
-      if (Input.axis.x < 0) then
+
+			Input.inputByKeyboard = false
+
+			if (Input.axis.x < 0) then
         Input.axis.x = -1
       else
         Input.axis.x = 1
       end
+
 		else
 			Input.axis.x = 0
     end
 
     if ( absfun(Input.axis.y) > Input.joyOffset ) then
-      if (Input.axis.y < 0) then
+
+			Input.inputByKeyboard = false
+
+			if (Input.axis.y < 0) then
         Input.axis.y = -1
       else
         Input.axis.y = 1
       end
+
+
 		else
 			Input.axis.y = 0
     end
 
   end
 
-	if (love.keyboard.isDown("down")) then
+	if (Input:isKeyDown("down")) then
 		Input.axis.y = 1
-	elseif (love.keyboard.isDown("up")) then
+	elseif (Input:isKeyDown("up")) then
 		Input.axis.y = -1
 	end
 
-	if (love.keyboard.isDown("right")) then
+	if (Input:isKeyDown("right")) then
 		Input.axis.x = 1
-	elseif (love.keyboard.isDown("left")) then
+	elseif (Input:isKeyDown("left")) then
 		Input.axis.x = -1
 	end
 
 	--normalize the axis values
 	Input.axis:normalize()
+
 end
 
 -- [[ TECLADO ]] --
 
 function Input:keyPressed(key, scancode, isrepeat)
+
+	Input.inputByKeyboard = true
+
 	if not Input.overallListener:onKeyPress(key, scancode, isrepeat) then
+
 		Input.currentScreenListener:onKeyPress(key, scancode, isrepeat)
 	end
+
 end
 
 function Input:keyReleased(key, scancode, isrepeat)
@@ -91,13 +107,23 @@ function Input:keyReleased(key, scancode, isrepeat)
 end
 
 function Input:isKeyDown(key)
+
+	local isDown = love.keyboard.isDown(key)
+
+	if (isDown) then
+		Input.inputByKeyboard = true
+	end
+
 	return love.keyboard.isDown(key)
+
 end
 
 function Input:textInput( t )
+
 	if ( Input.currentScreenListener.textInput ) then
 		Input.currentScreenListener:textInput( t )
 	end
+
 end
 
 -- [[ MOUSE ]] --
@@ -126,7 +152,7 @@ function Input:joystickAdded(joystick)
 
 	Input.joyid = joysticks[1]:getID()
 
-	print("Joystick ID : " .. Input.joyid)
+	--print("Joystick ID : " .. Input.joyid)
 end
 
 function Input:joystickRemoved(joystick)
@@ -136,11 +162,14 @@ end
 function Input:joystickPressed(joystick, button)
 	if joystick:getID() == Input.joyid then
 
+		Input.inputByKeyboard = false
+
 		if (Input.currentScreenListener.joystickPressed ~= nil) then
       Input.currentScreenListener:joystickPressed(joystick, button)
     end
 
   end
+
 end
 
 function Input:joystickReleased(joystick, button)
@@ -155,4 +184,8 @@ end
 
 function Input:getAxis()
   return Vec(Input.axis.x, Input.axis.y)
+end
+
+function Input:isInputByKeyboard()
+	return Input.inputByKeyboard
 end

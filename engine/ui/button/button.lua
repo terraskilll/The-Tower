@@ -16,8 +16,8 @@ local buttonShader = love.graphics.newShader("engine/shaders/ui.glsl")
 
 class "Button"
 
-function Button:Button(positionX, positionY, buttonText, buttonImage, buttonScale)
-  self.position = Vec(positionX, positionY)
+function Button:Button( positionX, positionY, buttonText, buttonImage, buttonScale )
+  self.position = Vec( positionX, positionY )
   self.text     = buttonText
   self.image    = buttonImage
   self.scale    = buttonScale or 1
@@ -34,13 +34,13 @@ function Button:update(dt)
 end
 
 function Button:draw()
-  buttonShader:send("uIsSelected", self.selected)
-  buttonShader:send("uIsEnabled", self.enabled)
+  buttonShader:send( "uIsSelected", self.selected )
+  buttonShader:send( "uIsEnabled", self.enabled )
 
   x, y = self:getPosition()
 
-  love.graphics.setShader(buttonShader)
-  love.graphics.draw(self.image, x, y, 0, self.scale, self.scale)
+  love.graphics.setShader( buttonShader )
+  love.graphics.draw( self.image, x, y, 0, self.scale, self.scale )
   love.graphics.setShader()
 
   self:drawText()
@@ -84,19 +84,27 @@ function Button:setAnchor(anchorPoint, offX, offY)
 end
 
 function Button:getPosition()
+
   if ( self.anchor ) then
+
     local iw, ih = self.image:getDimensions()
 
-    local px, py = getAnchoredPosition(self.anchor, self.position.x, self.position.y, self.offsetX, self.offsetY, iw, ih, self.scale)
+    local px, py = getAnchoredPosition( self.anchor, self.position.x, self.position.y, self.offsetX, self.offsetY, iw, ih, self.scale )
 
     return px, py
+
   else
+
     return self.position.x, self.position.y
+
   end
+
 end
 
-function Button:onClick(sender)
+function Button:onClick( sender )
+
   if ( self.onButtonClick ~= nil ) then
     self:onButtonClick( sender )
   end
+
 end
