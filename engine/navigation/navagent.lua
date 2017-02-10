@@ -28,7 +28,7 @@ function NavAgent:NavAgent( agentOwner, posX, posY, agentRadius, offX, offY )
   self.speed    = 100
 
   self.navmesh = nil
-  self.area = nil
+  self.area    = nil
 end
 
 function NavAgent:setNavMesh( newNavMesh )
@@ -47,7 +47,7 @@ function NavAgent:getRadius()
   return self.radius
 end
 
-function NavAgent:update( dt, axisVector )
+function NavAgent:update( dt, axisVector, collisionManager )
   local offsettedPosition = Vec( self.position.x + self.offsetX, self.position.y + self.offsetY )
 
   local movement = axisVector * dt * self.speed
@@ -72,7 +72,7 @@ function NavAgent:update( dt, axisVector )
   local boundedMov = self.navmesh:getInsidePosition( offsettedPosition, movement )
 
   --//TODO allow movement if it is diagonal and collision is on one direction (x or y)
-  local collisionCheckedMov = self.navmesh:getCollisionCheckedPosition( offsettedPosition, boundedMov, self.owner:getCollider() )
+  local collisionCheckedMov = self.navmesh:getCollisionCheckedPosition( offsettedPosition, boundedMov, self.owner:getCollider(), collisionManager )
 
   --self.position = self.position + collisionCheckedMov
 

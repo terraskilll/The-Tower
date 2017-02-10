@@ -9,9 +9,7 @@ a navmesh is the walkable part of an floor
 ]]
 
 require("../engine/lclass")
-
 require("../engine/globalconf")
-
 require("../engine/utl/funcs")
 
 local Vec = require("../engine/math/vector")
@@ -197,50 +195,9 @@ function NavMesh:isMobile()
   return self.mobile
 end
 
-function NavMesh:getCollisionCheckedPosition ( currentPosition, movementVector, objectCollider )
-  local movedPosition = Vec( currentPosition.x + movementVector.x,  currentPosition.y + movementVector.y)
+function NavMesh:getCollisionCheckedPosition ( currentPosition, movementVector, objectCollider, collisionManager )
 
-  local futureCollider = objectCollider:clone()
-  futureCollider:setOwner( objectCollider:getOwner() )
-  futureCollider:changePosition( movementVector.x , movementVector.y )
-
-  local collided = false
-
-  local collIndex = 1
-
-  local checkedAll = self.simpleCollidersCount == 0 -- if no colliders, no check
-
-  while not checkedAll do
-
-    collided = collision.check( futureCollider, self.simpleColliders[collIndex] )
-
-    if ( collided ) then
-      --//notifies collision to objects
-      --//TODO better collision management between agents/objects
-      self.simpleColliders[collIndex]:collisionEnter( objectCollider )
-      objectCollider:collisionEnter( self.simpleColliders[collIndex] )
-
-      movementVector:set(0,0) --//TODO change to check the collision and keep moving?
-
-      --[[ --FIX code below is not working properly, so we set vector to 0 for now
-      movementVector = self:orientedCollisionCheck( objectCollider, self.staticColliders[collIndex], movementVector )
-
-      if ( movementVector.x == 0 and movementVector.y == 0 ) then
-        checkedAll = true -- cant move, so exit loop
-      end
-    else
-      collIndex = collIndex + 1
-      checkedAll = collIndex >= self.staticCollidersCount
-    end
-
-    ]]
-
-    end
-
-    collIndex = collIndex + 1
-
-    checkedAll = collIndex > self.simpleCollidersCount
-  end
+  movementVector = collisionManager:checkCollisionForMovement( currentPosition, movementVector, objectCollider )
 
   return movementVector
 end

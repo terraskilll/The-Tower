@@ -80,7 +80,7 @@ end
 function NavMap:draw()
 
   --//TODO remove or comment
-  --[[
+
     for i = 1, #self.cells do
     love.graphics.rectangle("line",
         self.cells[i][1],
@@ -88,6 +88,6 @@ function NavMap:draw()
         self.cells[i][3] - self.cells[i][1] ,
         self.cells[i][4] - self.cells[i][2])
   end
-  ]]--
+  
 
 end

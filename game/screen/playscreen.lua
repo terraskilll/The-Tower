@@ -23,12 +23,16 @@ require("../game/spider/spider")
 
 local Vec = require("../engine/math/vector")
 
+local sepiaShader = love.graphics.newShader("engine/shaders/sepia.glsl")
+
 class "PlayScreen" ("Screen")
 
 function PlayScreen:PlayScreen(game)
-  self.game = game
+  self.game   = game
   self.paused = false
-  self.spider = Spider("Spider1", 300, 200)
+
+  self.enemies = {}
+
   self.tree   = nil
 
   self.camera = game:getCamera()
@@ -59,6 +63,10 @@ function PlayScreen:update(dt)
 end
 
 function PlayScreen:draw()
+  if ( self.paused ) then
+    love.graphics.setShader( sepiaShader )
+  end
+
   self.camera:set()
 
   self.currentMap:draw()
@@ -67,11 +75,15 @@ function PlayScreen:draw()
 
   --self.game:getPlayer():draw()
 
-  self.spider:draw()
+  for i=1, #self.enemies do
+    self.enemies[i]:draw()
+  end
 
   self.navmap:draw() --//TODO remove
 
   self.camera:unset()
+
+  love.graphics.setShader()
 
   -- menus are not affected by camera
   self.pauseMenu:draw()
@@ -132,33 +144,30 @@ function PlayScreen:checkPause()
   self.pauseMenu:setVisible(self.paused)
 end
 
-function PlayScreen:handleInPauseMenu(joystick, button)
-  self.pauseMenu:joystickPressed(joystick, button, self)
+function PlayScreen:handleInPauseMenu( joystick, button )
+  self.pauseMenu:joystickPressed( joystick, button, self )
 end
 
-function PlayScreen:handleInGame(joystick, button, sender)
-  self.game:getPlayer():joystickPressed(joystick, button, self)
+function PlayScreen:handleInGame( joystick, button, sender )
+  self.game:getPlayer():joystickPressed( joystick, button, self )
 end
 
-function PlayScreen:updatePaused(dt)
+function PlayScreen:updatePaused( dt )
   self.pauseMenu:update(dt)
 end
 
-function PlayScreen:updateInGame(dt)
-  self.game:getPlayer():update(dt)
+function PlayScreen:updateInGame( dt )
+  self.game:getPlayer():update( dt, self.game )
 
-  self.spider:update(dt)
-
-  self.camera:update(dt)
-
-  self.currentMap:update(dt)
-
-  local coll = collision.check( self.game:getPlayer():getCollider(), self.spider:getCollider() )
-
-  if (coll) then
-    self.game:getPlayer():getCollider():collisionEnter( self.spider:getCollider() )
-    self.spider:getCollider():collisionEnter( self.game:getPlayer():getCollider() )
+  for i=1, #self.enemies do
+    self.enemies[i]:update( dt )
   end
+
+  self.camera:update( dt )
+
+  self.currentMap:update( dt )
+
+  self.game:getCollisionManager():checkCollisions()
 
 end
 
@@ -279,15 +288,23 @@ function PlayScreen:createTestMap()
 
   movingPlate:start()
 
-  self.navmap = NavMap(self.spider, self.spider:getNavAgent())
-  self.navmap:generateFromNavMesh(nav, self.spider:getNavAgent():getRadius())
+  local spider1 = Spider("Spider1", 300, 200)
+
+  table.insert(self.enemies, spider1)
+
+  self.navmap = NavMap(spider1, spider1:getNavAgent())
+  self.navmap:generateFromNavMesh(nav, spider1:getNavAgent():getRadius())
 
   --print(self.navmap:getAgentCurrentCell( self.spider:getPosition(), self.spider:getNavAgent():getRadius() ))
 
-  self:changeMap(mapa, area, floor, spawnpt)
+  self:changeMap( mapa, area, floor, spawnpt )
 
   self.game:getDrawManager():addObject( self.game:getPlayer() )
   self.game:getDrawManager():addObject( self.tree )
   self.game:getDrawManager():addAllFloors( area:getFloors() )
   self.game:getDrawManager():addAllMovingObjects( area:getMovingObjects() )
+
+  self.game:getCollisionManager():addCollider( self.game:getPlayer():getCollider() )
+  self.game:getCollisionManager():addCollider( spider1:getCollider() )
+  self.game:getCollisionManager():addCollider( self.tree:getCollider() )
 end

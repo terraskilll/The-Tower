@@ -5,6 +5,7 @@ require("../engine/io/io")
 require("../engine/globalconf")
 require("../engine/camera/camera")
 require("../engine/render/drawmanager")
+require("../engine/collision/collisionmanager")
 
 require("../game/screen/menuscreen")
 require("../game/player/player")
@@ -54,9 +55,11 @@ function Game:onKeyRelease(key, scancode, isrepeat)
 end
 
 function Game:configure()
-  self.player      = Player("PLAYER", 0, 0)
+  self.player      = Player( "PLAYER", 0, 0 )
   self.camera      = Camera()
-  self.drawManager = DrawManager(self.camera)
+
+  self.drawManager      = DrawManager( self.camera )
+  self.collisionManager = CollisionManager()
 
   Input.overallListener = Game
   Input.camera = self.camera
@@ -75,6 +78,10 @@ end
 
 function Game:getDrawManager()
   return self.drawManager
+end
+
+function Game:getCollisionManager()
+  return self.collisionManager
 end
 
 function Game:setScreen(newScreen)

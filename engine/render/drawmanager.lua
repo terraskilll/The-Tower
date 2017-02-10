@@ -14,6 +14,8 @@ in the ordering algorithm
 
 objects not in-game (ui elements, menu buttons) are not affected by this
 
+--//TODO use skiplist
+
 ]]--
 
 require("../engine/lclass")
@@ -37,7 +39,7 @@ local function isInside(x, y, bounds)
   )
 end
 
-function DrawManager:DrawManager(gameCamera)
+function DrawManager:DrawManager( gameCamera )
   self.camera      = gameCamera
 
   self.objectCount = 0
@@ -56,7 +58,7 @@ function DrawManager:clear()
   self.objects = {}
 end
 
-function DrawManager:update(dt)
+function DrawManager:update( dt )
   --//TODO sort less times
   table.sort( self.objects, sortByY )
 end

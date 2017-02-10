@@ -31,12 +31,12 @@ function Player:Player( playerName, positionX, positionY )
   self:configure()
 end
 
-function Player:update(dt)
-  self.fsm:getCurrent():onUpdate(dt)
+function Player:update( dt, game )
+  self.fsm:getCurrent():onUpdate( dt )
 
   local xyVec = Input:getAxis()
 
-  self.navagent:update(dt, xyVec)
+  self.navagent:update(dt, xyVec, game:getCollisionManager() )
 end
 
 function Player:draw()
