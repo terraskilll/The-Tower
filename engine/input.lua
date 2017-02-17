@@ -89,32 +89,39 @@ end
 
 -- [[ TECLADO ]] --
 
-function Input:keyPressed(key, scancode, isrepeat)
+function Input:keyPressed( key, scancode, isrepeat )
 
 	Input.inputByKeyboard = true
 
-	if not Input.overallListener:onKeyPress(key, scancode, isrepeat) then
+	if not Input.overallListener:onKeyPress( key, scancode, isrepeat ) then
 
-		Input.currentScreenListener:onKeyPress(key, scancode, isrepeat)
+		if ( Input.currentScreenListener.onKeyPress ) then
+			Input.currentScreenListener:onKeyPress( key, scancode, isrepeat )
+		end
+
 	end
 
 end
 
-function Input:keyReleased(key, scancode, isrepeat)
-	if not Input.overallListener:onKeyRelease(key, scancode, isrepeat) then
-		Input.currentScreenListener:onKeyRelease(key, scancode, isrepeat)
+function Input:keyReleased( key, scancode, isrepeat )
+	if not Input.overallListener:onKeyRelease( key, scancode, isrepeat ) then
+
+		if ( Input.currentScreenListener.onKeyRelease ) then
+			Input.currentScreenListener:onKeyRelease( key, scancode, isrepeat )
+		end
+
 	end
 end
 
 function Input:isKeyDown(key)
 
-	local isDown = love.keyboard.isDown(key)
+	local isDown = love.keyboard.isDown( key )
 
 	if (isDown) then
 		Input.inputByKeyboard = true
 	end
 
-	return love.keyboard.isDown(key)
+	return love.keyboard.isDown( key )
 
 end
 

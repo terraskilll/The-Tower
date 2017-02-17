@@ -32,6 +32,10 @@ i_deffloor = loadImage("res/floor/floor1.png")
 
 i__me = loadImage("res/_me.png") --//TODO temporary
 
+i__spid = loadImage("res/_spid.png") --//TODO temporary
+
 i__tree = loadImage("res/_tree.png") --//TODO temporary
 
 i__mov = loadImage("res/_mov.png") --//TODO temporary
+
+i__lit = loadImage("res/__lit.png")  --//TODO temporary

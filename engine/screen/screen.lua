@@ -16,33 +16,33 @@ function Screen:Screen()
 end
 
 function Screen:onEnter()
-  print("default Scren onenter function: need override")
+  print("default Screen onenter function: need override")
 end
 
 function Screen:onExit()
-  print("default Scren onexit function: need override")
+  print("default Screen onexit function: need override")
 end
 
 function Screen:update(dt)
-  print("default Scren update function: need override")
+  print("default Screen update function: need override")
 end
 
 function Screen:draw()
-  print("default Scren draw function: need override")
+  print("default Screen draw function: need override")
 end
 
 function Screen:onEnter()
-  print("default Scren onenter function: need override")
+  print("default Screen onenter function: need override")
 end
 
 function Screen:onExit()
-  print("default Scren onexit function: need override")
+  print("default Screen onexit function: need override")
 end
 
-function Screen:setBackgroundImage(newImage)
-  self.backgroundImage = newImage
+function Screen:setBackgroundImage( imageToSet )
+  self.backgroundImage = imageToSet
 end
 
-function Screen:setCamera(cameraToSet)
+function Screen:setCamera( cameraToSet )
   self.camera = cameraToSet
 end

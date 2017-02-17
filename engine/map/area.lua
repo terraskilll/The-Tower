@@ -24,15 +24,15 @@ end
 
 function Area:update(dt)
 
-  for _,mo in pairs(self.movingObjects) do
-    mo:update(dt)
+  for _,mo in pairs( self.movingObjects ) do
+    mo:update( dt )
   end
 
 end
 
 function Area:draw()
 
-  for i, fl in pairs(self.floors) do
+  for i, fl in pairs( self.floors ) do
     fl:draw()
   end
 

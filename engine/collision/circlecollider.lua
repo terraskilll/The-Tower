@@ -38,8 +38,8 @@ function CircleCollider:setScale( newScale )
   self.scale = newScale
 end
 
-function CircleCollider:setSolid(solidCollider)
-  self.solid = solidCollider
+function CircleCollider:setSolid( isSolidCollider )
+  self.solid = isSolidCollider
 end
 
 function CircleCollider:isSolid()

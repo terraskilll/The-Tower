@@ -9,7 +9,7 @@ require("../engine/io/savetable")
 
 local basePath = love.filesystem.getSourceBaseDirectory() .. "/__data/"
 
-function saveFile(filePath, fileData)
+function saveFile( filePath, fileData )
   local fullPath = basePath .. filePath
 
   print(fullPath)
@@ -22,7 +22,7 @@ function saveFile(filePath, fileData)
 
 end
 
-function loadFile(filePath)
+function loadFile( filePath )
   local fullPath = basePath .. filePath
 
 	data, err = table.load(fullPath)

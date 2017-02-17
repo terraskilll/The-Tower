@@ -7,9 +7,6 @@ require("../engine/camera/camera")
 require("../engine/render/drawmanager")
 require("../engine/collision/collisionmanager")
 
-require("../game/screen/menuscreen")
-require("../game/player/player")
-
 local config = {
   gameScreenWidth = 1280,
   gameScreenHeight = 720,
@@ -19,16 +16,13 @@ local config = {
 class "Game"
 
 function Game:Game()
-  --//TODO load configuration
-  self:configure()
-
-  self:setScreen(MenuScreen(self))
+  self.screens = {}
 end
 
 function Game:update(dt)
   Input:update(dt)
-	self.currentScreen:update(dt)
-  self.drawManager:update(dt) --//TODO rever se ficar lento
+	self.currentScreen:update( dt )
+  self.drawManager:update( dt ) --//TODO check is gets slow
 end
 
 function Game:draw()
@@ -37,6 +31,7 @@ function Game:draw()
   if ( glob.devMode.showFPS ) then
     love.graphics.print("Current FPS: ".. tostring( love.timer.getFPS() ), 10, 10)
   end
+
 end
 
 function Game:onKeyPress(key, scancode, isrepeat)
@@ -55,8 +50,20 @@ function Game:onKeyRelease(key, scancode, isrepeat)
 end
 
 function Game:configure()
-  self.player      = Player( "PLAYER", 0, 0 )
-  self.camera      = Camera()
+  self:loadConfiguration()
+
+  if (config.setFullScreen == nil) then
+    config.setFullScreen = false
+  end
+
+  local ww, wh = config.gameScreenWidth, config.gameScreenHeight
+
+  love.window.setMode( ww, wh, config.gameIsFullScreen )
+
+  self.player = Player( "PLAYER", 0, 0 )
+
+  self.camera = Camera()
+  self.camera:setScale( ww / 1280, wh / 720 )
 
   self.drawManager      = DrawManager( self.camera )
   self.collisionManager = CollisionManager()
@@ -64,8 +71,8 @@ function Game:configure()
   Input.overallListener = Game
   Input.camera = self.camera
 
-  local font = love.graphics.newFont("res/font/ubuntu.ttf", 12)
-  love.graphics.setFont(font)
+  local font = love.graphics.newFont( "res/font/ubuntu.ttf", 12 )
+  love.graphics.setFont( font )
 end
 
 function Game:getPlayer()
@@ -84,20 +91,41 @@ function Game:getCollisionManager()
   return self.collisionManager
 end
 
-function Game:setScreen(newScreen)
-  if (self.currentScreen) then
+function Game:setCurrentScreen( screenName )
+  local nextScreen = self.screens[screenName]
+
+  if ( not nextScreen ) then
+    print( "Screen not found: " .. screenName )
+    return
+  end
+
+  if ( self.currentScreen ) then
     self.currentScreen:onExit()
   end
 
-  self.currentScreen = newScreen
-  Input.currentScreenListener = newScreen
+  self.currentScreen = nextScreen
+  Input.currentScreenListener = nextScreen
 
-  newScreen:setCamera(self.camera)
+  nextScreen:setCamera(self.camera)
 
-  newScreen:onEnter()
+  nextScreen:onEnter()
 end
 
-function Game:changeResolution(resolutionWidth, resolutionHeight, setFullScreen)
+function Game:addScreen( screenName, screen )
+
+  if ( self.screens[screenName] == nil) then
+
+    self.screens[screenName] = screen
+    print("Screen Added: " .. screenName)
+
+  else
+
+    print("Screen already exists: " .. screenName)
+
+  end
+end
+
+function Game:changeResolution( resolutionWidth, resolutionHeight, setFullScreen )
   if (setFullScreen == nil) then
     setFullScreen = false
   end
@@ -106,10 +134,15 @@ function Game:changeResolution(resolutionWidth, resolutionHeight, setFullScreen)
 
   self.camera:setScale(resolutionWidth / 1280, resolutionHeight / 720)
 
-  self:saveConfiguration()
+  config.gameScreenWidth  = resolutionWidth
+  config.gameScreenHeight = resolutionHeight
+  config.gameIsFullScreen = setFullScreen
 end
 
 function Game:saveConfiguration()
-  --//TODO
-  print("TODO")
+  saveFile("__config", config)
+end
+
+function Game:loadConfiguration()
+  config, err = loadFile("__config")
 end

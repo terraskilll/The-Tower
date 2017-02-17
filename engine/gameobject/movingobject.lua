@@ -97,7 +97,7 @@ function MovingObject:isWalkable()
 end
 
 function MovingObject:update( dt )
-  local movement = Vec(0, 0)
+  local movement = Vec( 0, 0 )
 
   if ( self.stopDelay > 0 ) then
     self.stopDelay = self.stopDelay - dt
@@ -106,12 +106,12 @@ function MovingObject:update( dt )
 
     movement:normalize()
 
-    movement = (movement * dt * self.speed)
+    movement = ( movement * dt * self.speed )
   end
 
   self.position = self.position + movement
 
-  self:updateObjectOver(movement)
+  self:updateObjectOver( movement )
 
   self:checkNextPoint()
 

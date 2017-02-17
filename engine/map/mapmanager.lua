@@ -14,7 +14,7 @@ function MapManager:MapManager()
   self.maps = {}
 end
 
-function MapManager:addMap(mapName, mapFile)
+function MapManager:addMap( mapName, mapFile )
   self.maps[mapName] = {
     file   = mapFile,
     loaded = false,

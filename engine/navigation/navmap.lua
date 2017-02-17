@@ -19,75 +19,91 @@ require("../engine/globalconf")
 
 local Vec = require("../engine/math/vector")
 
+local absfun = math.abs
+local floorfun = math.floor
+local ceilfun = math.ceil
+local maxfun = math.max
+local minfun = math.min
+
 class "NavMap"
 
-function NavMap:NavMap(mapOwner, agentRadius)
+function NavMap:NavMap( mapOwner, agentRadius )
   self.owner  = mapOwner
   self.radius = agentRadius
   self.cells  = {}
+  self.grid   = {}
 
-  self.positionx = 0
-  self.positiony = 0
+  self.bounds = nil
+
+  self.colCount = 0
+  self.rowCount = 0
 end
 
-function NavMap:clear()
-  self.cells = {}
+function NavMap:getRadius()
+  return self.radius
 end
 
-function NavMap:addCell(ccol, crow, cx, cy, cw, ch)
-  table.insert( self.cells, { ccol, crow, cx, cy, cw, ch, true } )
+function NavMap:addCell( ccol, crow, cx, cy, cw, ch )
+  -- column, line, x, y, width, height, iswalkable, f, g, h
+  table.insert( self.cells, { col = ccol, row = crow, x = cx, y = cy, w = cw, h = ch, walkable = true } )
+
 end
 
-function NavMap:generateFromNavMesh(navmesh, radius)
-  self:clear()
+function NavMap:generateFromNavMesh( navmesh, radius )
+  self.grid = {}
 
   local obstacles = navmesh:getObstacles()
-  local bounds = navmesh:getBounds()
+  self.bounds = navmesh:getBounds()
 
-  self.positionx = bounds[1] - radius
-  self.positiony = bounds[2] - radius
+  local cols = ceilfun( ( self.bounds[3] - self.bounds[1]) / radius )
+  local rows = ceilfun( ( self.bounds[4] - self.bounds[2]) / radius )
 
-  for i = self.positionx, bounds[3], radius do
+  for j = 1, rows do
 
-    for j = self.positiony, bounds[4], radius do
+    self.grid[j] = {}
 
-      table.insert( self.cells, {i, j, i + radius, j + radius} )
+    for i = 1, cols do
+
+      self.grid[j][i] = 0
 
     end
 
   end
 
-  --//TODO add obstacles
-
+  --//TODO add obstacles, mark places as unwalkable
 end
 
-function NavMap:getAgentCurrentCell(agentPosition, agentRadius)
-  print(self.positionx)
-  print(self.positiony)
-  print(agentPosition.x)
-  print(agentPosition.y)
-  print(agentRadius)
-  local xp = (agentPosition.x - self.positionx) / agentRadius
-  local yp = (agentPosition.y - self.positiony) / agentRadius
+function NavMap:getAgentCurrentCell( agentX, agentY, agentRadius )
+  --//TODO refactor
 
-  return xp, yp
+  local col = maxfun ( absfun( ceilfun( ( agentX - self.bounds[1] ) / agentRadius ) ), 1 )
+  local row = maxfun ( absfun( ceilfun( ( agentY - self.bounds[2] ) / agentRadius ) ), 1 )
+
+  return row, col
 end
 
-function NavMap:getPathTo(fromX, fromY, toX, toY)
+function NavMap:getGrid()
+  return self.grid
+end
 
+function NavMap:getColAndRowCount()
+  return self.colCount, self.rowCount
 end
 
 function NavMap:draw()
 
   --//TODO remove or comment
 
-    for i = 1, #self.cells do
-    love.graphics.rectangle("line",
-        self.cells[i][1],
-        self.cells[i][2],
-        self.cells[i][3] - self.cells[i][1] ,
-        self.cells[i][4] - self.cells[i][2])
+  for i = 1, #self.grid do
+    for j = 1, #self.grid[i] do
+      --[[
+      love.graphics.rectangle("line",
+          self.bounds[1] + ((i - 1) * self.radius),
+          self.bounds[2] + ((j - 1) * self.radius),
+          self.radius,
+          self.radius)
+          ]]
+    end
   end
-  
 
 end

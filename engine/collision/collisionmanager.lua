@@ -28,8 +28,8 @@ function CollisionManager:checkCollisions()
         local coll = collision.check( self.colliders[i], self.colliders[j] )
 
         if ( coll ) then
-          self.colliders[i]:getOwner():collisionEnter( self.colliders[j] )
-          self.colliders[j]:getOwner():collisionEnter( self.colliders[i] )
+          self.colliders[i]:collisionEnter( self.colliders[j] )
+          self.colliders[j]:collisionEnter( self.colliders[i] )
         end
 
       end
@@ -90,4 +90,34 @@ function CollisionManager:checkCollisionForMovement( currentPosition, movementVe
   end
 
   return movementVector
+end
+
+
+function CollisionManager:orientedCollisionCheck( coll1, coll2, movementVector )
+  -- checks whether a collided object can keep moving on in one direction
+  -- at least, if the movement is diagonal (x not equal 0, y not equal 0)
+
+  local collx = coll1:clone()
+  local colly = coll1:clone()
+
+  collx:changePosition(movementVector.x, 0)
+  colly:changePosition(0, movementVector.y)
+
+  local collidedX = collision.check( collx, coll2 )
+  local collidedY = collision.check( colly, coll2 )
+
+  if (collidedX and collidedY) then
+
+    return Vec(0,0) -- collided both, cant move
+
+  elseif (collidedX) then
+
+    return Vec(0,movementVector.y) -- can keep going on Y
+
+  else
+
+    return Vec(movementVector.x, 0) -- can keep going on X
+
+  end
+
 end

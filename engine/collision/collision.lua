@@ -42,6 +42,7 @@ collision = {
     else
       return false
     end
+
   end,
 
   checkCircleToCircle = function ( collider1, collider2 )

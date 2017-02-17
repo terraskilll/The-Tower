@@ -40,8 +40,8 @@ function BoxCollider:setScale( newScale )
   self.scale = newScale
 end
 
-function BoxCollider:setSolid( solidCollider )
-  self.solid = solidCollider
+function BoxCollider:setSolid( isSolidCollider )
+  self.solid = isSolidCollider
 end
 
 function BoxCollider:isSolid()

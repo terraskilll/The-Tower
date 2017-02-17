@@ -41,7 +41,7 @@ function GameObject:setPosition( newPosition )
   self.position:set( newPosition.x, newPosition.y )
 end
 
-function GameObject:update(dt)
+function GameObject:update( dt )
   print("default gameboject update method : need override")
 end
 

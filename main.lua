@@ -2,12 +2,12 @@
 require("../engine/globalconf")
 require("../engine/input")
 
-require("../game")
+require("../game/thetower")
 
 local game
 
 function love.load()
-	game = Game()
+	game = TheTower()
 end
 
 function love.draw()

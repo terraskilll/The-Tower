@@ -1,6 +1,7 @@
 require("../engine/lclass")
 
 require("../engine/input")
+--require("../engine/gamemanager")
 require("../engine/ui/uigroup")
 require("../engine/ui/button/button")
 require("../engine/screen/screen")
@@ -9,6 +10,7 @@ require("../engine/gameobject/staticimage")
 require("../engine/gameobject/simpleobject")
 require("../engine/gameobject/movingobject")
 require("../engine/gameobject/ground")
+require("../engine/light/light")
 require("../engine/map/map")
 require("../engine/map/area")
 require("../engine/map/floor")
@@ -39,7 +41,7 @@ function PlayScreen:PlayScreen(game)
   self.camera:setTarget( self.game:getPlayer() )
   self.currentMap  = nil
 
-  self.navmap = nil
+  self.navmaps = {}
 
   self:createPauseMenu()
 end
@@ -75,11 +77,9 @@ function PlayScreen:draw()
 
   --self.game:getPlayer():draw()
 
-  for i=1, #self.enemies do
-    self.enemies[i]:draw()
+  for i=1, #self.navmaps do
+    self.navmaps[i]:draw()
   end
-
-  self.navmap:draw() --//TODO remove
 
   self.camera:unset()
 
@@ -111,9 +111,9 @@ function PlayScreen:joystickPressed(joystick, button)
 
 end
 
-function PlayScreen:changeMap(newMap, newArea, newFloor, newSpawnPoint)
+function PlayScreen:changeMap( newMap, newArea, newFloor, newSpawnPoint )
   self.currentMap = newMap
-  self.game:getPlayer():setMap(self.currentMap, newArea, newFloor, newSpawnPoint)
+  self.game:getPlayer():setMap( newMap, newArea, newFloor, newSpawnPoint )
 end
 
 function PlayScreen:createPauseMenu()
@@ -160,7 +160,7 @@ function PlayScreen:updateInGame( dt )
   self.game:getPlayer():update( dt, self.game )
 
   for i=1, #self.enemies do
-    self.enemies[i]:update( dt )
+    self.enemies[i]:update( dt, self.game )
   end
 
   self.camera:update( dt )
@@ -169,10 +169,16 @@ function PlayScreen:updateInGame( dt )
 
   self.game:getCollisionManager():checkCollisions()
 
+  if ( Input:isKeyDown("l") ) then
+    --self.enemies[2]:getNavAgent():findPathTo( self.game:getPlayer():getPosition() )
+  end
+
 end
 
-function PlayScreen:exitButtonClick(sender)
-  print("exit the game")
+function PlayScreen:exitButtonClick( sender )
+
+  sender.game:setCurrentScreen( "MenuScreen" )
+
 end
 
 function PlayScreen:createTestMap()
@@ -213,7 +219,8 @@ function PlayScreen:createTestMap()
 
   floor:addSimpleObject( self.tree:getName(), self.tree )
 
-  local spawnpt = SpawnPoint( "Inicio", 200, 400 )
+  --local spawnpt = SpawnPoint( "Inicio", -550, 0 )
+  local spawnpt = SpawnPoint( "Inicio", -400, -100 )
 
   floor:addSpawnPoint( spawnpt:getName(), spawnpt )
 
@@ -269,7 +276,7 @@ function PlayScreen:createTestMap()
   farNav:addPoint(-260, 90)
   farNav:addPoint(-840, 90)
 
-  farFloor:setNavMesh(farNav)
+  farFloor:setNavMesh( farNav )
 
   area:addFloor( farFloor:getName(), farFloor)
 
@@ -288,23 +295,48 @@ function PlayScreen:createTestMap()
 
   movingPlate:start()
 
-  local spider1 = Spider("Spider1", 300, 200)
+  local spider1 = Spider( "Spider1", 300, 200 )
+  local spider2 = Spider( "Spider2", -590, -600 )
 
-  table.insert(self.enemies, spider1)
+  spider1:getNavAgent():setNavMesh( nav )
+  spider2:getNavAgent():setNavMesh( farNav )
 
-  self.navmap = NavMap(spider1, spider1:getNavAgent())
-  self.navmap:generateFromNavMesh(nav, spider1:getNavAgent():getRadius())
+  spider1:setTarget( self.game:getPlayer() )
+  spider2:setTarget( self.game:getPlayer() )
 
-  --print(self.navmap:getAgentCurrentCell( self.spider:getPosition(), self.spider:getNavAgent():getRadius() ))
+  table.insert( self.enemies, spider1 )
+  table.insert( self.enemies, spider2 )
 
-  self:changeMap( mapa, area, floor, spawnpt )
+  local navmap1 = NavMap( spider1, spider1:getNavAgent():getRadius() )
+  spider1:getNavAgent():setNavMap( navmap1 )
+  navmap1:generateFromNavMesh( nav, spider1:getNavAgent():getRadius() )
+
+  local navmap2 = NavMap( spider2, spider2:getNavAgent():getRadius() )
+  spider2:getNavAgent():setNavMap( navmap2 )
+  navmap2:generateFromNavMesh( farNav, spider2:getNavAgent():getRadius() )
+
+  spider1:setMap( mapa, area, floor, nil )
+  spider2:setMap( mapa, area, farFloor, nil )
+
+  table.insert( self.navmaps, navmap1 )
+  table.insert( self.navmaps, navmap2 )
+
+  local lit = Light( "", 800, 100, 5 )
+  lit:setImage( i__lit )
+
+  self.game:getDrawManager():addLight( lit )
 
   self.game:getDrawManager():addObject( self.game:getPlayer() )
   self.game:getDrawManager():addObject( self.tree )
+  self.game:getDrawManager():addObject( spider1 )
+  self.game:getDrawManager():addObject( spider2 )
   self.game:getDrawManager():addAllFloors( area:getFloors() )
   self.game:getDrawManager():addAllMovingObjects( area:getMovingObjects() )
 
   self.game:getCollisionManager():addCollider( self.game:getPlayer():getCollider() )
   self.game:getCollisionManager():addCollider( spider1:getCollider() )
+  self.game:getCollisionManager():addCollider( spider2:getCollider() )
   self.game:getCollisionManager():addCollider( self.tree:getCollider() )
+
+  self:changeMap( mapa, area, floor, spawnpt )
 end

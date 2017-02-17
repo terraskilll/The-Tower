@@ -10,6 +10,7 @@ glob = {
     drawColliders    = true,
     drawNavMesh      = true,
     drawBoundingBox  = true,
+    lightsActive     = false,
     disableDamage    = false,
     disableNormalMap = false,
     editorEnabled    = true,
@@ -40,6 +41,12 @@ glob = {
         glob.devMode.drawBoundingBox = not glob.devMode.drawBoundingBox
         print(" DEV:: Draw BoundingBox = " .. tostring(glob.devMode.drawBoundingBox))
       end
+
+      if ( key == "kp4" ) then
+        glob.devMode.lightsActive = not glob.devMode.lightsActive
+        print(" DEV:: Lights are active = " .. tostring(glob.devMode.lightsActive))
+      end
+
     end
 
   }

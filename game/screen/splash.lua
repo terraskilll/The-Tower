@@ -1,15 +1,11 @@
-require ("lclass")
+require("../engine/lclass")
 
 require("../engine/input")
 require("../engine/screen/screen")
 
-require("../gameobject/gameobject")
-require("../gameobject/staticimage")
-
-
 class "SplashScreen" ("Screen")
 
-function SplashScreen:SplashScreen(theGame)
+function SplashScreen:SplashScreen( theGame )
   self.game = theGame
 end
 

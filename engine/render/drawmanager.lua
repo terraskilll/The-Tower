@@ -20,6 +20,8 @@ objects not in-game (ui elements, menu buttons) are not affected by this
 
 require("../engine/lclass")
 
+local lightShader = love.graphics.newShader("engine/shaders/lightspot.glsl")
+
 class "DrawManager"
 
 local function sortByY(o1, o2)
@@ -41,6 +43,9 @@ end
 
 function DrawManager:DrawManager( gameCamera )
   self.camera      = gameCamera
+
+  self.lightCount  = 0
+  self.lights      = {} -- lights in map
 
   self.objectCount = 0
   self.objects     = {} -- objects currently being managed
@@ -73,6 +78,11 @@ function DrawManager:addFloorObject( objectToAdd )
   self.floorCount = #self.floors
 end
 
+function DrawManager:addLight( lightToAdd )
+  table.insert ( self.lights, lightToAdd)
+  self.lightCount = #self.lights
+end
+
 function DrawManager:addMovingObject ( objectToAdd )
   table.insert( self.movingObjects, objectToAdd )
   self.movingCount = #self.movingObjects
@@ -81,8 +91,8 @@ end
 function DrawManager:addAllFloors( floorsToAdd )
 
   for _,f in ipairs( floorsToAdd ) do
-    print(f)
-    self:addFloorObject(f)
+    --print(f)
+    self:addFloorObject( f )
   end
 
 end
@@ -100,6 +110,20 @@ function DrawManager:sortObjects()
 end
 
 function DrawManager:draw()
+
+  if ( glob.devMode.lightsActive ) then
+
+    for i = 1, self.lightCount do
+
+      self.lights[i]:apply( lightShader )
+
+    end
+
+    if ( self.lightCount > 0 ) then
+      love.graphics.setShader( lightShader )
+    end
+
+  end
 
   for i = 1, self.floorCount do
 
@@ -121,6 +145,16 @@ function DrawManager:draw()
     end
 
   end
+
+  for i = 1, self.lightCount do
+
+    --if (self:isInsideScreen(self.floors[i])) then
+      self.lights[i]:draw()
+    --end
+
+  end
+
+  love.graphics.setShader( )
 
 end
 

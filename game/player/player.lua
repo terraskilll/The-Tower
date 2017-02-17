@@ -36,7 +36,7 @@ function Player:update( dt, game )
 
   local xyVec = Input:getAxis()
 
-  self.navagent:update(dt, xyVec, game:getCollisionManager() )
+  self.navagent:update( dt, xyVec, game:getCollisionManager() )
 end
 
 function Player:draw()
@@ -50,7 +50,7 @@ function Player:draw()
   love.graphics.draw(i__me, x, y, 0, 0.75, 0.75, 32, 32)
 
   self.collider:draw()
-  self.navagent:draw()
+  --self.navagent:draw()
   self.boundingbox:draw()
 end
 
@@ -70,32 +70,12 @@ function Player:setPosition( newX, newY )
   self.navagent:setPosition( newX, newY )
 end
 
-function Player:joystickPressed(joystick, button, sender)
+function Player:joystickPressed( joystick, button, sender )
   --//TODO
 end
 
 function Player:getCollider()
   return self.collider
-end
-
-function Player:getBoundingBox()
-  return self.boundingbox
-end
-
-function Player:setMap( newMap, newArea, newFloor, spawnPoint )
-  self.map   = newMap
-  self.area  = newArea
-  self.floor = newFloor
-
-  self.navagent:setArea( newArea )
-  self.navagent:setNavMesh( self.floor:getNavMesh() )
-
-  if ( spawnPoint ~= nil ) then
-    local pos = spawnPoint:getPosition()
-
-    self:setPosition( pos.x, pos.y )
-  end
-
 end
 
 function Player:configure()
@@ -108,8 +88,8 @@ function Player:configure()
 
   local iddlestate = IddleState()
 
-  self.fsm:pushState(iddlestate)
-  self.fsm:setCurrentState(iddlestate)
+  self.fsm:pushState( iddlestate )
+  self.fsm:setCurrentState( iddlestate )
   self.fsm:start()
 
   self.fsm:start()
@@ -128,5 +108,5 @@ function Player:configure()
 end
 
 function Player:onCollisionEnter( otherCollider )
-  print( "Player Collided with " .. otherCollider:getOwner():getName() )
+  --print( "Player Collided with " .. otherCollider:getOwner():getName() )
 end

@@ -202,35 +202,6 @@ function NavMesh:getCollisionCheckedPosition ( currentPosition, movementVector, 
   return movementVector
 end
 
-function NavMesh:orientedCollisionCheck( coll1, coll2, movementVector )
-  -- checks whether a collided object can keep moving on in one direction
-  -- at least, if the movement is diagonal (x not equal 0, y not equal 0)
-
-  local collx = coll1:clone()
-  local colly = coll1:clone()
-
-  collx:changePosition(movementVector.x, 0)
-  colly:changePosition(0, movementVector.y)
-
-  local collidedX = collision.check( collx, coll2 )
-  local collidedY = collision.check( colly, coll2 )
-
-  if (collidedX and collidedY) then
-
-    return Vec(0,0) -- collided both, cant move
-
-  elseif (collidedX) then
-
-    return Vec(0,movementVector.y) -- can keep going on Y
-
-  else
-
-    return Vec(movementVector.x, 0) -- can keep going on X
-
-  end
-
-end
-
 function NavMesh:getInsidePosition( currentPosition, movementVector )
 
   local newX = currentPosition.x + movementVector.x
@@ -261,9 +232,9 @@ end
 function NavMesh:isInside( centerX, centerY )
   -- far ended horizontal line to the right
   --//TODO check if 1000000000 is enough :D
-  local intersections = self:countIntersections(centerX, centerY, 1000000000, centerY)
+  local intersections = self:countIntersections( centerX, centerY, 1000000000, centerY )
 
-  return (intersections % 2) == 1
+  return ( intersections % 2 ) == 1
 end
 
 function NavMesh:countIntersections(centerX, centerY, endx, endy)

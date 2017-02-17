@@ -12,11 +12,11 @@ require("../engine/gameobject/staticimage")
 
 require("../resources")
 
-require("../game/screen/playscreen")
+require("../game/screen/play")
 
 class "MenuScreen" ("Screen")
 
-function MenuScreen:MenuScreen(theGame)
+function MenuScreen:MenuScreen( theGame )
   self.game = theGame
 
   self.inMainMenu = true
@@ -39,17 +39,17 @@ function MenuScreen:MenuScreen(theGame)
   exitButton:setAnchor(4, 15, 20)
   exitButton.onButtonClick = self.exitButtonClick
 
-  self.mainMenu:addButton(startButton)
-  self.mainMenu:addButton(continueButton)
-  self.mainMenu:addButton(optionsButton)
-  self.mainMenu:addButton(exitButton)
+  self.mainMenu:addButton( startButton )
+  self.mainMenu:addButton( continueButton )
+  self.mainMenu:addButton( optionsButton )
+  self.mainMenu:addButton( exitButton )
 
   -- options menu
 
   self.configMenu = UIGroup()
 
   self.resolutionChange = Selector(0, 0, "RESOLUÇÃO", ib_uibutton1, 0.375)
-  self.resolutionChange:setAnchor(4, 15, 185)
+  self.resolutionChange:setAnchor(4, 15, 240)
 
   self.resolutionChange:addOption("1024 x 768", {1024, 768})
   self.resolutionChange:addOption("1280 x 720", {1280, 720})
@@ -61,7 +61,7 @@ function MenuScreen:MenuScreen(theGame)
   self.resolutionChange.onSelectorChange  = self.selectorOnChange
 
   self.fullscreenMode = Selector(0, 0, "TELA CHEIA", ib_uibutton1, 0.375)
-  self.fullscreenMode:setAnchor(4, 15, 130)
+  self.fullscreenMode:setAnchor(4, 15, 185)
   self.fullscreenMode:addOption("SIM", true)
   self.fullscreenMode:addOption("NÃO", false)
 
@@ -70,8 +70,12 @@ function MenuScreen:MenuScreen(theGame)
 
   self.applyOptionsButton = Button(0, 0, "APLICAR", ib_uibutton1, 0.375)
   self.applyOptionsButton:setEnabled(false)
-  self.applyOptionsButton:setAnchor(4, 15, 75)
+  self.applyOptionsButton:setAnchor(4, 15, 130)
   self.applyOptionsButton.onButtonClick = self.applyOptionsButtonClick
+
+  self.creditsButton = Button(0, 0, "CRÉDITOS", ib_uibutton1, 0.375)
+  self.creditsButton:setAnchor(4, 15, 75)
+  self.creditsButton.onButtonClick = self.creditsButtonClick
 
   self.exitOptionsButton = Button(0, 0, "VOLTAR", ib_uibutton1, 0.375)
   self.exitOptionsButton:setAnchor(4, 15, 20)
@@ -80,6 +84,7 @@ function MenuScreen:MenuScreen(theGame)
   self.configMenu:addButton(self.resolutionChange)
   self.configMenu:addButton(self.fullscreenMode)
   self.configMenu:addButton(self.applyOptionsButton)
+  self.configMenu:addButton(self.creditsButton)
   self.configMenu:addButton(self.exitOptionsButton)
 end
 
@@ -117,12 +122,12 @@ function MenuScreen:update(dt)
   self:checkEditor()
 
   if ( self.inMainMenu == true) then
-    self.mainMenu:update(dt)
+    self.mainMenu:update( dt )
   else
-    self.configMenu:update(dt)
+    self.configMenu:update( dt )
 
     if ( ( self.resolutionChange:haveChanged() == true ) or ( self.fullscreenMode:haveChanged() == true ) ) then
-      self.applyOptionsButton:setEnabled(true)
+      self.applyOptionsButton:setEnabled( true )
     end
 
   end
@@ -153,32 +158,37 @@ function MenuScreen:setIsInMainMenu(isInMainMenu)
 end
 
 function MenuScreen:startButtonClick(sender)
-  local play = PlayScreen(sender.game)
 
-  sender.game:setScreen(play)
+  sender.game:setCurrentScreen("PlayScreen")
+
 end
 
-function MenuScreen:exitButtonClick(sender)
-  love.event.push("quit")
+function MenuScreen:exitButtonClick( sender )
+  love.event.push( "quit" )
 end
 
-function MenuScreen:optionsButtonClick(sender)
-  sender:setIsInMainMenu(false)
+function MenuScreen:optionsButtonClick( sender )
+  sender:setIsInMainMenu( false )
 end
 
-function MenuScreen:applyOptionsButtonClick(sender)
+function MenuScreen:applyOptionsButtonClick( sender )
   --//TODO save configuration and load it next time
 
   local resValues = sender.resolutionChange:getValue()
   sender.game:changeResolution( resValues[1], resValues[2], false)
+  sender.game:saveConfiguration()
 end
 
-function MenuScreen:exitOptionsButtonClick(sender)
-  sender:setIsInMainMenu(true)
+function MenuScreen:creditsButtonClick( sender )
+  sender.game:setCurrentScreen("CreditsScreen")
 end
 
-function MenuScreen:selectorOnChange(sender)
-  sender.applyOptionsButton:setEnabled(true)
+function MenuScreen:exitOptionsButtonClick( sender )
+  sender:setIsInMainMenu( true )
+end
+
+function MenuScreen:selectorOnChange( sender )
+  sender.applyOptionsButton:setEnabled( true )
 end
 
 

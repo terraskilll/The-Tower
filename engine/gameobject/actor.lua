@@ -18,8 +18,48 @@ function Actor:Actor( actorName, positionX, positionY )
   self.name      = actorName
   self.position  = Vec( positionX, positionY )
 
+  self.map   = nil
+  self.area  = nil
+  self.floor = nil
+
+  self.boundingbox = nil
+
   self.navagent = nil
   self.navmap   = nil
+end
+
+function Actor:setMap( newMap, newArea, newFloor, spawnPoint )
+  self.map   = newMap
+  self.area  = newArea
+  self.floor = newFloor
+
+  if ( self.navagent ) then
+    self.navagent:setArea( newArea )
+    self.navagent:setNavMesh( self.floor:getNavMesh() )
+  end
+
+  if ( spawnPoint ~= nil ) then
+    local pos = spawnPoint:getPosition()
+
+    self:setPosition( pos.x, pos.y )
+  end
+
+end
+
+function Actor:getMap()
+  return self.map
+end
+
+function Actor:getArea()
+  return self.area
+end
+
+function Actor:getFloor()
+  return self.floor
+end
+
+function Actor:setFloor( floorToSet )
+  self.floor = floorToSet
 end
 
 function Actor:getNavAgent()
@@ -29,6 +69,14 @@ end
 function Actor:setNavAgent( agentToSet, agentSpeed )
   self.navagent = agentToSet
   self.navagent:setSpeed( agentSpeed )
+end
+
+function Actor:getBoundingBox()
+  return self.boundingbox
+end
+
+function Actor:setBoundingBox( boundingBoxToSet )
+  self.boundingbox = boundingBoxToSet
 end
 
 function Actor:setNavMap( navmapToSet )
