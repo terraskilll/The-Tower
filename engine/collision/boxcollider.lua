@@ -18,7 +18,7 @@ function BoxCollider:BoxCollider( x, y, w, h, offX, offY, s )
 
   self.owner = nil
 
-  self.name = "Void"
+  self.name = "Box Collider "
 end
 
 function BoxCollider:update( dt )

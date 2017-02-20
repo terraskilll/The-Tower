@@ -29,8 +29,8 @@ function NavMesh:NavMesh()
 
   self.mobile = false
 
-  self.simpleColliders      = {}
-  self.simpleCollidersCount = 0
+  self.obstacleColliders      = {}
+  self.obstacleCollidersCount = 0
 
   --//TODO obstacles and simple colliders are a bit redundant, no?
   self.obstacles     = {}
@@ -160,12 +160,18 @@ function NavMesh:changePosition( movementVector )
 end
 
 function NavMesh:addSimpleCollider( colliderToAdd )
-  table.insert( self.simpleColliders, colliderToAdd )
-  self.simpleCollidersCount = #self.simpleColliders
-end
+  if ( colliderToAdd == nil ) then
+    return
+  end
 
+  table.insert( self.obstacleColliders, colliderToAdd )
+  self.obstacleCollidersCount = #self.obstacleColliders
+end
+--[[
 function NavMesh:addObstacle( obstacleToAdd, addOffSet )
   -- obstacle must be the rectangle of the objects boundingbox
+
+  --//TODO use this?
 
   -- create a offset in the rectangle
   if ( addOffSet == true ) then
@@ -179,8 +185,14 @@ function NavMesh:addObstacle( obstacleToAdd, addOffSet )
   self.obstacleCount = self.obstacleCount + 1
 end
 
+]]
+
 function NavMesh:getObstacles()
   return self.obstacles
+end
+
+function NavMesh:getObstacleColliders()
+  return self.obstacleColliders
 end
 
 function NavMesh:getBounds()

@@ -42,7 +42,10 @@ local function isInside(x, y, bounds)
 end
 
 function DrawManager:DrawManager( gameCamera )
-  self.camera      = gameCamera
+  self.camera = gameCamera
+
+  self.scaleX = 1
+  self.scaleY = 1
 
   self.lightCount  = 0
   self.lights      = {} -- lights in map
@@ -55,6 +58,11 @@ function DrawManager:DrawManager( gameCamera )
 
   self.floorCount  = 0
   self.floors      = {}
+end
+
+function DrawManager:setScale( newScaleX, newScaleY )
+  self.scaleX = newScaleX or 1
+  self.scaleY = newScaleY or 1
 end
 
 function DrawManager:clear()
@@ -158,19 +166,30 @@ function DrawManager:draw()
 
 end
 
-function DrawManager:isInsideScreen(object)
+function DrawManager:isInsideScreen( object )
   local camX, camY, camW, camH = self.camera:getVisibleArea(-300, -300, 400, 400) -- arbitrary values?
   local objX, objY, objW, objH = object:getBoundingBox():getBounds()
+
+  --//TODO fix isInside when changed resolution
+
+  if ( object:getName() == "onetree") then
+    objX = objX * self.scaleX
+    objY = objY * self.scaleY
+
+    --print(objX .. " " .. objY .. " " .. objW .. " " .. objH)
+  end
+
+  --print(camX .. " " .. camY .. " " .. camW .. " " .. camH)
 
   --//TODO how to do if object is bigger than screen?
 
   -- if at least one of the rectangle bounds of the object
   -- is inside the screen, the object is visible
   return (
-    isInside(objX, objY, {camX, camY, camW, camH}) or
-    isInside(objX + objW, objY, {camX, camY, camW, camH}) or
-    isInside(objX, objY + objH, {camX, camY, camW, camH}) or
-    isInside(objX + objW, objY + objH, {camX, camY, camW, camH})
+    isInside( objX, objY, {camX, camY, camW, camH} ) or
+    isInside( objX + objW, objY, {camX, camY, camW, camH} ) or
+    isInside( objX, objY + objH, {camX, camY, camW, camH} ) or
+    isInside( objX + objW, objY + objH, {camX, camY, camW, camH} )
   )
 
 end

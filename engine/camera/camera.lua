@@ -9,24 +9,25 @@ class "Camera"
 function Camera:Camera()
   self.positionX = 0
   self.positionY = 0
-  self.scaleX = 1
-  self.scaleY = 1
+  self.scaleX    = 1
+  self.scaleY    = 1
 
   self.target = nil
 end
 
-function Camera:update(dt)
-  if (self.target ~=  nil) then
+function Camera:update( dt )
+  if ( self.target ~=  nil ) then
 
     local targetPosition = self.target:getPosition()
     local screenWidth, screenHeight = love.graphics.getDimensions()
-    self:setPosition(targetPosition.x - screenWidth / 2, targetPosition.y - screenHeight / 2)
+
+    self:setPosition( targetPosition.x - screenWidth / 2, targetPosition.y - screenHeight / 2 )
 
   end
 end
 
-function Camera:setTarget(newTarget)
-  if (newTarget.getPosition == nil) then
+function Camera:setTarget( newTarget )
+  if ( not newTarget.getPosition ) then
     print("Target has no getPosition method")
     return
   end
@@ -44,23 +45,24 @@ function Camera:unset()
   love.graphics.pop()
 end
 
-function Camera:move(incX, incY)
-  self.positionX = self.positionX + (incX or 0)
-  self.positionY = self.positionY + (incY or 0)
+function Camera:move( incX, incY )
+  self.positionX = self.positionX + ( incX or 0 )
+  self.positionY = self.positionY + ( incY or 0 )
 end
 
-function Camera:scale(changeScaleX, changeScaleY)
+function Camera:scale( changeScaleX, changeScaleY )
   changeScaleX = changeScaleX or 1
-  self.scaleX = self.scaleX * changeScaleX
-  self.scaleY = self.scaleY * (changeScaleY or changeScaleX)
+
+  self.scaleX  = self.scaleX * changeScaleX
+  self.scaleY  = self.scaleY * (changeScaleY or changeScaleX)
 end
 
-function Camera:setPosition(newX, newY)
+function Camera:setPosition( newX, newY )
   self.positionX = newX or self.positionX
   self.positionY = newY or self.positionY
 end
 
-function Camera:setScale(newScaleX, newScaleY)
+function Camera:setScale( newScaleX, newScaleY )
   self.scaleX = newScaleX or self.scaleX
   self.scaleY = newScaleY or self.scaleY
 end
@@ -69,16 +71,19 @@ function Camera:mousePosition()
   return love.mouse.getX() * self.scaleX + self.positionX, love.mouse.getY() * self.scaleY + self.positionY
 end
 
-function Camera:getVisibleArea(startXOffset, startYOffset, endXOffset, endYOffset)
+function Camera:getVisibleArea( startXOffset, startYOffset, endXOffset, endYOffset )
   startXOffset = startXOffset or 0
   startYOffset = startYOffset or 0
   endXOffset   = endXOffset or 0
   endYOffset   = endYOffset or 0
 
   local screenWidth, screenHeight = love.graphics.getDimensions()
+
+  --print (endYOffset * self.scaleY)
+
   return
-    self.positionX + startXOffset,
-    self.positionY + startYOffset,
-    screenWidth + endXOffset,
-    screenHeight + endYOffset
+    ( self.positionX + startXOffset * self.scaleX ),
+    ( self.positionY + startYOffset * self.scaleY ),
+    ( screenWidth + endXOffset * self.scaleX ),
+    ( screenHeight + endYOffset * self.scaleY )
 end

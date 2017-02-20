@@ -63,7 +63,7 @@ function Spider:updateAI( dt, game )
 
   end
 
-  self:walk( dt, game )
+  --self:walk( dt, game )
 
 end
 

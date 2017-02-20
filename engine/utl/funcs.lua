@@ -1,4 +1,5 @@
 
+
 normalizeVec = function(v1, v2)
 	local mag = sqrt(v1 * v1 + v2 * v2)
 

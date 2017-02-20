@@ -20,10 +20,8 @@ require("../engine/globalconf")
 local Vec = require("../engine/math/vector")
 
 local absfun = math.abs
-local floorfun = math.floor
 local ceilfun = math.ceil
 local maxfun = math.max
-local minfun = math.min
 
 class "NavMap"
 
@@ -43,16 +41,10 @@ function NavMap:getRadius()
   return self.radius
 end
 
-function NavMap:addCell( ccol, crow, cx, cy, cw, ch )
-  -- column, line, x, y, width, height, iswalkable, f, g, h
-  table.insert( self.cells, { col = ccol, row = crow, x = cx, y = cy, w = cw, h = ch, walkable = true } )
-
-end
-
 function NavMap:generateFromNavMesh( navmesh, radius )
   self.grid = {}
 
-  local obstacles = navmesh:getObstacles()
+  local obsColliders = navmesh:getObstacleColliders()
   self.bounds = navmesh:getBounds()
 
   local cols = ceilfun( ( self.bounds[3] - self.bounds[1]) / radius )
@@ -69,6 +61,28 @@ function NavMap:generateFromNavMesh( navmesh, radius )
     end
 
   end
+
+  --//TODO remove
+  self.grid[7][5] = 1
+  self.grid[7][6] = 1
+  self.grid[7][7] = 1
+  self.grid[7][8] = 1
+  self.grid[7][9] = 1
+  self.grid[7][10] = 1
+
+  self.grid[8][5] = 1
+  self.grid[8][6] = 1
+  self.grid[8][7] = 1
+  self.grid[8][8] = 1
+  self.grid[8][9] = 1
+  self.grid[8][10] = 1
+
+  self.grid[9][5] = 1
+  self.grid[9][6] = 1
+  self.grid[9][7] = 1
+  self.grid[10][5] = 1
+  self.grid[10][6] = 1
+  self.grid[10][7] = 1
 
   --//TODO add obstacles, mark places as unwalkable
 end
@@ -92,18 +106,33 @@ end
 
 function NavMap:draw()
 
+  if ( not glob.devMode.drawNavMap ) then
+    return
+  end
+
   --//TODO remove or comment
 
   for i = 1, #self.grid do
+
     for j = 1, #self.grid[i] do
-      --[[
+
       love.graphics.rectangle("line",
-          self.bounds[1] + ((i - 1) * self.radius),
-          self.bounds[2] + ((j - 1) * self.radius),
+          self.bounds[1] + ((j - 1) * self.radius),
+          self.bounds[2] + ((i - 1) * self.radius),
           self.radius,
           self.radius)
-          ]]
+
+      if ( self.grid[i][j] == 1 ) then
+        love.graphics.line(
+          self.bounds[1] + ((j - 1) * self.radius),
+          self.bounds[2] + ((i - 1) * self.radius),
+          self.bounds[1] + ((j - 1) * self.radius) + self.radius,
+          self.bounds[2] + ((i - 1) * self.radius) + self.radius
+        )
+      end
+
     end
+
   end
 
 end

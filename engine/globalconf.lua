@@ -9,6 +9,7 @@ glob = {
     showFPS          = true,
     drawColliders    = true,
     drawNavMesh      = true,
+    drawNavMap       = true,
     drawBoundingBox  = true,
     lightsActive     = false,
     disableDamage    = false,
@@ -45,6 +46,11 @@ glob = {
       if ( key == "kp4" ) then
         glob.devMode.lightsActive = not glob.devMode.lightsActive
         print(" DEV:: Lights are active = " .. tostring(glob.devMode.lightsActive))
+      end
+
+      if ( key == "kp5" ) then
+        glob.devMode.drawNavMap = not glob.devMode.drawNavMap
+        print(" DEV:: Draw NavMap = " .. tostring(glob.devMode.drawNavMap))
       end
 
     end

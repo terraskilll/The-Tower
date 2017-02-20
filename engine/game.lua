@@ -65,7 +65,9 @@ function Game:configure()
   self.camera = Camera()
   self.camera:setScale( ww / 1280, wh / 720 )
 
-  self.drawManager      = DrawManager( self.camera )
+  self.drawManager = DrawManager( self.camera )
+  self.drawManager:setScale( ww / 1280, wh / 720 )
+
   self.collisionManager = CollisionManager()
 
   Input.overallListener = Game
@@ -113,14 +115,14 @@ end
 
 function Game:addScreen( screenName, screen )
 
-  if ( self.screens[screenName] == nil) then
+  if ( self.screens[screenName] ) then
 
-    self.screens[screenName] = screen
-    print("Screen Added: " .. screenName)
+    print("Screen already exists: " .. screenName)
 
   else
 
-    print("Screen already exists: " .. screenName)
+    self.screens[screenName] = screen
+    print("Screen Added: " .. screenName)
 
   end
 end
@@ -130,9 +132,10 @@ function Game:changeResolution( resolutionWidth, resolutionHeight, setFullScreen
     setFullScreen = false
   end
 
-  love.window.setMode(resolutionWidth, resolutionHeight, {fullscreen = setFullScreen})
+  love.window.setMode( resolutionWidth, resolutionHeight, {fullscreen = setFullScreen} )
 
-  self.camera:setScale(resolutionWidth / 1280, resolutionHeight / 720)
+  self.camera:setScale( resolutionWidth / 1280, resolutionHeight / 720 )
+  self.drawManager:setScale( resolutionWidth / 1280, resolutionHeight / 720 )
 
   config.gameScreenWidth  = resolutionWidth
   config.gameScreenHeight = resolutionHeight

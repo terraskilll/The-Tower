@@ -16,7 +16,7 @@ function CircleCollider:CircleCollider( x, y, r, offX, offY, s )
 
   self.owner = nil
 
-  self.name = "Void Circle "
+  self.name = "Circle Collider "
 end
 
 function CircleCollider:update( dt )
@@ -55,7 +55,7 @@ function CircleCollider:draw()
       self.positionY + self.offsetY * self.scale,
       self.radius * self.scale)
 
-    love.graphics.setColor(glob.defaultColor)
+    love.graphics.setColor( glob.defaultColor )
   end
 end
 
@@ -86,7 +86,7 @@ end
 function CircleCollider:collisionEnter( otherCollider )
 
   if ( self:getOwner() == nil )  then
-    --print(self.name .. " has no owner")
+    print(self.name .. " has no owner")
     return
   end
 
@@ -94,6 +94,14 @@ function CircleCollider:collisionEnter( otherCollider )
     self.owner:onCollisionEnter( otherCollider )
   end
 
+end
+
+function CircleCollider:getBounds()
+  return
+      self.positionX + self.offsetX - self.radius * self.scale,
+      self.positionY + self.offsetY - self.radius * self.scale,
+      self.radius * 2,
+      self.radius * 2
 end
 
 function CircleCollider:clone()

@@ -183,14 +183,14 @@ function Input:joystickReleased(joystick, button)
   if joystick:getID() == Input.joyid then
 
     if (Input.currentScreenListener.joystickReleased ~= nil) then
-      Input.currentScreenListener:joystickReleased(joystick, button)
+      Input.currentScreenListener:joystickReleased( joystick, button )
     end
 
   end
 end
 
 function Input:getAxis()
-  return Vec(Input.axis.x, Input.axis.y)
+  return Vec( Input.axis.x, Input.axis.y )
 end
 
 function Input:isInputByKeyboard()

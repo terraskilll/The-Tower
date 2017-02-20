@@ -119,7 +119,7 @@ end
 function NavAgent:findPathTo( targetPosition )
   self.path = {}
 
-  local agentRow, agentCol    = self.navmap:getAgentCurrentCell( self.position.x, self.position.y , self.radius )
+  local agentRow, agentCol    = self.navmap:getAgentCurrentCell( self.position.x + self.offsetX, self.position.y + self.offsetY, self.radius )
   local targetRow, targetCol  = self.navmap:getAgentCurrentCell( targetPosition.x, targetPosition.y, self.radius )
 
   local grid = Grid( self.navmap:getGrid() )
@@ -130,7 +130,6 @@ function NavAgent:findPathTo( targetPosition )
   if ( p ) then
 
     for node, count in p:nodes() do
-      --print( node.y .. " " .. node.x )
 
       table.insert( self.path, { row = node.y, col = node.x } )
 
@@ -173,16 +172,13 @@ function NavAgent:nextPointInPath()
 
   if ( #self.path > 0 ) then
     local pt = table.remove( self.path, 1 )
-    --print(pt.col .. " " .. pt.row)
 
     local bd = self.navmesh:getBounds()
 
     local xm = bd[1] + ( pt.col - 1 ) * self.radius
     local ym = bd[2] + ( pt.row - 1 ) * self.radius
 
-    --print(xm .. " " .. ym)
-
-    next:set( xm, ym )
+    next:set( xm + self.radius, ym + self.radius )
   end
 
   return next
@@ -205,13 +201,15 @@ end
 
 function NavAgent:drawPath()
 
+  if (not glob.devMode.drawNavMesh) then
+    return
+  end
+
   if ( #self.path == 0) then
     return
   end
 
   local bd = self.navmesh:getBounds()
-
-  print(#self.path)
 
   local p = self.path[1]
 
