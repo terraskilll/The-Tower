@@ -4,16 +4,16 @@ require("../engine/gameobject/actor")
 require("../engine/fsm/fsm")
 require("../engine/collision/boxcollider")
 require("../engine/collision/circlecollider")
+require("../engine/ai/fov")
 
 local Vec = require("../engine/math/vector")
 
-class "Spider" ("Actor")
+class "Celebrity" ("Actor")
 
-function Spider:Spider( spiderName, positionX, positionY )
-  self.name      = spiderName
+function Celebrity:Celebrity( actorName, positionX, positionY )
+  self.name      = actorName
   self.position  = Vec( positionX, positionY )
   self.direction = Vec( 0, 0 )
-  self.speed     = 70
 
   self.fsm         = nil
   self.map         = nil
@@ -29,19 +29,21 @@ function Spider:Spider( spiderName, positionX, positionY )
   --//TODO add states and animations
 end
 
-function Spider:setTarget( targetActor )
+function Celebrity:setTarget( targetActor )
   self.target = targetActor
 end
 
-function Spider:update( dt, game )
+function Celebrity:update( dt, game )
 
   --//TODO movement in state
   self:updateAI( dt, game )
 
   self.collider:update( dt )
+
+  self.fov:update( dt, self.direction ) --//TODO send walking angle
 end
 
-function Spider:updateAI( dt, game )
+function Celebrity:updateAI( dt, game )
   if( self.target ~= nil ) then
     local dist = self.position:distSqTo( self.target:getPosition() )
 
@@ -63,11 +65,11 @@ function Spider:updateAI( dt, game )
 
   end
 
-  --self:walk( dt, game )
+  self:walk( dt, game )
 
 end
 
-function Spider:draw()
+function Celebrity:draw()
   --//TODO animations
   --self.fsm:getCurrent():getAnimation():draw(self:getPositionXY())
 
@@ -81,15 +83,24 @@ function Spider:draw()
   self.collider:draw()
   self.navagent:draw()
   self.boundingbox:draw()
+  self.fov:draw()
 end
 
-function Spider:walk( dt, game )
-  local vv = self.navagent:nextStep()
+function Celebrity:walk( dt, game )
+  local nextPos = self.navagent:nextStep()
 
-  self.navagent:update( dt, vv, game:getCollisionManager() )
+  --self.navagent:update( dt, nextPos, game:getCollisionManager() )
+
+  self.direction = nextPos - self.position
+
+  self.direction:normalize()
+
+  if (self.name == "Spider2") then
+    print(self.direction)
+  end
 end
 
-function Spider:changePosition( movementVector )
+function Celebrity:changePosition( movementVector )
   self.position = self.position + movementVector
 
   self.collider:changePosition( movementVector.x, movementVector.y )
@@ -97,11 +108,11 @@ function Spider:changePosition( movementVector )
   self.navagent:changePosition( movementVector )
 end
 
-function Spider:getCollider()
+function Celebrity:getCollider()
   return self.collider
 end
 
-function Spider:configure()
+function Celebrity:configure()
   self.collider = CircleCollider( self.position.x, self.position.y, 36, 0, 4 )
   self.collider:setOwner( self )
   self.collider:setSolid( false )
@@ -110,4 +121,6 @@ function Spider:configure()
   self:setNavAgent( NavAgent(self, self.position.x, self.position.y, 30, 0, 12), 100 )
 
   self.boundingbox = BoundingBox(self.position.x, self.position.y, 88, 88, 0, -44, -44)
+
+  self.fov = FieldOfView(self.position.x, self.position.y, 90, 200)
 end

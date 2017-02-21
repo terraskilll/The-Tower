@@ -197,7 +197,7 @@ function MenuScreen:checkEditor()
 
     local editor = Editor()
 
-    self.game:setScreen( editor )
+    self.game:setCurrentScreen( editor:getName() )
 
   end
 end

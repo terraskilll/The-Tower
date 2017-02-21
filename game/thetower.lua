@@ -13,7 +13,7 @@ require("../game/screen/play")
 require("../game/screen/splash")
 
 require("../engine/game")
-require("../game/player/player")
+require("../game/actors/player/player")
 
 class "TheTower" ("Game")
 
@@ -21,6 +21,8 @@ function TheTower:TheTower()
   self.screens = {}
 
   self:configure()
+
+  self:addScreen( "EditorScreen", Editor() )
 
   self:addScreen( "MenuScreen", MenuScreen( self ) )
   self:addScreen( "PlayScreen", PlayScreen( self ) )

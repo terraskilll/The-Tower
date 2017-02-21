@@ -1,7 +1,6 @@
 require("../engine/lclass")
 
 require("../engine/input")
---require("../engine/gamemanager")
 require("../engine/ui/uigroup")
 require("../engine/ui/button/button")
 require("../engine/screen/screen")
@@ -21,7 +20,7 @@ require("../engine/navigation/navmap")
 
 require("../resources")
 
-require("../game/spider/spider")
+require("../game/actors/spider/spider")
 
 local Vec = require("../engine/math/vector")
 
@@ -220,7 +219,7 @@ function PlayScreen:createTestMap()
   floor:addSimpleObject( self.tree:getName(), self.tree )
 
   --local spawnpt = SpawnPoint( "Inicio", -550, 0 )
-  local spawnpt = SpawnPoint( "Inicio", -400, -100 )
+  local spawnpt = SpawnPoint( "Inicio", -500, -300 )
 
   floor:addSpawnPoint( spawnpt:getName(), spawnpt )
 
@@ -237,8 +236,8 @@ function PlayScreen:createTestMap()
   movingPlate:addPoint( Vec (-300, -100) )
   movingPlate:addPoint( Vec (200, -100) )
   movingPlate:addPoint( Vec (200, -5) )
-  movingPlate:setSpeed(150)
-  movingPlate:setDelays(1, 1, 1)
+  movingPlate:setSpeed( 150 )
+  movingPlate:setDelays( 1, 1, 1 )
 
   local plateNav = NavMesh()
   plateNav:addPoint(-300, -100)

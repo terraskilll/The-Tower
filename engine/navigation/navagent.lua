@@ -150,8 +150,6 @@ function NavAgent:nextStep()
 
     local dist = self.position:distSqTo( self.nextpoint )
 
-    --print( self.nextpoint.x )
-
     if ( dist < 1 ) then
 
       self.nextpoint = self:nextPointInPath()

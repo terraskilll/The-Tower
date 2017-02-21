@@ -1,13 +1,32 @@
 
+local Vec = require("../engine/math/vector")
 
-normalizeVec = function(v1, v2)
-	local mag = sqrt(v1 * v1 + v2 * v2)
+local sinfun = math.sin
+local cosfun = math.cos
+local atan2fun = math.atan2
+
+normalizeVec = function( v1, v2 )
+	local mag = sqrt( v1 * v1 + v2 * v2 )
 
 	if mag > 0 then
-    v1, v2 = v1/mag, v2/mag
+    v1, v2 = v1 / mag, v2 / mag
   end
 
   return v1, v2
+end
+
+rotateVec = function ( vector, angleInRadians )
+	local s = sinfun( angleInRadians );
+	local c = cosfun( angleInRadians );
+
+	local dx = vector.x * c - vector.y * s;
+	local dy = vector.x * s + vector.y * c;
+
+	return Vec( dx, dy );
+end
+
+angleBetween = function ( v1, v2 )
+  return atan2fun( v2.y - v1.y , v2.x - v1.x )
 end
 
 linesIntersectFunc = function ( x1, y1, x2, y2, x3, y3, x4, y4 )

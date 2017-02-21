@@ -1,5 +1,6 @@
 
 glob = {
+  engineVersion   = 100, --//TODO note: change this at each commit
   defaultFontSize = 12,
   defaultColor    = {255,255,255,255},
 
@@ -8,8 +9,8 @@ glob = {
     active           = false,
     showFPS          = true,
     drawColliders    = true,
-    drawNavMesh      = true,
-    drawNavMap       = true,
+    drawNavMesh      = false,
+    drawNavMap       = false,
     drawBoundingBox  = true,
     lightsActive     = false,
     disableDamage    = false,

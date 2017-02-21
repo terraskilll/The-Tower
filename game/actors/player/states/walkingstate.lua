@@ -1,6 +1,6 @@
 require("../engine/lclass")
 require("../engine/animation/animation")
-require("../game/player/animation/walkinganimation")
+require("../game/actors/player/animation/walkinganimation")
 
 require("../resources")
 

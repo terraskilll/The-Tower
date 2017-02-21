@@ -21,32 +21,33 @@ local options = {
 class "Editor" ("Screen")
 
 function Editor:Editor()
+  self.name = "EditorScreen"
   self.currentEditor = nil
 end
 
 function Editor:update(dt)
-  if (self.currentEditor ~= nil) then
-    self.currentEditor:update(dt)
+  if ( self.currentEditor ~= nil ) then
+    self.currentEditor:update( dt )
   else
     self:localUpdate(dt)
   end
 end
 
 function Editor:draw()
-  if (self.currentEditor ~= nil) then
+  if ( self.currentEditor ~= nil ) then
     self.currentEditor:draw()
   else
     self:localDraw()
   end
 end
 
-function Editor:localUpdate(dt)
+function Editor:localUpdate( dt )
 
 end
 
 function Editor:localDraw()
   for i = 1, #options do
-    love.graphics.print(options[i], 16, (i * 16) + 40)
+    love.graphics.print( options[i], 16, (i * 16) + 40 )
   end
 end
 
@@ -92,7 +93,8 @@ function Editor:checkKey(key, scancode, isrepeat)
   end
 
   if ( key == "f3" ) then
-
+    self.currentEditor = MapList(self)
+    self.currentEditor:onEnter()
   end
 
 end

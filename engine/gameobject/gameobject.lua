@@ -8,9 +8,10 @@ local Vec = require("../engine/math/vector")
 class "GameObject"
 
 function GameObject:GameObject( positionX, positionY )
-  self.position = Vec( positionX, positionY )
   self.name = "Unnamed Game Object"
   self.tag  = "None"
+
+  self.position = Vec( positionX, positionY )
 end
 
 function GameObject:getName()

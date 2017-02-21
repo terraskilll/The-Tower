@@ -10,8 +10,8 @@ require("../engine/input")
 class "Screen"
 
 function Screen:Screen()
-  self.game = nil
-  self.backgroundImage = nil
+  self.name   = "EmptyScreen"
+  self.game   = nil
   self.camera = nil
 end
 
@@ -39,8 +39,8 @@ function Screen:onExit()
   print("default Screen onexit function: need override")
 end
 
-function Screen:setBackgroundImage( imageToSet )
-  self.backgroundImage = imageToSet
+function Screen:getName()
+  return self.name
 end
 
 function Screen:setCamera( cameraToSet )

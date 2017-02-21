@@ -5,8 +5,8 @@ require("../engine/collision/boxcollider")
 require("../engine/collision/circlecollider")
 require("../engine/render/boundingbox")
 
-require("../game/player/states/iddlestate")
-require("../game/player/states/walkingstate")
+require("../game/actors/player/states/iddlestate")
+require("../game/actors/player/states/walkingstate")
 
 local Vec = require("../engine/math/vector")
 

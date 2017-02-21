@@ -81,6 +81,8 @@ function Camera:getVisibleArea( startXOffset, startYOffset, endXOffset, endYOffs
 
   --print (endYOffset * self.scaleY)
 
+  
+
   return
     ( self.positionX + startXOffset * self.scaleX ),
     ( self.positionY + startYOffset * self.scaleY ),

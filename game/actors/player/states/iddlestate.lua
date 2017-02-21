@@ -3,8 +3,8 @@ require("../engine/animation/animation")
 
 require("../resources")
 
-require("../game/player/animation/iddleanimation")
-require("../game/player/animation/noanimation") --//TODO
+require("../game/actors/player/animation/iddleanimation")
+require("../game/actors/player/animation/noanimation") --//TODO
 
 class "IddleState" ("State")
 

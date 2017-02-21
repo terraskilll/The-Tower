@@ -19,9 +19,7 @@ require("../engine/globalconf")
 
 local Vec = require("../engine/math/vector")
 
-local absfun = math.abs
-local ceilfun = math.ceil
-local maxfun = math.max
+local absfun, ceilfun, maxfun = math.abs, math.ceil, math.max
 
 class "NavMap"
 

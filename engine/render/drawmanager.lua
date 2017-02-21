@@ -182,6 +182,7 @@ function DrawManager:isInsideScreen( object )
   --print(camX .. " " .. camY .. " " .. camW .. " " .. camH)
 
   --//TODO how to do if object is bigger than screen?
+  -- check rectangleOverlap and https://love2d.org/forums/viewtopic.php?f=4&t=9281&hilit=field+of+view&sid=c46504dd91ead64328d64fd0359c84e8
 
   -- if at least one of the rectangle bounds of the object
   -- is inside the screen, the object is visible

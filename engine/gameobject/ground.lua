@@ -10,7 +10,8 @@ local Vec = require("../engine/math/vector")
 
 class "Ground" ("SimpleObject")
 
-function Ground:Ground(positionX, positionY, groundImage, groundQuad, objectScale)
+function Ground:Ground( groundName, positionX, positionY, groundImage, groundQuad, objectScale )
+  self.name     = groundName
   self.position = Vec(positionX, positionY)
   self.image    = groundImage
   self.quad     = groundQuad
