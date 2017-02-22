@@ -29,12 +29,12 @@ function Game:draw()
   self.currentScreen:draw()
 
   if ( glob.devMode.showFPS ) then
-    love.graphics.print("Current FPS: ".. tostring( love.timer.getFPS() ), 10, 10)
+    love.graphics.print( "Current FPS: ".. tostring( love.timer.getFPS() ), 10, 10 )
   end
 
 end
 
-function Game:onKeyPress(key, scancode, isrepeat)
+function Game:onKeyPress( key, scancode, isrepeat )
 	local consumed = false
 
 	if key == "escape" then
@@ -45,7 +45,19 @@ function Game:onKeyPress(key, scancode, isrepeat)
 	return consumed
 end
 
-function Game:onKeyRelease(key, scancode, isrepeat)
+function Game:onMousePress( x, y, button, scaleX, scaleY, istouch )
+  return false
+end
+
+function Game:onMouseRelease( x, y, button, scaleX, scaleY, istouch )
+  return false
+end
+
+function Game:onMouseMove( x, y, dx, dy, scaleX, scaleY, istouch )
+  return false
+end
+
+function Game:onKeyRelease( key, scancode, isrepeat )
 	return false
 end
 

@@ -14,6 +14,8 @@ in the ordering algorithm
 
 objects not in-game (ui elements, menu buttons) are not affected by this
 
+--//TODO add Area support, instead of drawing the whole map
+
 --//TODO use skiplist
 
 ]]--

@@ -96,7 +96,7 @@ function UIGroup:selectNext()
   self:desselectAll()
 
   if ( self.items[self.selectedIndex]:isEnabled() ) then
-    self.items[self.selectedIndex]:setSelected(true)
+    self.items[self.selectedIndex]:setSelected( true )
     self.loopCount = 0
   else
     self:checkLoop(1)
@@ -120,7 +120,7 @@ function UIGroup:selectPrevious()
   end
 end
 
-function UIGroup:checkLoop(whereToGo)
+function UIGroup:checkLoop( whereToGo )
   -- check "loops" (all buttons are disabled) and
   -- does not allow the buttongroup to lock in selectNext/selectPrevious
   if ( #self.items > 0 ) then
@@ -161,12 +161,60 @@ function UIGroup:desselectAll()
 
 end
 
-function UIGroup:joystickPressed(joystick, button, sender)
+function UIGroup:joystickPressed( joystick, button, sender )
 
   if ( button == 1 or button == 8 ) then
+
     if ( self.items[self.selectedIndex].onClick ) then
       self.items[self.selectedIndex]:onClick(sender)
     end
+
+  end
+
+end
+
+function UIGroup:mousePressed( x, y, button, scaleX, scaleY, sender )
+
+  if ( button == 1 ) then
+    self.items[self.selectedIndex]:onClick(sender)
+  end
+
+end
+
+function UIGroup:mouseReleased( x, y, button, scaleX, scaleY, sender )
+
+end
+
+function UIGroup:mouseMoved( x, y, dx, dy, scaleX, scaleY, sender )
+  local over = false
+
+  local sel = 0
+
+  local i = 1
+
+  for _,v in ipairs( self.items ) do
+    if ( not over ) then
+
+      over = v:checkMouseOver( x, y )
+
+      if ( over ) then
+        sel = i
+      end
+
+      i = i + 1
+
+    end
+
+  end
+
+  if ( over ) then
+
+    if ( self.items[sel]:isEnabled() ) then
+      self:desselectAll()
+      self.selectedIndex = sel
+      self.items[self.selectedIndex]:setSelected(true)
+    end
+
   end
 
 end

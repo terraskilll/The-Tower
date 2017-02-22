@@ -38,8 +38,8 @@ function Area:draw()
 
 end
 
-function Area:addFloor( floorName, floor )
-  self.floors[floorName] = floor
+function Area:addFloor( floor )
+  self.floors[floor:getName()] = floor
 end
 
 function Area:getFloors()
@@ -50,8 +50,8 @@ function Area:getFloorByName ( floorName )
   return self.floors[floorName]
 end
 
-function Area:addMovingObject( objectName, objectToAdd )
-  self.movingObjects[objectName] = objectToAdd
+function Area:addMovingObject( objectToAdd )
+  self.movingObjects[objectToAdd:getName()] = objectToAdd
 end
 
 function Area:getMovingObjects()
@@ -77,7 +77,7 @@ function Area:checkChangedNavMesh( objectPosition, objectMovement )
     end
   end
 
-  for _,mo in pairs(self.movingObjects) do
+  for _,mo in pairs( self.movingObjects ) do
     if ( mo:isWalkable() ) then
 
       isIn = mo:getNavMesh():isInside( pos.x, pos.y )

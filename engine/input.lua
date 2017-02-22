@@ -1,8 +1,6 @@
 --[[--
 
-
 Manages the command input in the game (keyboard, mouse, joystick)
-
 
 Receive the commands and sends them to the registered listeners
 
@@ -19,16 +17,16 @@ local sqrt   = math.sqrt
 local joyid = nil
 
 Input = {
-	overallListener = nil,
+	overallListener       = nil,
 	currentScreenListener = nil,
-	inputByKeyboard = true,
-  camera = nil,
-  joystick = nil,
-  joyOffset = 0.5,
-	axis = Vec(0,0)
+	inputByKeyboard       = true,
+  camera                = nil,
+  joystick              = nil,
+  joyOffset             = 0.5,
+	axis                  = Vec(0,0)
 }
 
-function Input:update(dt)
+function Input:update( dt )
 
   --//TODO general refactor
 
@@ -62,7 +60,6 @@ function Input:update(dt)
       else
         Input.axis.y = 1
       end
-
 
 		else
 			Input.axis.y = 0
@@ -135,38 +132,71 @@ end
 
 -- [[ MOUSE ]] --
 
-function Input:mousePressed(x, y, button, istouch)
-	mx, my = Input.camera:mousePosition() -- correct position by scale
+function Input:mousePressed( x, y, button, istouch )
+
+	--mx, my = Input.camera:mousePosition() --correct position by scale
+
+	local scaleX, scaleY = Input.camera:getScale()
+
+	if not Input.overallListener:onMousePress( x, y, button, scaleX, scaleY, istouch ) then
+
+		if ( Input.currentScreenListener.onMouseMove ) then
+			Input.currentScreenListener:onMousePress( x, y, button, scaleX, scaleY, istouch )
+		end
+
+	end
+
 end
 
-function Input:mouseReleased(x, y, button, istouch)
+function Input:mouseReleased( x, y, button, istouch )
 	mx, my = Input.camera:mousePosition() -- correct position by scale
+
+	local scaleX, scaleY = Input.camera:getScale()
+
+	if not Input.overallListener:onMouseRelease( x, y, button, scaleX, scaleY, istouch ) then
+
+		if ( Input.currentScreenListener.onMouseMove ) then
+			Input.currentScreenListener:onMouseRelease( x, y, button, scaleX, scaleY, istouch )
+		end
+
+	end
+
 end
 
-function Input.mouseMoved(x, y, dx, dy, istouch)
-	mx, my = Input.camera:mousePosition() -- correct position by scale
+function Input:mouseMoved( x, y, dx, dy )
+
+	local scaleX, scaleY = Input.camera:getScale()
+
+	if not Input.overallListener:onMouseMove( x, y, dx, dy ) then
+
+		if ( Input.currentScreenListener.onMouseMove ) then
+			Input.currentScreenListener:onMouseMove( x, y, dx, dy, scaleX, scaleY )
+		end
+
+	end
+
 end
 
-function Input.wheelMoved(x, y)
-	Input:checkJoysticksConnected()
+function Input:wheelMoved( xm, ym )
+
 end
 
 -- [[ JOYSTICK / GAMEPAD ]] --
 
-function Input:joystickAdded(joystick)
+function Input:joystickAdded( joystick )
 	local joysticks = love.joystick.getJoysticks()
-  Input.joystick = joysticks[1]
+  Input.joystick  = joysticks[1]
 
 	Input.joyid = joysticks[1]:getID()
 
 	--print("Joystick ID : " .. Input.joyid)
 end
 
-function Input:joystickRemoved(joystick)
+function Input:joystickRemoved( joystick )
 	-- TODO ?
 end
 
-function Input:joystickPressed(joystick, button)
+function Input:joystickPressed( joystick, button )
 	if joystick:getID() == Input.joyid then
 
 		Input.inputByKeyboard = false
@@ -179,10 +209,10 @@ function Input:joystickPressed(joystick, button)
 
 end
 
-function Input:joystickReleased(joystick, button)
+function Input:joystickReleased( joystick, button )
   if joystick:getID() == Input.joyid then
 
-    if (Input.currentScreenListener.joystickReleased ~= nil) then
+    if ( Input.currentScreenListener.joystickReleased ) then
       Input.currentScreenListener:joystickReleased( joystick, button )
     end
 

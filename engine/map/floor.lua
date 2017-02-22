@@ -37,16 +37,16 @@ function Floor:draw()
   self.navmesh:draw()
 end
 
-function Floor:addGround( groundName, ground )
-  self.grounds[groundName] = ground
+function Floor:addGround( ground )
+  self.grounds[ground:getName()] = ground
 end
 
-function Floor:addSpawnPoint( spanwName, spawnPoint )
-  self.spawns[spanwName] = spawnPoint
+function Floor:addSpawnPoint( spawnPoint )
+  self.spawns[spawnPoint:getName()] = spawnPoint
 end
 
-function Floor:addSimpleObject( objectName, simpleObjectToAdd )
-  self.simpleObjects[objectName] = simpleObjectToAdd
+function Floor:addSimpleObject( simpleObjectToAdd )
+  self.simpleObjects[simpleObjectToAdd:getName()] = simpleObjectToAdd
 
   if ( self.navmesh ~= nil ) then
     self.navmesh:addSimpleCollider( simpleObjectToAdd:getCollider() )

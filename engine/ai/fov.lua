@@ -58,8 +58,10 @@ function FieldOfView:update( dt )
 end
 
 function FieldOfView:draw()
-  love.graphics.line( self.position.x, self.position.y, self.tl.x, self.tl.y )
-  love.graphics.line( self.position.x, self.position.y, self.tr.x, self.tr.y )
+  if ( glob.devMode.drawFov ) then
+    love.graphics.line( self.position.x, self.position.y, self.tl.x, self.tl.y )
+    love.graphics.line( self.position.x, self.position.y, self.tr.x, self.tr.y )
+  end
 
   --love.graphics.line( self.position.x, self.position.y, xk + self.position.x , yk + self.position.y )
 end

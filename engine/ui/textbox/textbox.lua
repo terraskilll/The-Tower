@@ -27,13 +27,17 @@ function TextBox:TextBox(positionX, positionY, selectorScale)
 end
 
 function TextBox:onEnter()
-  love.keyboard.setTextInput(true)
+  love.keyboard.setTextInput( true )
 end
 
 function TextBox:onExit()
-  love.keyboard.setTextInput(false)
+  love.keyboard.setTextInput( false )
 end
 
 function TextBox:getText()
   return self.text
+end
+
+function TextBox:checkMouseOver( x, y )
+  return false
 end

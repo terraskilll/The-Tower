@@ -12,6 +12,7 @@ glob = {
     drawNavMesh      = false,
     drawNavMap       = false,
     drawBoundingBox  = true,
+    drawFov          = false,
     lightsActive     = false,
     disableDamage    = false,
     disableNormalMap = false,
@@ -52,6 +53,11 @@ glob = {
       if ( key == "kp5" ) then
         glob.devMode.drawNavMap = not glob.devMode.drawNavMap
         print(" DEV:: Draw NavMap = " .. tostring(glob.devMode.drawNavMap))
+      end
+
+      if ( key == "kp6" ) then
+        glob.devMode.drawFov = not glob.devMode.drawFov
+        print(" DEV:: Draw FOV = " .. tostring(glob.devMode.drawFov))
       end
 
     end

@@ -216,12 +216,12 @@ function ObjectList:removeSelected()
 end
 
 function ObjectList:doTextInput ( t )
-  if ( self.textInput ~= nil ) then
+  if ( self.textInput ) then
     self.textInput:input( t )
     return
   end
 
-  if (self.objectEditor ~= nil) then
+  if ( self.objectEditor ) then
     self.objectEditor:doTextInput( t )
     return
   end

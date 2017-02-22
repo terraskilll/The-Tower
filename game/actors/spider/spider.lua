@@ -95,9 +95,9 @@ function Spider:walk( dt, game )
 
   self.direction:normalize()
 
-  if (self.name == "Spider2") then
-    print(tostring(nextPos) .. " " .. tostring(self.direction))
-  end
+  --if (self.name == "Spider2") then
+    --print(tostring(nextPos) .. " " .. tostring(self.direction))
+  --end
 end
 
 function Spider:changePosition( movementVector )

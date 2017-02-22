@@ -14,48 +14,52 @@ function love.draw()
 	game:draw()
 end
 
-function love.update(dt)
-	game:update(dt)
+function love.update( dt )
+	game:update( dt )
 end
 
-function love.keypressed(key, scancode, isrepeat)
-	glob.devMode.check(key)
+function love.keypressed( key, scancode, isrepeat )
+	glob.devMode.check( key )
 
-  Input:keyPressed(key, scancode, isrepeat)
+  Input:keyPressed( key, scancode, isrepeat )
 end
 
-function love.keyreleased(key, scancode, isrepeat)
-	Input:keyReleased(key, scancode, isrepeat)
+function love.keyreleased( key, scancode, isrepeat )
+	Input:keyReleased( key, scancode, isrepeat )
 end
 
-function love.mousepressed(x, y, button, istouch)
-	Input:mousePressed(x, y, button, istouch)
+function love.mousepressed( x, y, button, istouch )
+	Input:mousePressed( x, y, button, istouch )
 end
 
-function love.mousereleased(x, y, button, istouch)
-	Input:mouseReleased(x, y, button, istouch)
+function love.mousereleased( x, y, button, istouch )
+	Input:mouseReleased( x, y, button, istouch )
 end
 
-function love.wheelmoved(x, y)
-	Input:wheelMoved(x, y)
+function love.mousemoved( x, y, dx, dy )
+	Input:mouseMoved( x, y, dx, dy )
 end
 
-function love.joystickadded(joystick)
-	Input:joystickAdded(joystick)
+function love.wheelmoved( x, y )
+	Input:wheelMoved( x, y )
 end
 
-function love.joystickremoved(joystick)
-	Input:joystickRemoved(joystick)
+function love.joystickadded( joystick )
+	Input:joystickAdded( joystick )
 end
 
-function love.joystickpressed(joystick, button)
-	Input:joystickPressed(joystick, button)
+function love.joystickremoved( joystick )
+	Input:joystickRemoved( joystick )
 end
 
-function love.joystickreleased(joystick, button)
-	Input:joystickReleased(joystick, button)
+function love.joystickpressed( joystick, button )
+	Input:joystickPressed( joystick, button )
 end
 
-function love.textinput(t)
-  Input:textInput( t ) --//TODO
+function love.joystickreleased( joystick, button )
+	Input:joystickReleased( joystick, button )
+end
+
+function love.textinput( t )
+  Input:textInput( t ) --//TODO refactor?
 end

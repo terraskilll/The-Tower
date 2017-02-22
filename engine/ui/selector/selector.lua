@@ -20,6 +20,8 @@ function Selector:Selector(positionX, positionY, captionText, selectorImage, sel
   self.caption    = captionText
   self.image      = selectorImage
   self.scale      = selectorScale or 1
+  self.width      = selectorImage:getWidth()
+  self.height     = selectorImage:getHeight()
 
   self.altDelay    = 0.16
   self.selected    = false
@@ -81,14 +83,14 @@ end
 
 function Selector:getPosition()
   if ( self.anchor ) then
-    local iw, ih = self.image:getDimensions()
-
-    local px, py = getAnchoredPosition(self.anchor, self.position.x, self.position.y, self.offsetX, self.offsetY, iw, ih, self.scale)
-
-    return px, py
+    return self:getPositionByAnchor()
   else
     return self.position.x, self.position.y
   end
+end
+
+function Selector:getPositionByAnchor()
+  return getAnchoredPosition( self.anchor, self.position.x, self.position.y, self.offsetX, self.offsetY, self.width, self.height, self.scale )
 end
 
 function Selector:drawText()
@@ -182,4 +184,8 @@ end
 
 function Selector:getValue()
   return self.currentValue
+end
+
+function Selector:checkMouseOver( x, y )
+  return false
 end

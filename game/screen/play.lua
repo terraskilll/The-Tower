@@ -182,57 +182,57 @@ end
 
 function PlayScreen:createTestMap()
   --//TODO remove
-  local floor = Floor("TestFloor")
+  local floor = Floor( "TestFloor" )
 
-  floor:addGround("grd1", Ground(100, 100, i_deffloor))
-  floor:addGround("grd2", Ground(300, 100, i_deffloor))
-  floor:addGround("grd3", Ground(500, 100, i_deffloor))
-  floor:addGround("grd4", Ground(700, 100, i_deffloor))
+  floor:addGround( Ground( "grd1", 100, 100, i_deffloor ) )
+  floor:addGround( Ground( "grd2", 300, 100, i_deffloor ) )
+  floor:addGround( Ground( "grd3", 500, 100, i_deffloor ) )
+  floor:addGround( Ground( "grd4", 700, 100, i_deffloor ) )
 
-  floor:addGround("grd5", Ground(100, 300, i_deffloor))
-  floor:addGround("grd6", Ground(300, 300, i_deffloor))
-  floor:addGround("grd7", Ground(500, 300, i_deffloor))
-  floor:addGround("grd8", Ground(700, 400, i_deffloor))
+  floor:addGround( Ground( "grd5", 100, 300, i_deffloor ) )
+  floor:addGround( Ground( "grd6", 300, 300, i_deffloor ) )
+  floor:addGround( Ground( "grd7", 500, 300, i_deffloor ) )
+  floor:addGround( Ground( "grd8", 700, 400, i_deffloor ) )
 
   local nav = NavMesh()
 
-  nav:addPoint(110, 110)
-  nav:addPoint(110, 490)
-  nav:addPoint(710, 490)
-  nav:addPoint(710, 590)
-  nav:addPoint(890, 590)
+  nav:addPoint( 110, 110 )
+  nav:addPoint( 110, 490 )
+  nav:addPoint( 710, 490 )
+  nav:addPoint( 710, 590 )
+  nav:addPoint( 890, 590 )
 
-  nav:addPoint(890, 410)
-  nav:addPoint(690, 410)
-  nav:addPoint(690, 290)
-  nav:addPoint(890, 290)
-  nav:addPoint(890, 110)
+  nav:addPoint( 890, 410 )
+  nav:addPoint( 690, 410 )
+  nav:addPoint( 690, 290 )
+  nav:addPoint( 890, 290 )
+  nav:addPoint( 890, 110 )
 
   floor:setNavMesh(nav)
 
-  local collTree = BoxCollider(400, 300, 20, 22, 23, 42)
+  local collTree = BoxCollider( 400, 300, 20, 22, 23, 42 )
 
   self.tree = SimpleObject( "onetree", 400, 300, i__tree )
-  self.tree:setBoundingBox( BoundingBox(400, 300, 60, 64, 0, 2, 0) )
+  self.tree:setBoundingBox( BoundingBox( 400, 300, 60, 64, 0, 2, 0 ) )
   self.tree:setCollider( collTree )
 
-  floor:addSimpleObject( self.tree:getName(), self.tree )
+  floor:addSimpleObject( self.tree )
 
   --local spawnpt = SpawnPoint( "Inicio", -550, 0 )
   local spawnpt = SpawnPoint( "Inicio", -500, -300 )
 
-  floor:addSpawnPoint( spawnpt:getName(), spawnpt )
+  floor:addSpawnPoint( spawnpt )
 
-  local area = Area("TestArea")
+  local area = Area( "TestArea" )
 
-  area:addFloor( floor:getName(), floor )
+  area:addFloor( floor )
 
-  local mapa = Map("TestMap")
+  local mapa = Map( "TestMap" )
 
-  mapa:addArea(area:getName(), area)
-  mapa:setCurrentAreaByName("TestArea")
+  mapa:addArea( area:getName(), area )
+  mapa:setCurrentAreaByName( "TestArea" )
 
-  local movingPlate = MovingObject("Moving", -300, -100, i__mov)
+  local movingPlate = MovingObject( "Moving", -300, -100, i__mov )
   movingPlate:addPoint( Vec (-300, -100) )
   movingPlate:addPoint( Vec (200, -100) )
   movingPlate:addPoint( Vec (200, -5) )
@@ -240,44 +240,44 @@ function PlayScreen:createTestMap()
   movingPlate:setDelays( 1, 1, 1 )
 
   local plateNav = NavMesh()
-  plateNav:addPoint(-300, -100)
-  plateNav:addPoint(-172, -100)
-  plateNav:addPoint(-172, 28)
-  plateNav:addPoint(-300, 28)
+  plateNav:addPoint( -300, -100 )
+  plateNav:addPoint( -172, -100 )
+  plateNav:addPoint( -172, 28 )
+  plateNav:addPoint( -300, 28 )
 
   plateNav:setMobile( true )
 
   movingPlate:setNavMesh( plateNav )
 
-  area:addMovingObject( movingPlate:getName(), movingPlate )
+  area:addMovingObject( movingPlate )
 
   -- another floor
-  local farFloor = Floor("FarFloor")
+  local farFloor = Floor( "FarFloor" )
 
-  farFloor:addGround("grd100", Ground(-450, -100, i_deffloor))
-  farFloor:addGround("grd101", Ground(-650, -100, i_deffloor))
-  farFloor:addGround("grd103", Ground(-850, -100, i_deffloor))
-  farFloor:addGround("grd104", Ground(-450, -300, i_deffloor))
-  farFloor:addGround("grd105", Ground(-650, -300, i_deffloor))
-  farFloor:addGround("grd106", Ground(-850, -300, i_deffloor))
+  farFloor:addGround( Ground( "grd100", -450, -100, i_deffloor ) )
+  farFloor:addGround( Ground( "grd101", -650, -100, i_deffloor ) )
+  farFloor:addGround( Ground( "grd103", -850, -100, i_deffloor ) )
+  farFloor:addGround( Ground( "grd104", -450, -300, i_deffloor ) )
+  farFloor:addGround( Ground( "grd105", -650, -300, i_deffloor ) )
+  farFloor:addGround( Ground( "grd106", -850, -300, i_deffloor ) )
 
-  farFloor:addGround("grd107", Ground(-450, -500, i_deffloor))
-  farFloor:addGround("grd108", Ground(-650, -500, i_deffloor))
-  farFloor:addGround("grd109", Ground(-850, -500, i_deffloor))
-  farFloor:addGround("grd110", Ground(-450, -700, i_deffloor))
-  farFloor:addGround("grd111", Ground(-650, -700, i_deffloor))
-  farFloor:addGround("grd112", Ground(-850, -700, i_deffloor))
+  farFloor:addGround( Ground( "grd107", -450, -500, i_deffloor ) )
+  farFloor:addGround( Ground( "grd108", -650, -500, i_deffloor ) )
+  farFloor:addGround( Ground( "grd109", -850, -500, i_deffloor ) )
+  farFloor:addGround( Ground( "grd110", -450, -700, i_deffloor ) )
+  farFloor:addGround( Ground( "grd111", -650, -700, i_deffloor ) )
+  farFloor:addGround( Ground( "grd112", -850, -700, i_deffloor ) )
 
   local farNav = NavMesh()
 
-  farNav:addPoint(-840, -690)
-  farNav:addPoint(-260, -690)
-  farNav:addPoint(-260, 90)
-  farNav:addPoint(-840, 90)
+  farNav:addPoint( -840, -690 )
+  farNav:addPoint( -260, -690 )
+  farNav:addPoint( -260, 90 )
+  farNav:addPoint( -840, 90 )
 
   farFloor:setNavMesh( farNav )
 
-  area:addFloor( farFloor:getName(), farFloor)
+  area:addFloor( farFloor)
 
   --local m = nil
   -- lots of trees:

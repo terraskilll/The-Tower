@@ -21,6 +21,8 @@ function Button:Button( positionX, positionY, buttonText, buttonImage, buttonSca
   self.text     = buttonText
   self.image    = buttonImage
   self.scale    = buttonScale or 1
+  self.width    = buttonImage:getWidth()
+  self.height   = buttonImage:getHeight()
 
   self.selected = false
   self.enabled  = true
@@ -87,11 +89,7 @@ function Button:getPosition()
 
   if ( self.anchor ) then
 
-    local iw, ih = self.image:getDimensions()
-
-    local px, py = getAnchoredPosition( self.anchor, self.position.x, self.position.y, self.offsetX, self.offsetY, iw, ih, self.scale )
-
-    return px, py
+    return self:getPositionByAnchor()
 
   else
 
@@ -101,10 +99,30 @@ function Button:getPosition()
 
 end
 
+function Button:getPositionByAnchor()
+  return getAnchoredPosition( self.anchor, self.position.x, self.position.y, self.offsetX, self.offsetY, self.width, self.height, self.scale )
+end
+
 function Button:onClick( sender )
 
   if ( self.onButtonClick ~= nil ) then
     self:onButtonClick( sender )
   end
 
+end
+
+function Button:checkMouseOver( x, y )
+  local xi, yi = self.position.x, self.position.y
+
+  if ( self.anchor ) then
+    xi, yi = self:getPositionByAnchor()
+  end
+
+  local isover =
+    xi <= x and
+    yi <= y and
+    xi + self.width * self.scale >= x and
+    yi + self.height * self.scale >= y
+
+  return isover
 end

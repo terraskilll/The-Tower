@@ -11,8 +11,8 @@ local modfun = math.fmod
 local floorfun = math.floor
 
 local options = {
-  "F1 - Create Map",
-  "F2 - Edit Properties",
+  "F1 - New Map",
+  "F2 - Edit Name",
   "F3 - Remove Map",
   "",
   "F4 - Edit Map",
@@ -79,11 +79,11 @@ function MapList:update(dt)
 end
 
 function MapList:draw()
-  if ( self.textInput ~= nil ) then
+  if ( self.textInput ) then
 
     self.textInput:draw()
 
-  elseif ( self.mapEditor ~= nil ) then
+  elseif ( self.mapEditor ) then
       self.mapEditor:draw()
   else
     for i = 1, #options do
@@ -150,7 +150,7 @@ function MapList:onKeyPress( key, scancode, isrepeat )
     return
   end
 
-  if ( self.mapEditor ~= nil ) then
+  if ( self.mapEditor  ) then
     self.mapEditor:onKeyPress( key, scancode, isrepeat )
     return
   end
@@ -215,15 +215,16 @@ function MapList:removeSelected()
 end
 
 function MapList:doTextInput ( t )
-  if ( self.textInput ~= nil ) then
+  if ( self.textInput ) then
     self.textInput:input( t )
     return
   end
 
-  if (self.mapEditor ~= nil) then
+  if ( self.mapEditor ) then
     self.mapEditor:doTextInput( t )
     return
   end
+
 end
 
 function MapList:addMode()
@@ -245,7 +246,9 @@ function MapList:editSelected()
 
   self.mode = 4
 
-  self.mapEditor = MapEditor(self, mapindex, allmap[mapindex][1])
+  self.mapEditor = MapEditor( self, mapindex, allmaps[mapindex][1] )
+
+  self.mapEditor:onEnter()
 end
 
 function MapList:backFromEdit()

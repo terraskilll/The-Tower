@@ -86,6 +86,8 @@ function MenuScreen:MenuScreen( theGame )
   self.configMenu:addButton(self.applyOptionsButton)
   self.configMenu:addButton(self.creditsButton)
   self.configMenu:addButton(self.exitOptionsButton)
+
+  self.currentmenu = self.mainMenu
 end
 
 function MenuScreen:onEnter()
@@ -98,18 +100,8 @@ end
 
 function MenuScreen:onKeyPress(key, scancode, isrepeat)
 
-  if ( self.inMainMenu == true ) then
-
-    if ( key == "return" or key == "kpenter") then
-      self.mainMenu:keyPressed( key, self )
-    end
-
-  else
-
-    if ( key == "return" or key == "kpenter" or key == "left" or key == "right") then
-      self.configMenu:keyPressed( key, self )
-    end
-
+  if ( key == "return" or key == "kpenter" or key == "left" or key == "right") then
+    self.currentmenu:keyPressed( key, self )
   end
 
 end
@@ -121,40 +113,26 @@ end
 function MenuScreen:update(dt)
   self:checkEditor()
 
-  if ( self.inMainMenu == true) then
-    self.mainMenu:update( dt )
-  else
-    self.configMenu:update( dt )
+  self.currentmenu:update( dt )
 
-    if ( ( self.resolutionChange:haveChanged() == true ) or ( self.fullscreenMode:haveChanged() == true ) ) then
-      self.applyOptionsButton:setEnabled( true )
-    end
-
+  if ( ( self.resolutionChange:haveChanged() == true ) or ( self.fullscreenMode:haveChanged() == true ) ) then
+    self.applyOptionsButton:setEnabled( true )
   end
+
 end
 
 function MenuScreen:draw()
+
   if (self.backgroundImage) then
     self.backgroundImage:draw(self.light)
   end
 
-  if ( self.inMainMenu == true) then
-    self.mainMenu:draw()
-  else
-    self.configMenu:draw()
-  end
+  self.currentmenu:draw()
+
 end
 
 function MenuScreen:joystickPressed(joystick, button)
-   if (self.inMainMenu) then
-     self.mainMenu:joystickPressed(joystick, button, self)
-   else
-	   self.configMenu:joystickPressed(joystick, button, self)
-   end
-end
-
-function MenuScreen:setIsInMainMenu(isInMainMenu)
-  self.inMainMenu = isInMainMenu
+   self.currentmenu:joystickPressed( joystick, button, self )
 end
 
 function MenuScreen:startButtonClick(sender)
@@ -168,7 +146,7 @@ function MenuScreen:exitButtonClick( sender )
 end
 
 function MenuScreen:optionsButtonClick( sender )
-  sender:setIsInMainMenu( false )
+  sender.currentmenu = sender.configMenu
 end
 
 function MenuScreen:applyOptionsButtonClick( sender )
@@ -184,13 +162,33 @@ function MenuScreen:creditsButtonClick( sender )
 end
 
 function MenuScreen:exitOptionsButtonClick( sender )
-  sender:setIsInMainMenu( true )
+  sender.currentmenu = sender.mainMenu
 end
 
 function MenuScreen:selectorOnChange( sender )
   sender.applyOptionsButton:setEnabled( true )
 end
 
+function MenuScreen:onMousePress( x, y, button, scaleX, scaleY, istouch )
+
+  self.currentmenu:mousePressed( x, y, button, scaleX, scaleY, self )
+
+  return false
+end
+
+function MenuScreen:onMouseRelease( x, y, button, scaleX, scaleY, istouch )
+
+  self.currentmenu:mouseReleased( x, y, button, scaleX, scaleY, self )
+
+  return false
+end
+
+function MenuScreen:onMouseMove( x, y, dx, dy, scaleX, scaleY )
+
+  self.currentmenu:mouseMoved( x, y, dx, dy, scaleX, scaleY, self )
+
+  return false
+end
 
 function MenuScreen:checkEditor()
   if ( Input:isKeyDown("lctrl") and Input:isKeyDown("f8") ) then

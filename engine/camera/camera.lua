@@ -67,6 +67,10 @@ function Camera:setScale( newScaleX, newScaleY )
   self.scaleY = newScaleY or self.scaleY
 end
 
+function Camera:getScale()
+  return self.scaleX , self.scaleY
+end
+
 function Camera:mousePosition()
   return love.mouse.getX() * self.scaleX + self.positionX, love.mouse.getY() * self.scaleY + self.positionY
 end
@@ -81,7 +85,7 @@ function Camera:getVisibleArea( startXOffset, startYOffset, endXOffset, endYOffs
 
   --print (endYOffset * self.scaleY)
 
-  
+
 
   return
     ( self.positionX + startXOffset * self.scaleX ),
