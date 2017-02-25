@@ -28,14 +28,14 @@ function Actor:Actor( actorName, positionX, positionY )
   self.navmap   = nil
 end
 
-function Actor:setMap( newMap, newArea, newFloor, spawnPoint )
+function Actor:setMap( newMap, newFloor, newArea, spawnPoint )
   self.map   = newMap
-  self.area  = newArea
   self.floor = newFloor
+  self.area  = newArea
 
   if ( self.navagent ) then
-    self.navagent:setArea( newArea )
-    self.navagent:setNavMesh( self.floor:getNavMesh() )
+    self.navagent:setFloor( newFloor )
+    self.navagent:setNavMesh( self.area:getNavMesh() )
   end
 
   if ( spawnPoint ~= nil ) then

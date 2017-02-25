@@ -23,6 +23,16 @@ function ResourceManager:load()
   if (allResources == nil) then
     allResources = {}
   end
+
+  return allResources
+end
+
+function ResourceManager:save( resources )
+  if ( resources ) then
+    allResources = resources
+  end
+
+  saveFile("__resourcelist", allResources)
 end
 
 function ResourceManager:getResourceByIndex( resourceIndex )
@@ -30,6 +40,7 @@ function ResourceManager:getResourceByIndex( resourceIndex )
 end
 
 function ResourceManager:getResourceByName( wantedResourceName )
+
   local resourceCount = #allResources
 
   for i = 1, resourceCount do
@@ -39,8 +50,13 @@ function ResourceManager:getResourceByName( wantedResourceName )
     end
 
   end
+
 end
 
-function ResourceManager:loadImage(filePath)
-  return love.graphics.newImage(filePath)
+function ResourceManager:loadImage( filePath )
+  return love.graphics.newImage( filePath )
+end
+
+function ResourceManager:loadSound( filepath )
+
 end

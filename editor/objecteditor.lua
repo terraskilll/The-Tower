@@ -144,7 +144,7 @@ function ObjectEditor:updateNone(dt)
 
 end
 
-function ObjectEditor:updateGetResource(dt)
+function ObjectEditor:updateGetResource( dt )
   if ( self.textInput:isFinished() ) then
 
     local resname, restype, respath = self.resourceManager:getResourceByName(self.textInput:getText())
@@ -554,20 +554,20 @@ function ObjectEditor:keypressEditCollider ( key )
   local cd = self.object.colldata
 
   if ( self.object.colltype == "box" ) then
-    self.object.collider = BoxCollider(cd[1] + 300, cd[2] + 100, cd[3], cd[4], cd[5], cd[6], cd[7])
+    self.object.collider = BoxCollider( cd[1] + 300, cd[2] + 100, cd[3], cd[4], cd[5], cd[6], cd[7] )
   else
-    self.object.collider = CircleCollider(cd[1] + 300, cd[2] + 100, cd[8], cd[5], cd[6], cd[7])
+    self.object.collider = CircleCollider( cd[1] + 300, cd[2] + 100, cd[8], cd[5], cd[6], cd[7] )
   end
 
 end
 
-function ObjectEditor:saveObject(objectFileName)
-  saveFile("__objects/" .. objectFileName, self.object)
+function ObjectEditor:saveObject( objectFileName )
+  saveFile( "__objects/" .. objectFileName, self.object )
 
-  print("Saved " .. self.name)
+  print( "Saved " .. self.name )
 end
 
-function ObjectEditor:loadObject(objectFileName)
+function ObjectEditor:loadObject( objectFileName )
 
   local obj, err = loadFile("__objects/" .. objectFileName)
 
@@ -578,9 +578,9 @@ function ObjectEditor:loadObject(objectFileName)
   else
     self.object = obj
 
-    local resname, restype, respath = self.resourceManager:getResourceByName(self.object.resourcename)
+    local resname, restype, respath = self.resourceManager:getResourceByName( self.object.resourcename )
 
-    self.image = self.resourceManager:loadImage(respath)
+    self.image = self.resourceManager:loadImage( respath )
 
     if ( self.object.quaddata ~= nil ) then
 
@@ -594,7 +594,7 @@ function ObjectEditor:loadObject(objectFileName)
 
       local bb = self.object.bboxdata
 
-      self.object.boundingbox = BoundingBox(bb[1] + 300, bb[2] + 100, bb[3], bb[4], bb[5], bb[6], bb[7], bb[8])
+      self.object.boundingbox = BoundingBox( bb[1] + 300, bb[2] + 100, bb[3], bb[4], bb[5], bb[6], bb[7], bb[8] )
 
     end
 
@@ -603,13 +603,13 @@ function ObjectEditor:loadObject(objectFileName)
       local cd = self.object.colldata
 
       if ( self.object.colltype == "box" ) then
-        self.object.collider = BoxCollider(cd[1] + 300, cd[2] + 100, cd[3], cd[4], cd[5], cd[6], cd[7])
+        self.object.collider = BoxCollider( cd[1] + 300, cd[2] + 100, cd[3], cd[4], cd[5], cd[6], cd[7] )
       else
-        self.object.collider = CircleCollider(cd[1] + 300, cd[2] + 100, cd[8], cd[5], cd[6], cd[7])
+        self.object.collider = CircleCollider( cd[1] + 300, cd[2] + 100, cd[8], cd[5], cd[6], cd[7] )
       end
 
     end
 
-    print("Loaded " .. objectFileName)
+    print( "Loaded " .. objectFileName )
   end
 end

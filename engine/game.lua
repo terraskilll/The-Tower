@@ -64,6 +64,7 @@ end
 function Game:configure()
   self:loadConfiguration()
 
+  -- window configuration
   if (config.setFullScreen == nil) then
     config.setFullScreen = false
   end
@@ -71,6 +72,8 @@ function Game:configure()
   local ww, wh = config.gameScreenWidth, config.gameScreenHeight
 
   love.window.setMode( ww, wh, config.gameIsFullScreen )
+
+  self.resourceManager = ResourceManager()
 
   self.player = Player( "PLAYER", 0, 0 )
 
@@ -103,6 +106,10 @@ end
 
 function Game:getCollisionManager()
   return self.collisionManager
+end
+
+function Game:getResourceManager()
+  return self.resourceManager
 end
 
 function Game:setCurrentScreen( screenName )
@@ -160,4 +167,8 @@ end
 
 function Game:loadConfiguration()
   config, err = loadFile("__config")
+end
+
+function Game:Message(str)
+  print(str)
 end

@@ -28,7 +28,7 @@ local sepiaShader = love.graphics.newShader("engine/shaders/sepia.glsl")
 
 class "PlayScreen" ("Screen")
 
-function PlayScreen:PlayScreen(game)
+function PlayScreen:PlayScreen( game )
   self.game   = game
   self.paused = false
 
@@ -38,7 +38,7 @@ function PlayScreen:PlayScreen(game)
 
   self.camera = game:getCamera()
   self.camera:setTarget( self.game:getPlayer() )
-  self.currentMap  = nil
+  self.currentMap = nil
 
   self.navmaps = {}
 
@@ -110,25 +110,25 @@ function PlayScreen:joystickPressed(joystick, button)
 
 end
 
-function PlayScreen:changeMap( newMap, newArea, newFloor, newSpawnPoint )
+function PlayScreen:changeMap( newMap, newFloor, newArea, newSpawnPoint )
   self.currentMap = newMap
-  self.game:getPlayer():setMap( newMap, newArea, newFloor, newSpawnPoint )
+  self.game:getPlayer():setMap( newMap, newFloor, newArea, newSpawnPoint )
 end
 
 function PlayScreen:createPauseMenu()
   self.pauseMenu = UIGroup()
 
-  local continueButton = Button(0, 0, "CONTINUAR", ib_uibutton1, 0.375)
-  continueButton:setAnchor(4, 15, 130)
+  local continueButton = Button( 0, 0, "CONTINUAR", ib_uibutton1, 0.375 )
+  continueButton:setAnchor( 4, 15, 130 )
 
-  local exitButton = Button(0, 0, "SAIR", ib_uibutton1, 0.375)
-  exitButton:setAnchor(4, 15, 75)
+  local exitButton = Button( 0, 0, "SAIR", ib_uibutton1, 0.375 )
+  exitButton:setAnchor( 4, 15, 75 )
   exitButton.onButtonClick = self.exitButtonClick
 
-  self.pauseMenu:addButton(continueButton)
-  self.pauseMenu:addButton(exitButton)
+  self.pauseMenu:addButton( continueButton )
+  self.pauseMenu:addButton( exitButton )
 
-  self.pauseMenu:setVisible(self.paused)
+  self.pauseMenu:setVisible( self.paused )
 end
 
 function PlayScreen:checkPause()
@@ -168,10 +168,6 @@ function PlayScreen:updateInGame( dt )
 
   self.game:getCollisionManager():checkCollisions()
 
-  if ( Input:isKeyDown("l") ) then
-    --self.enemies[2]:getNavAgent():findPathTo( self.game:getPlayer():getPosition() )
-  end
-
 end
 
 function PlayScreen:exitButtonClick( sender )
@@ -182,17 +178,17 @@ end
 
 function PlayScreen:createTestMap()
   --//TODO remove
-  local floor = Floor( "TestFloor" )
+  local area = Area( "TestArea" )
 
-  floor:addGround( Ground( "grd1", 100, 100, i_deffloor ) )
-  floor:addGround( Ground( "grd2", 300, 100, i_deffloor ) )
-  floor:addGround( Ground( "grd3", 500, 100, i_deffloor ) )
-  floor:addGround( Ground( "grd4", 700, 100, i_deffloor ) )
+  area:addGround( Ground( "grd1", 100, 100, i_deffloor ) )
+  area:addGround( Ground( "grd2", 300, 100, i_deffloor ) )
+  area:addGround( Ground( "grd3", 500, 100, i_deffloor ) )
+  area:addGround( Ground( "grd4", 700, 100, i_deffloor ) )
 
-  floor:addGround( Ground( "grd5", 100, 300, i_deffloor ) )
-  floor:addGround( Ground( "grd6", 300, 300, i_deffloor ) )
-  floor:addGround( Ground( "grd7", 500, 300, i_deffloor ) )
-  floor:addGround( Ground( "grd8", 700, 400, i_deffloor ) )
+  area:addGround( Ground( "grd5", 100, 300, i_deffloor ) )
+  area:addGround( Ground( "grd6", 300, 300, i_deffloor ) )
+  area:addGround( Ground( "grd7", 500, 300, i_deffloor ) )
+  area:addGround( Ground( "grd8", 700, 400, i_deffloor ) )
 
   local nav = NavMesh()
 
@@ -208,7 +204,7 @@ function PlayScreen:createTestMap()
   nav:addPoint( 890, 290 )
   nav:addPoint( 890, 110 )
 
-  floor:setNavMesh(nav)
+  area:setNavMesh( nav )
 
   local collTree = BoxCollider( 400, 300, 20, 22, 23, 42 )
 
@@ -216,21 +212,21 @@ function PlayScreen:createTestMap()
   self.tree:setBoundingBox( BoundingBox( 400, 300, 60, 64, 0, 2, 0 ) )
   self.tree:setCollider( collTree )
 
-  floor:addSimpleObject( self.tree )
+  area:addSimpleObject( self.tree )
 
   --local spawnpt = SpawnPoint( "Inicio", -550, 0 )
   local spawnpt = SpawnPoint( "Inicio", -500, -300 )
 
-  floor:addSpawnPoint( spawnpt )
+  area:addSpawnPoint( spawnpt )
 
-  local area = Area( "TestArea" )
+  local floor = Floor( "TestFloor" )
 
-  area:addFloor( floor )
+  floor:addArea( area )
 
   local mapa = Map( "TestMap" )
 
-  mapa:addArea( area:getName(), area )
-  mapa:setCurrentAreaByName( "TestArea" )
+  mapa:addFloor( floor )
+  mapa:setCurrentFloorByName( "TestFloor" )
 
   local movingPlate = MovingObject( "Moving", -300, -100, i__mov )
   movingPlate:addPoint( Vec (-300, -100) )
@@ -249,24 +245,24 @@ function PlayScreen:createTestMap()
 
   movingPlate:setNavMesh( plateNav )
 
-  area:addMovingObject( movingPlate )
+  floor:addMovingObject( movingPlate )
 
-  -- another floor
-  local farFloor = Floor( "FarFloor" )
+  -- another area
+  local farArea = Area( "FarArea" )
 
-  farFloor:addGround( Ground( "grd100", -450, -100, i_deffloor ) )
-  farFloor:addGround( Ground( "grd101", -650, -100, i_deffloor ) )
-  farFloor:addGround( Ground( "grd103", -850, -100, i_deffloor ) )
-  farFloor:addGround( Ground( "grd104", -450, -300, i_deffloor ) )
-  farFloor:addGround( Ground( "grd105", -650, -300, i_deffloor ) )
-  farFloor:addGround( Ground( "grd106", -850, -300, i_deffloor ) )
+  farArea:addGround( Ground( "grd100", -450, -100, i_deffloor ) )
+  farArea:addGround( Ground( "grd101", -650, -100, i_deffloor ) )
+  farArea:addGround( Ground( "grd103", -850, -100, i_deffloor ) )
+  farArea:addGround( Ground( "grd104", -450, -300, i_deffloor ) )
+  farArea:addGround( Ground( "grd105", -650, -300, i_deffloor ) )
+  farArea:addGround( Ground( "grd106", -850, -300, i_deffloor ) )
 
-  farFloor:addGround( Ground( "grd107", -450, -500, i_deffloor ) )
-  farFloor:addGround( Ground( "grd108", -650, -500, i_deffloor ) )
-  farFloor:addGround( Ground( "grd109", -850, -500, i_deffloor ) )
-  farFloor:addGround( Ground( "grd110", -450, -700, i_deffloor ) )
-  farFloor:addGround( Ground( "grd111", -650, -700, i_deffloor ) )
-  farFloor:addGround( Ground( "grd112", -850, -700, i_deffloor ) )
+  farArea:addGround( Ground( "grd107", -450, -500, i_deffloor ) )
+  farArea:addGround( Ground( "grd108", -650, -500, i_deffloor ) )
+  farArea:addGround( Ground( "grd109", -850, -500, i_deffloor ) )
+  farArea:addGround( Ground( "grd110", -450, -700, i_deffloor ) )
+  farArea:addGround( Ground( "grd111", -650, -700, i_deffloor ) )
+  farArea:addGround( Ground( "grd112", -850, -700, i_deffloor ) )
 
   local farNav = NavMesh()
 
@@ -275,9 +271,9 @@ function PlayScreen:createTestMap()
   farNav:addPoint( -260, 90 )
   farNav:addPoint( -840, 90 )
 
-  farFloor:setNavMesh( farNav )
+  farArea:setNavMesh( farNav )
 
-  area:addFloor( farFloor)
+  floor:addArea( farArea )
 
   --local m = nil
   -- lots of trees:
@@ -314,8 +310,8 @@ function PlayScreen:createTestMap()
   spider2:getNavAgent():setNavMap( navmap2 )
   navmap2:generateFromNavMesh( farNav, spider2:getNavAgent():getRadius() )
 
-  spider1:setMap( mapa, area, floor, nil )
-  spider2:setMap( mapa, area, farFloor, nil )
+  spider1:setMap( mapa, floor, area, nil )
+  spider2:setMap( mapa, floor, farArea, nil )
 
   table.insert( self.navmaps, navmap1 )
   table.insert( self.navmaps, navmap2 )
@@ -329,13 +325,13 @@ function PlayScreen:createTestMap()
   self.game:getDrawManager():addObject( self.tree )
   self.game:getDrawManager():addObject( spider1 )
   self.game:getDrawManager():addObject( spider2 )
-  self.game:getDrawManager():addAllFloors( area:getFloors() )
-  self.game:getDrawManager():addAllMovingObjects( area:getMovingObjects() )
+  self.game:getDrawManager():addAllAreas( floor:getAreas() )
+  self.game:getDrawManager():addAllMovingObjects( floor:getMovingObjects() )
 
   self.game:getCollisionManager():addCollider( self.game:getPlayer():getCollider() )
   self.game:getCollisionManager():addCollider( spider1:getCollider() )
   self.game:getCollisionManager():addCollider( spider2:getCollider() )
   self.game:getCollisionManager():addCollider( self.tree:getCollider() )
 
-  self:changeMap( mapa, area, floor, spawnpt )
+  self:changeMap( mapa, floor, area, spawnpt )
 end

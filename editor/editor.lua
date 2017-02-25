@@ -20,21 +20,23 @@ local options = {
 
 class "Editor" ("Screen")
 
-function Editor:Editor()
+function Editor:Editor( thegame )
+  self.game = thegame
   self.name = "EditorScreen"
   self.currentEditor = nil
+
 end
 
-function Editor:update(dt)
-  if ( self.currentEditor ~= nil ) then
+function Editor:update( dt )
+  if ( self.currentEditor  ) then
     self.currentEditor:update( dt )
   else
-    self:localUpdate(dt)
+    self:localUpdate( dt )
   end
 end
 
 function Editor:draw()
-  if ( self.currentEditor ~= nil ) then
+  if ( self.currentEditor ) then
     self.currentEditor:draw()
   else
     self:localDraw()
@@ -59,41 +61,71 @@ function Editor:onExit()
 
 end
 
-function Editor:onKeyPress(key, scancode, isrepeat)
-  if ( self.currentEditor ~= nil ) then
-    self.currentEditor:onKeyPress(key, scancode, isrepeat)
+function Editor:onKeyPress( key, scancode, isrepeat )
+  if ( self.currentEditor ) then
+    self.currentEditor:onKeyPress( key, scancode, isrepeat )
   else
-    self:checkKey(key, scancode, isrepeat)
+    self:checkKey( key, scancode, isrepeat )
   end
 end
 
-function Editor:onKeyRelease(key, scancode, isrepeat)
+function Editor:onKeyRelease( key, scancode, isrepeat )
 
 end
 
 function Editor:textInput( t )
-  if (self.currentEditor ~= nil) then
+  if (self.currentEditor ) then
 
-    if ( self.currentEditor.doTextInput ~= nil) then
+    if ( self.currentEditor.doTextInput ) then
       self.currentEditor:doTextInput( t )
     end
 
   end
 end
 
-function Editor:checkKey(key, scancode, isrepeat)
+function Editor:onMousePress( x, y, button, istouch )
+  if (self.currentEditor ) then
+
+    if ( self.currentEditor.onMousePress ) then
+      self.currentEditor:onMousePress( x, y, button, istouch )
+    end
+
+  end
+end
+
+function Editor:onMouseRelease( x, y, button, istouch )
+  if (self.currentEditor ) then
+
+    if ( self.currentEditor.onMousePress ) then
+      self.currentEditor:onMouseRelease( x, y, button, istouch )
+    end
+
+  end
+end
+
+function Editor:onMouseMove( x, y, dx, dy )
+  if (self.currentEditor ) then
+
+    if ( self.currentEditor.onMousePress ) then
+      self.currentEditor:onMouseRelease( x, y, dx, dy )
+    end
+
+  end
+end
+
+function Editor:checkKey( key, scancode, isrepeat )
   if ( key == "f1" ) then
-    self.currentEditor = ResourceList(self)
+    self.currentEditor = ResourceList( self, self.game )
     self.currentEditor:onEnter()
   end
 
   if ( key == "f2" ) then
-    self.currentEditor = ObjectList(self)
+    self.currentEditor = ObjectList( self, self.game )
     self.currentEditor:onEnter()
   end
 
   if ( key == "f3" ) then
-    self.currentEditor = MapList(self)
+    self.currentEditor = MapList( self, self.game )
     self.currentEditor:onEnter()
   end
 

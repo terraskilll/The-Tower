@@ -7,7 +7,7 @@ glob = {
   --//TODO revisit default configurations
   devMode = {
     active           = false,
-    showFPS          = true,
+    showFPS          = false,
     drawColliders    = true,
     drawNavMesh      = false,
     drawNavMap       = false,
@@ -30,6 +30,11 @@ glob = {
     end,
 
     keypress = function ( key )
+      if ( key == "kp0" ) then
+        glob.devMode.showFPS = not glob.devMode.showFPS
+        print(" DEV:: Show FPS = " .. tostring(glob.devMode.showFPS))
+      end
+
       if ( key == "kp1" ) then
         glob.devMode.drawColliders = not glob.devMode.drawColliders
         print(" DEV:: Draw Colliders = " .. tostring(glob.devMode.drawColliders))

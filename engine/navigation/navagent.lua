@@ -33,7 +33,7 @@ function NavAgent:NavAgent( agentOwner, posX, posY, agentRadius, offX, offY )
 
   self.navmesh = nil
   self.navmap  = nil
-  self.area    = nil
+  self.floor   = nil
 
   self.walkPath  = false
   self.path      = {}
@@ -49,12 +49,12 @@ function NavAgent:getNavMesh()
   return self.navmesh
 end
 
-function NavAgent:setNavMap( newNavMap )
-  self.navmap = newNavMap
+function NavAgent:setNavMap( navmapToSet )
+  self.navmap = navmapToSet
 end
 
-function NavAgent:setArea( newArea )
-  self.area = newArea
+function NavAgent:setFloor( floorToSet )
+  self.floor = floorToSet
 end
 
 function NavAgent:setSpeed( newSpeed )
@@ -78,7 +78,7 @@ function NavAgent:update( dt, axisVector, collisionManager )
   local movement = axisVector * dt * self.speed
 
   -- check if agent got into another navmesh
-  local changedNavMesh = self.area:checkChangedNavMesh( offsettedPosition, movement )
+  local changedNavMesh = self.floor:checkChangedNavMesh( offsettedPosition, movement )
 
   if ( changedNavMesh ~= nil ) and ( changedNavMesh ~= self.navmesh ) then
 

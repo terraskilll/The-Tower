@@ -26,6 +26,7 @@ local options = {
 class "MapList"
 
 function MapList:MapList( ownerEditor )
+  self.game      = thegame
   self.editor    = ownerEditor
 
   self.pageIndex = 1
@@ -206,6 +207,36 @@ function MapList:onKeyPress( key, scancode, isrepeat )
   end
 end
 
+function MapList:onMousePress( x, y, button, istouch )
+  if ( self.mapEditor ) then
+
+    if ( self.mapEditor.onMousePress ) then
+      self.mapEditor:onMousePress( x, y, button, istouch )
+    end
+
+  end
+end
+
+function MapList:onMouseRelease( x, y, button, istouch )
+  if ( self.mapEditor ) then
+
+    if ( self.mapEditor.onMousePress ) then
+      self.mapEditor:onMouseRelease( x, y, button, istouch )
+    end
+
+  end
+end
+
+function MapList:onMouseMove( x, y, dx, dy )
+  if ( self.mapEditor ) then
+
+    if ( self.mapEditor.onMousePress ) then
+      self.mapEditor:onMouseRelease( x, y, dx, dy )
+    end
+
+  end
+end
+
 function MapList:removeSelected()
   local delIndex = self.selIndex + ( self.pageIndex - 1 ) * 40
 
@@ -231,14 +262,14 @@ function MapList:addMode()
   self.tempData  = {}
   self.mode      = 1
   self.inputMode = 1
-  self.textInput = TextInput("Map Name:")
+  self.textInput = TextInput( "Map Name:" )
 end
 
 function MapList:editMode()
   self.tempData  = {}
   self.mode      = 2
   self.inputMode = 1
-  self.textInput = TextInput("Map Name:", allmaps[self.selIndex][1])
+  self.textInput = TextInput( "Map Name:", allmaps[self.selIndex][1] )
 end
 
 function MapList:editSelected()
@@ -260,7 +291,7 @@ function MapList:refreshList()
   self.selIndex  = 1
   self.pageIndex = 1
 
-  self.listStart = (self.pageIndex - 1) * 40 + 1
+  self.listStart = ( self.pageIndex - 1 ) * 40 + 1
 
   self.listEnd = self.listStart + 40 - 1
 
@@ -269,7 +300,7 @@ function MapList:refreshList()
   end
 end
 
-function MapList:selectPrevious(steps)
+function MapList:selectPrevious( steps )
   steps = steps or 1
 
   self.selIndex = self.selIndex - steps
@@ -279,7 +310,7 @@ function MapList:selectPrevious(steps)
   end
 end
 
-function MapList:selectNext(steps)
+function MapList:selectNext( steps )
   steps = steps or 1
 
   self.selIndex = self.selIndex + steps
@@ -324,4 +355,5 @@ function MapList:listDown()
   if (self.listEnd > #allmaps) then
     self.listEnd = #allmaps
   end
+
 end

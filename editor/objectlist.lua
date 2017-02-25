@@ -29,7 +29,8 @@ class "ObjectList"
 
 local allObjects = {}
 
-function ObjectList:ObjectList( ownerEditor )
+function ObjectList:ObjectList( ownerEditor, thegame )
+  self.game      = thegame
   self.editor    = ownerEditor
 
   self.pageIndex = 1
@@ -53,9 +54,10 @@ end
 function ObjectList:load()
   allObjects, err = loadFile("__objectlist")
 
-  if (allObjects == nil) then
+  if ( allObjects == nil ) then
     allObjects = {}
   end
+
 end
 
 function ObjectList:onEnter()

@@ -166,7 +166,7 @@ function UIGroup:joystickPressed( joystick, button, sender )
   if ( button == 1 or button == 8 ) then
 
     if ( self.items[self.selectedIndex].onClick ) then
-      self.items[self.selectedIndex]:onClick(sender)
+      self.items[self.selectedIndex]:onClick( sender )
     end
 
   end
@@ -174,9 +174,10 @@ function UIGroup:joystickPressed( joystick, button, sender )
 end
 
 function UIGroup:mousePressed( x, y, button, scaleX, scaleY, sender )
+  --//TODO check is mouse is over button before click
 
   if ( button == 1 ) then
-    self.items[self.selectedIndex]:onClick(sender)
+    self.items[self.selectedIndex]:onClick( sender )
   end
 
 end
@@ -212,7 +213,7 @@ function UIGroup:mouseMoved( x, y, dx, dy, scaleX, scaleY, sender )
     if ( self.items[sel]:isEnabled() ) then
       self:desselectAll()
       self.selectedIndex = sel
-      self.items[self.selectedIndex]:setSelected(true)
+      self.items[self.selectedIndex]:setSelected( true )
     end
 
   end

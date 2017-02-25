@@ -32,7 +32,8 @@ class "ResourceList"
 
 local allResources = {}
 
-function ResourceList:ResourceList(ownerEditor)
+function ResourceList:ResourceList( ownerEditor , thegame )
+  self.game      = thegame
   self.editor    = ownerEditor
 
   self.pageIndex = 1
@@ -48,19 +49,15 @@ function ResourceList:ResourceList(ownerEditor)
 end
 
 function ResourceList:addResource( resourceName, resourceType, resourcePath )
-  table.insert(allResources, { resourceName, resourceType, resourcePath })
+  table.insert(allResources, { resourceName, resourceType, resourcePath } )
 end
 
 function ResourceList:save()
-  saveFile("__resourcelist", allResources)
+  self.game:getResourceManager():save( allResources )
 end
 
 function ResourceList:load()
-  allResources, err = loadFile("__resourcelist")
-
-  if (allResources == nil) then
-    allResources = {}
-  end
+  allResources = self.game:getResourceManager():load()
 end
 
 function ResourceList:onEnter()
@@ -71,17 +68,17 @@ function ResourceList:onEnter()
 end
 
 function ResourceList:onExit()
-  --self:save()
+
 end
 
 function ResourceList:draw()
-  if ( self.textInput ~= nil ) then
+  if ( self.textInput ) then
 
     self.textInput:draw()
 
   else
     for i = 1, #options do
-      love.graphics.print(options[i], 16, (i * 16) + 40)
+      love.graphics.print( options[i], 16, (i * 16) + 40 )
     end
 
     self:drawResourceList()
@@ -91,35 +88,37 @@ end
 
 function ResourceList:drawResourceList()
 
-  love.graphics.setColor(0, 255, 100, 255)
-  love.graphics.print("Name", 200, 56)
-  love.graphics.print("Type", 400, 56)
-  love.graphics.print("Path", 600, 56)
-  love.graphics.setColor(glob.defaultColor)
+  love.graphics.setColor( 0, 255, 100, 255 )
+  love.graphics.print( "Name", 200, 56 )
+  love.graphics.print( "Type", 400, 56 )
+  love.graphics.print( "Path", 600, 56 )
+  love.graphics.setColor( glob.defaultColor )
 
-  love.graphics.setColor(255, 255, 255, 80)
-  love.graphics.rectangle("fill", 190, (self.selIndex * 16) + 56, 1000, 18)
-  love.graphics.setColor(glob.defaultColor)
+  love.graphics.setColor( 255, 255, 255, 80 )
+  love.graphics.rectangle( "fill", 190, (self.selIndex * 16) + 56, 1000, 18 )
+  love.graphics.setColor( glob.defaultColor )
 
   if ( #allResources == 0) then
     return
   end
 
   for i = self.listStart, self.listEnd do
-    love.graphics.print(allResources[i][1], 200, ( (i - self.listStart + 1) * 16) + 56)
-    love.graphics.print(allResources[i][2], 400, ( (i - self.listStart + 1) * 16) + 56)
-    love.graphics.print(allResources[i][3], 600, ( (i - self.listStart + 1) * 16) + 56)
+    love.graphics.print( allResources[i][1], 200, ( (i - self.listStart + 1) * 16) + 56 )
+    love.graphics.print( allResources[i][2], 400, ( (i - self.listStart + 1) * 16) + 56 )
+    love.graphics.print( allResources[i][3], 600, ( (i - self.listStart + 1) * 16) + 56 )
   end
 
 end
 
-function ResourceList:update(dt)
+function ResourceList:update( dt )
+
   if ( self.mode == 1 or self.mode == 2 ) then
     self:updateAddEdit(dt)
   end
+
 end
 
-function ResourceList:onKeyPress(key, scancode, isrepeat)
+function ResourceList:onKeyPress( key, scancode, isrepeat )
   if ( self.mode == 1 or self.mode == 2 ) then
     self.textInput:keypressed( key )
     return
@@ -183,13 +182,13 @@ function ResourceList:editMode()
   self.tempData  = {}
   self.mode      = 2
   self.inputMode = 1
-  self.textInput = TextInput("Resource Name:", allResources[self.selIndex][1])
+  self.textInput = TextInput( "Resource Name:", allResources[self.selIndex][1] )
 end
 
 function ResourceList:removeSelected()
   local delIndex = self.selIndex + ( self.pageIndex - 1 ) * 40
 
-  table.remove(allResources, delIndex)
+  table.remove( allResources, delIndex )
 
   self:refreshList()
 end
@@ -200,7 +199,7 @@ function ResourceList:doTextInput ( t )
   end
 end
 
-function ResourceList:updateAddEdit(dt)
+function ResourceList:updateAddEdit( dt )
   if ( self.textInput:isFinished() ) then
     self.inputMode = self.inputMode + 1
 
@@ -230,7 +229,7 @@ function ResourceList:updateAddEdit(dt)
       self.tempData[3] = self.textInput:getText()
 
       if ( self.mode == 1 ) then
-        table.insert(allResources, self.tempData)
+        table.insert( allResources, self.tempData )
       else
         allResources[self.selIndex] = self.tempData
       end
@@ -251,16 +250,16 @@ function ResourceList:refreshList()
   self.selIndex  = 1
   self.pageIndex = 1
 
-  self.listStart = (self.pageIndex - 1) * 40 + 1
+  self.listStart = ( self.pageIndex - 1 ) * 40 + 1
 
   self.listEnd = self.listStart + 40
 
-  if (self.listEnd > #allResources) then
+  if ( self.listEnd > #allResources ) then
     self.listEnd   = #allResources
   end
 end
 
-function ResourceList:selectPrevious(steps)
+function ResourceList:selectPrevious( steps )
   steps = steps or 1
 
   self.selIndex = self.selIndex - steps
@@ -270,7 +269,7 @@ function ResourceList:selectPrevious(steps)
   end
 end
 
-function ResourceList:selectNext(steps)
+function ResourceList:selectNext( steps )
   steps = steps or 1
 
   self.selIndex = self.selIndex + steps
@@ -280,7 +279,7 @@ function ResourceList:selectNext(steps)
     self.selIndex = 40
   end
 
-  if ( self.listEnd < self.selIndex) then
+  if ( self.listEnd < self.selIndex ) then
      self.selIndex = self.listEnd
   end
 end
@@ -292,11 +291,11 @@ function ResourceList:listUp()
     self.pageIndex = 1
   end
 
-  self.listStart = (self.pageIndex - 1) * 40 + 1
+  self.listStart = ( self.pageIndex - 1 ) * 40 + 1
 
   self.listEnd = self.listStart + 40 - 1
 
-  if (self.listEnd > #allResources) then
+  if ( self.listEnd > #allResources ) then
     self.listEnd   = #allResources
   end
 end
@@ -304,15 +303,15 @@ end
 function ResourceList:listDown()
   self.pageIndex = self.pageIndex + 1
 
-  if (self.pageIndex > modfun(#allResources, 40)) then
-    self.pageIndex = modfun(#allResources, 40)
+  if ( self.pageIndex > modfun( #allResources, 40 ) ) then
+    self.pageIndex = modfun( #allResources, 40 )
   end
 
   self.listStart = (self.pageIndex - 1) * 40 + 1
 
   self.listEnd = self.listStart + 40 - 1
 
-  if (self.listEnd > #allResources) then
+  if ( self.listEnd > #allResources ) then
     self.listEnd   = #allResources
   end
 end

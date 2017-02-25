@@ -1,6 +1,6 @@
 --[[
 
-the engine game editor
+the engine map editor
 
 ]]
 
@@ -23,12 +23,48 @@ require("../engine/collision/collision")
 require("../engine/navigation/navmesh")
 require("../engine/navigation/navmap")
 
+require("../editor/objectselector")
+
 local generalOptions = {
   "Numpad '+/-' - Change Inc Modifier",
   --"F8 - Toogle View All/View Quad",
   "F9 - Save",
   "F11 - Back"
 }
+
+local mapOptions = {
+  "F1 - Add Floor",
+  "F2 - Edit Floor",
+  "",
+  "CTRL + F1 - Delete Floor"
+
+}
+
+local floorOptions = {
+  "F1 - Add Area",
+  "F2 - Edit Area",
+  "",
+  "CTRL + F1 - Delete Area"
+}
+
+local areaOptions = {
+
+
+}
+
+local groundOptions = {
+
+}
+
+local spawnPtOptions = {
+
+}
+
+local enemyOptions = {
+
+}
+
+local optionsToShow = mapOptions
 
 class "MapEditor"
 
@@ -39,12 +75,18 @@ function MapEditor:MapEditor( mapListOwner, mapIndex, mapName )
 
   self.incModifier = 1
 
-  self.map = Map( mapName )
+  self.map   = nil
+  self.floor = nil
+  self.area  = nil
+
+  self.objectSelector = ObjectSelector()
 
   self.updatefunction   = self.updategeneral
   self.keypressfunction = self.keypressgeneral
 
   self.textInput = nil
+
+  self:loadMap( mapName )
 end
 
 function MapEditor:onEnter()
@@ -91,64 +133,42 @@ function MapEditor:onKeyPress( key, scancode, isrepeat )
     return
   end
 
-  if ( key == "f11" ) then
-
-    if (self.mode ~= 0) then
-      self.mode = 0
-
-      options = mainOptions
-
-      self.updatefunction   = self.updategeneral
-      self.keypressfunction = self.keypressgeneral
-
-      return
-    end
-
-  end
-
   self:keypressfunction( key )
 end
 
 function MapEditor:draw()
 
+  if ( self.textInput ) then
+    self.textInput:draw()
+    return
+  end
+
   for i = 1, #generalOptions do
     love.graphics.print( generalOptions[i], 1050, (i * 16) )
   end
 
+  for i = 1, #optionsToShow do
+    love.graphics.print( optionsToShow[i], 1050, (i * 16) + 100)
+  end
+
+  self.objectSelector:draw()
+
   love.graphics.print("Inc Modifier: " .. self.incModifier, 1050, 700)
 end
 
-function MapEditor:updategeneral( dt )
+function MapEditor:onMousePress( x, y, button, istouch )
+
+  self.objectSelector:mousePressed( x, y, button, 1, 1, self )
 
 end
 
-function MapEditor:keypressgeneral( key )
+function MapEditor:onMouseRelease( x, y, button, istouch )
 
-  if ( self.mode == 1 ) then
-    self.textInput:keypressed( key )
-    return
-  end
+end
 
-  if ( key == "f1" ) then
+function MapEditor:onMouseMove( x, y, dx, dy )
 
-  end
-
-  if ( key == "f2" ) then
-
-  end
-
-  if ( key == "f4" ) then
-
-  end
-
-  if ( key == "f5" ) then
-
-  end
-
-  if ( key == "f11") then
-    self.mapList:backFromEdit()
-    return
-  end
+  self.objectSelector:mouseMoved( x, y, dx, dy, 1, 1, self )
 
 end
 
@@ -160,6 +180,190 @@ function MapEditor:doTextInput ( t )
 
 end
 
-function MapEditor:saveMap( mapFileName)
+function MapEditor:saveMap( mapFileName )
   print("TODO save")
 end
+
+function MapEditor:loadMap( mapName )
+  self.map = Map( mapName )
+
+end
+
+--- GENERAL UPDATE AND KEYPRESS ------------------------------------------------
+
+function MapEditor:updategeneral( dt )
+
+end
+
+function MapEditor:keypressgeneral( key )
+
+  if ( self.textInput ) then
+    self.textInput:keypressed( key )
+    return
+  end
+
+  if ( key == "f1" ) then
+
+    self.textInput        = TextInput("Floor Name:")
+    self.updatefunction   = self.updateAddFloor
+    self.keypressfunction = self.keypressAddFloor
+
+  end
+
+  if ( key == "f2" ) then
+    optionsToShow         = floorOptions
+
+    self.textInput        = TextInput("Floor Name (Edit):")
+    self.updatefunction   = self.updateSelectFloor
+    self.keypressfunction = self.keypressSelectFloor
+
+  end
+
+  if ( (Input:isKeyDown("lctrl") ) and ( key == "f1" ) ) then
+
+    self.textInput        = TextInput("Floor Name (Remove):")
+    self.updatefunction   = self.updateRemoveFloor
+    self.keypressfunction = self.keypressRemoveFloor
+
+  end
+
+  if ( key == "f11") then
+
+    self.mapList:backFromEdit()
+    return
+
+  end
+
+end
+
+--- ADD FLOOR -------------------------------------------------------------------
+
+function MapEditor:updateAddFloor( dt )
+  if ( self.textInput:isFinished() ) then
+
+    local floorname = self.textInput:getText()
+
+    local floor = Floor( floorname )
+
+    self.map:addFloor( floor )
+
+    print("Floor Added '" .. floorname .. "' ")
+
+    self.textInput = nil
+
+    self.updatefunction = self.updategeneral
+    self.keypressfunction = self.keypressgeneral
+  end
+
+end
+
+function MapEditor:keypressAddFloor( key )
+  self.textInput:keypressed( key )
+end
+
+---- SELECT FLOOR --------------------------------------------------------------
+
+function MapEditor:updateSelectFloor( dt )
+
+  if ( self.textInput:isFinished() ) then
+
+    local floorname = self.textInput:getText()
+
+    local selected = self.map:getFloorByName( floorname )
+
+    if ( selected ) then
+
+      optionsToShow = floorOptions
+
+      self.updatefunction = self.updateEditFloor
+      self.keypressfunction = self.keypressEditFloor
+
+    else
+
+      optionsToShow = mapOptions
+
+      self.updatefunction = self.updategeneral
+      self.keypressfunction = self.keypressgeneral
+
+      print("No floor was selected . Wrong name '" .. floorname .. "' ? ")
+
+    end
+
+    self.textInput = nil
+
+  end
+
+end
+
+function MapEditor:keypressSelectFloor( key )
+  self.textInput:keypressed( key )
+end
+
+--- EDIT FLOOR -----------------------------------------------------------------
+
+function MapEditor:updateEditFloor( dt )
+
+end
+
+function MapEditor:keypressEditFloor( key )
+  if ( self.textInput ) then
+    self.textInput:keypressed( key )
+    return
+  end
+
+  if ( key == "f1" ) then
+    self.textInput        = TextInput("Area Name:")
+    self.updatefunction   = self.updateAddArea
+    self.keypressfunction = self.keypressAddArea
+  end
+
+  if ( key == "f2" ) then
+    self.textInput        = TextInput("Area Name:")
+    self.updatefunction   = self.updateSelectArea
+    self.keypressfunction = self.keypressSelectArea
+  end
+
+  if ( ( Input:isKeyDown("lctrl") ) and ( key == "f1" ) ) then
+    self.textInput        = TextInput("Area Name (Remove):")
+    self.updatefunction   = self.updateRemoveArea
+    self.keypressfunction = self.keypressRemoveArea
+  end
+
+  if ( key == "f11") then
+
+    self.updatefunction   = self.updategeneral
+    self.keypressfunction = self.keypressgeneral
+
+    optionsToShow = mapOptions
+    return
+
+  end
+
+end
+
+--- REMOVE FLOOR ----------------------------------------------------------------
+
+function MapEditor:updateRemoveFloor( dt )
+  if ( self.textInput:isFinished() ) then
+
+    local floorname = self.textInput:getText()
+
+    local removed = self.map:removeFloorByName( floorname )
+
+    if ( not removed ) then
+      print("No floor was deleted . Wrong name '" .. floorname .. "' ? ")
+    end
+
+    self.textInput = nil
+
+    self.updatefunction = self.updategeneral
+    self.keypressfunction = self.keypressgeneral
+  end
+
+end
+
+function MapEditor:keypressRemoveFloor( key )
+  self.textInput:keypressed( key )
+end
+
+--------------------------------------------------------------------------------

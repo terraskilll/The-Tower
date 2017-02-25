@@ -1,93 +1,86 @@
 --[[
 
-an area is a isolated part of a map (a room, for example)
+an area is a isolated part of a floor (a room, for example)
 
-only one area is rendered at a time, instead of the whole map
+only one area is rendered at a time, instead of the whole map (this is not working now)
+
+
 
 ]]
 
 require("../engine/lclass")
-
 require("../engine/input")
 
 class "Area"
 
 function Area:Area( areaName )
   self.name          = areaName
-  self.floors        = {}
-  self.movingObjects = {}
+
+  self.grounds = {}
+  self.spawns  = {}
+
+  self.simpleObjects = {}
+
+  self.navmesh = nil
 end
 
 function Area:getName()
   return self.name
 end
 
-function Area:update(dt)
-
-  for _,mo in pairs( self.movingObjects ) do
-    mo:update( dt )
-  end
-
-end
-
 function Area:draw()
 
-  for i, fl in pairs( self.floors ) do
-    fl:draw()
+  --//TODO change ground drawing to drawmanager
+  for i,gr in pairs(self.grounds) do
+    gr:draw()
+  end
+
+  for i,sw in pairs(self.spawns) do
+    sw:draw()
+  end
+
+  self.navmesh:draw()
+
+end
+
+function Area:addGround( groundToAdd )
+  self.grounds[groundToAdd:getName()] = groundToAdd
+end
+
+function Area:addSpawnPoint( spawnPointToAdd )
+  self.spawns[spawnPointToAdd:getName()] = spawnPointToAdd
+end
+
+function Area:addSimpleObject( simpleObjectToAdd )
+  self.simpleObjects[simpleObjectToAdd:getName()] = simpleObjectToAdd
+
+  if ( self.navmesh ) then
+    self.navmesh:addSimpleCollider( simpleObjectToAdd:getCollider() )
   end
 
 end
 
-function Area:addFloor( floor )
-  self.floors[floor:getName()] = floor
+function Area:getGrounds()
+  return self.grounds
 end
 
-function Area:getFloors()
-  return self.floors
+function Area:getGroundByName( groundName )
+  return self.grounds[groundName]
 end
 
-function Area:getFloorByName ( floorName )
-  return self.floors[floorName]
+function Area:getSpawnPoints()
+  return self.spawns
 end
 
-function Area:addMovingObject( objectToAdd )
-  self.movingObjects[objectToAdd:getName()] = objectToAdd
+function Area:getSpawnPointByName( spawnName )
+  return self.spawns[spawnName]
 end
 
-function Area:getMovingObjects()
-  return self.movingObjects
+function Area:setNavMesh( newNavMesh )
+  self.navmesh = newNavMesh
+  self.navmesh:setOwner( self )
 end
 
-function Area:getMovingObjectByName( objectName )
-  return self.movingObjects[objectName]
-end
-
-function Area:checkChangedNavMesh( objectPosition, objectMovement )
-  local pos = objectPosition + objectMovement
-
-  local nav = nil
-
-  local isIn = false
-
-  for i, fl in pairs(self.floors) do
-    isIn = fl:getNavMesh():isInside( pos.x, pos.y )
-
-    if (isIn) then
-      nav = fl:getNavMesh()
-    end
-  end
-
-  for _,mo in pairs( self.movingObjects ) do
-    if ( mo:isWalkable() ) then
-
-      isIn = mo:getNavMesh():isInside( pos.x, pos.y )
-
-      if (isIn) then
-        nav = mo:getNavMesh()
-      end
-
-    end
-  end
-
-  return nav
+function Area:getNavMesh()
+  return self.navmesh
 end

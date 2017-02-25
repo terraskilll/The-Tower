@@ -23,6 +23,8 @@ i_box = love.graphics.newImage("res/box.png")
 
 ib_uibutton1 = loadImage("res/ui/uibutton1.png")
 
+ib_uibutton2 = loadImage("res/ui/uibutton2.png")
+
 -------------------------------------------------------------------------------
 -- others stuff
 -------------------------------------------------------------------------------

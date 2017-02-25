@@ -106,8 +106,8 @@ function MenuScreen:onKeyPress(key, scancode, isrepeat)
 
 end
 
-function MenuScreen:onKeyRelease(key, scancode, isrepeat)
-  -- DO NOTHING?
+function MenuScreen:onKeyRelease( key, scancode, isrepeat )
+  -- DO NOTHING
 end
 
 function MenuScreen:update(dt)
@@ -193,9 +193,7 @@ end
 function MenuScreen:checkEditor()
   if ( Input:isKeyDown("lctrl") and Input:isKeyDown("f8") ) then
 
-    local editor = Editor()
-
-    self.game:setCurrentScreen( editor:getName() )
+    self.game:setCurrentScreen( "EditorScreen" )
 
   end
 end

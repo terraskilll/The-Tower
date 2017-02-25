@@ -22,7 +22,7 @@ function TheTower:TheTower()
 
   self:configure()
 
-  self:addScreen( "EditorScreen", Editor() )
+  self:addScreen( "EditorScreen", Editor( self ) )
 
   self:addScreen( "MenuScreen", MenuScreen( self ) )
   self:addScreen( "PlayScreen", PlayScreen( self ) )

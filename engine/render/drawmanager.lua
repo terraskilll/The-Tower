@@ -58,8 +58,8 @@ function DrawManager:DrawManager( gameCamera )
   self.movingCount   = 0
   self.movingObjects = {} -- moving objects
 
-  self.floorCount  = 0
-  self.floors      = {}
+  self.areaCount  = 0
+  self.areas      = {} -- areas
 end
 
 function DrawManager:setScale( newScaleX, newScaleY )
@@ -74,7 +74,7 @@ function DrawManager:clear()
 end
 
 function DrawManager:update( dt )
-  --//TODO sort less times
+  --//TODO sort less times, use skiplist
   table.sort( self.objects, sortByY )
 end
 
@@ -83,13 +83,13 @@ function DrawManager:addObject( objectToAdd )
   self.objectCount = #self.objects
 end
 
-function DrawManager:addFloorObject( objectToAdd )
-  table.insert( self.floors, objectToAdd )
-  self.floorCount = #self.floors
+function DrawManager:addAreaObject( objectToAdd )
+  table.insert( self.areas, objectToAdd )
+  self.areaCount = #self.areas
 end
 
 function DrawManager:addLight( lightToAdd )
-  table.insert ( self.lights, lightToAdd)
+  table.insert ( self.lights, lightToAdd )
   self.lightCount = #self.lights
 end
 
@@ -98,13 +98,16 @@ function DrawManager:addMovingObject ( objectToAdd )
   self.movingCount = #self.movingObjects
 end
 
-function DrawManager:addAllFloors( floorsToAdd )
+function DrawManager:addAllAreas( areasToAdd )
 
-  for _,f in ipairs( floorsToAdd ) do
-    --print(f)
-    self:addFloorObject( f )
+  for _,f in ipairs( areasToAdd ) do
+    self:addAreaObject( f )
   end
 
+end
+
+function DrawManager:addArea( areaToAdd )
+  self:addAreaObject( areaToAdd )
 end
 
 function DrawManager:addAllMovingObjects( objectsToAdd )
@@ -135,10 +138,10 @@ function DrawManager:draw()
 
   end
 
-  for i = 1, self.floorCount do
+  for i = 1, self.areaCount do
 
-    --if (self:isInsideScreen(self.floors[i])) then
-      self.floors[i]:draw()
+    --if (self:isInsideScreen(self.areas[i])) then
+      self.areas[i]:draw()
     --end
 
   end
@@ -158,7 +161,7 @@ function DrawManager:draw()
 
   for i = 1, self.lightCount do
 
-    --if (self:isInsideScreen(self.floors[i])) then
+    --if (self:isInsideScreen(self.areas[i])) then
       self.lights[i]:draw()
     --end
 
