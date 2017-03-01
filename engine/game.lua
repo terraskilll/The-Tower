@@ -6,6 +6,8 @@ require("../engine/globalconf")
 require("../engine/camera/camera")
 require("../engine/render/drawmanager")
 require("../engine/collision/collisionmanager")
+require("../engine/resourcemanager")
+require("../engine/objectmanager")
 
 local config = {
   gameScreenWidth = 1280,
@@ -73,7 +75,10 @@ function Game:configure()
 
   love.window.setMode( ww, wh, config.gameIsFullScreen )
 
-  self.resourceManager = ResourceManager()
+  self.resourceManager = ResourceManager( self )
+
+  self.objectManager = ObjectManager( self )
+  self.objectManager:load()
 
   self.player = Player( "PLAYER", 0, 0 )
 
@@ -110,6 +115,10 @@ end
 
 function Game:getResourceManager()
   return self.resourceManager
+end
+
+function Game:getObjectManager()
+  return self.objectManager
 end
 
 function Game:setCurrentScreen( screenName )
@@ -169,6 +178,6 @@ function Game:loadConfiguration()
   config, err = loadFile("__config")
 end
 
-function Game:Message(str)
-  print(str)
+function Game:Message( str )
+  print( str )
 end

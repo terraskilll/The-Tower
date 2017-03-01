@@ -47,7 +47,9 @@ local colliderOptions = {
 
 local options = mainOptions
 
-function ObjectEditor:ObjectEditor( objectListOwner, objectIndex, objectName )
+function ObjectEditor:ObjectEditor( objectListOwner, objectIndex, objectName, thegame )
+  self.game = thegame
+
   self.objectList = objectListOwner
 
   self.index = objectIndex
@@ -65,7 +67,7 @@ function ObjectEditor:ObjectEditor( objectListOwner, objectIndex, objectName )
 
   self.textInput = nil
 
-  self:loadObject( objectName )
+  self:loadObjectWithName( objectName )
 
   self.updatefunction = self.updateNone
   self.keypressfunction = self.keypressNone
@@ -86,17 +88,17 @@ function ObjectEditor:draw()
   end
 
   for i = 1, #options do
-    love.graphics.print(options[i], 16, (i * 16) + 40)
+    love.graphics.print( options[i], 16, (i * 16) + 40 )
   end
 
   for i = 1, #generalOptions do
-    love.graphics.print(generalOptions[i], 16, (i * 16) + 350)
+    love.graphics.print( generalOptions[i], 16, (i * 16) + 350 )
   end
 
-  love.graphics.line(299, 0, 299, 2000)
-  love.graphics.line(299, 99, 2000, 99)
+  love.graphics.line( 299, 0, 299, 2000 )
+  love.graphics.line( 299, 99, 2000, 99 )
 
-  love.graphics.print("Inc Modifier: " .. self.incModifier, 16, 300)
+  love.graphics.print( "Inc Modifier: " .. self.incModifier, 16, 300 )
 
   self:printObject()
 end
@@ -147,7 +149,7 @@ end
 function ObjectEditor:updateGetResource( dt )
   if ( self.textInput:isFinished() ) then
 
-    local resname, restype, respath = self.resourceManager:getResourceByName(self.textInput:getText())
+    local resname, restype, respath = self.resourceManager:getResourceByName( self.textInput:getText() )
 
     if ( restype == "image" ) then
       self.image = self.resourceManager:loadImage(respath)
@@ -231,7 +233,7 @@ function ObjectEditor:onKeyPress( key, scancode, isrepeat )
   end
 
   if ( key == "f9" ) then
-    self:saveObject(self.name)
+    self:saveObject( self.name )
 
     return
   end
@@ -567,16 +569,12 @@ function ObjectEditor:saveObject( objectFileName )
   print( "Saved " .. self.name )
 end
 
-function ObjectEditor:loadObject( objectFileName )
+function ObjectEditor:loadObjectWithName( objectFileName )
 
-  local obj, err = loadFile("__objects/" .. objectFileName)
+  local obdata = self.game:getObjectManager():loadObjectData( objectFileName )
 
-  if ( obj  == nil ) then
-    self.object = nil
-
-    print("Load error for " .. objectFileName)
-  else
-    self.object = obj
+  if ( obdata ) then
+    self.object = obdata
 
     local resname, restype, respath = self.resourceManager:getResourceByName( self.object.resourcename )
 

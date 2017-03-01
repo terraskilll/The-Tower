@@ -30,21 +30,8 @@ end
 
 function Area:draw()
 
-  --//TODO change ground drawing to drawmanager
-  for i,gr in pairs(self.grounds) do
-    gr:draw()
-  end
+  -- Do Nothing?
 
-  for i,sw in pairs(self.spawns) do
-    sw:draw()
-  end
-
-  self.navmesh:draw()
-
-end
-
-function Area:addGround( groundToAdd )
-  self.grounds[groundToAdd:getName()] = groundToAdd
 end
 
 function Area:addSpawnPoint( spawnPointToAdd )
@@ -58,6 +45,22 @@ function Area:addSimpleObject( simpleObjectToAdd )
     self.navmesh:addSimpleCollider( simpleObjectToAdd:getCollider() )
   end
 
+end
+
+function Area:getSimpleObjects()
+  return self.simpleObjects
+end
+
+function Area:getSimpleObjectByName( simpleObjectName )
+
+  if ( self.simpleObjects[simpleObjectName] ) then
+    return self.simpleObjects[simpleObjectName]
+  end
+
+end
+
+function Area:addGround( groundToAdd )
+  self.grounds[groundToAdd:getName()] = groundToAdd
 end
 
 function Area:getGrounds()

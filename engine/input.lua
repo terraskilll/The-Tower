@@ -181,6 +181,11 @@ function Input:wheelMoved( xm, ym )
 
 end
 
+function Input:mousePosition()
+	--//TODO check for camera?
+	return love.mouse.getPosition()
+end
+
 -- [[ JOYSTICK / GAMEPAD ]] --
 
 function Input:joystickAdded( joystick )

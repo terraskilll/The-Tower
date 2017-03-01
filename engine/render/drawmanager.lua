@@ -60,6 +60,15 @@ function DrawManager:DrawManager( gameCamera )
 
   self.areaCount  = 0
   self.areas      = {} -- areas
+
+  self.groundCount  = 0
+  self.grounds      = {} -- grounds
+
+  self.spawnCount  = 0
+  self.spawns      = {} -- spawn points
+
+  self.navCount   = 0
+  self.navmeshes  = {}
 end
 
 function DrawManager:setScale( newScaleX, newScaleY )
@@ -68,9 +77,24 @@ function DrawManager:setScale( newScaleX, newScaleY )
 end
 
 function DrawManager:clear()
-  -- removes all objects in list
-  --// TODO is this expensive?
-  self.objects = {}
+  -- removes all objects in lists
+  --// TODO check if this is expensive
+
+  self.lightCount  = 0
+  self.objectCount = 0
+  self.movingCount = 0
+  self.areaCount   = 0
+  self.groundCount = 0
+  self.spawnCount  = 0
+  self.navCount    = 0
+
+  self.objects       = {}
+  self.lights        = {}
+  self.movingObjects = {}
+  self.areas         = {}
+  self.grounds       = {}
+  self.spawnPoints   = {}
+  self.navmeshes     = {}
 end
 
 function DrawManager:update( dt )
@@ -83,9 +107,22 @@ function DrawManager:addObject( objectToAdd )
   self.objectCount = #self.objects
 end
 
-function DrawManager:addAreaObject( objectToAdd )
-  table.insert( self.areas, objectToAdd )
-  self.areaCount = #self.areas
+function DrawManager:removeObject( objectName )
+  local index = 0
+
+  local i = 1
+
+  for _,o in pairs( self.objects ) do
+    if ( o:getName() == objectName ) then
+      index = i
+    end
+
+    i = i + 1
+  end
+
+  if ( index > 0 ) then
+    table.remove(self.objects, index)
+  end
 end
 
 function DrawManager:addLight( lightToAdd )
@@ -98,24 +135,77 @@ function DrawManager:addMovingObject ( objectToAdd )
   self.movingCount = #self.movingObjects
 end
 
-function DrawManager:addAllAreas( areasToAdd )
-
-  for _,f in ipairs( areasToAdd ) do
-    self:addAreaObject( f )
-  end
-
-end
-
-function DrawManager:addArea( areaToAdd )
-  self:addAreaObject( areaToAdd )
-end
-
 function DrawManager:addAllMovingObjects( objectsToAdd )
 
   for _,o in pairs( objectsToAdd ) do
     self:addMovingObject( o )
   end
 
+end
+
+function DrawManager:addSpawnPoint( spawnToAdd )
+  table.insert( self.spawns, spawnToAdd )
+  self.spawnCount = #self.spawns
+end
+
+function DrawManager:addAllSpawns( spawnsToAdd )
+
+  for _,s in pairs( spawnsToAdd ) do
+    self:addSpawnPoint( s )
+  end
+
+end
+
+function DrawManager:addGround( groundToAdd )
+  table.insert( self.grounds, groundToAdd )
+  self.groundCount = #self.grounds
+end
+
+function DrawManager:addAllGrounds( groundsToAdd )
+
+  for _,g in pairs( groundsToAdd ) do
+    self:addGround( g )
+  end
+
+end
+
+function DrawManager:removeGround( groundName )
+  local index = 0
+
+  local i = 1
+
+  for _,g in pairs( self.grounds ) do
+    if (g:getName() == groundName) then
+      index = i
+    end
+
+    i = i + 1
+  end
+
+  if ( index > 0 ) then
+    table.remove(self.grounds, index)
+  end
+end
+
+function DrawManager:addArea( areaToAdd )
+  table.insert( self.areas, areaToAdd )
+  self.areaCount = #self.areas
+
+  self:addAllGrounds( areaToAdd:getGrounds() )
+  self:addAllSpawns( areaToAdd:getSpawnPoints() )
+end
+
+function DrawManager:addAllAreas( areasToAdd )
+
+  for _,f in pairs( areasToAdd ) do
+    self:addArea( f )
+  end
+
+end
+
+function DrawManager:addNavMesh( navmeshToAdd )
+  table.insert ( self.navmeshes, navmeshToAdd )
+  self.navCount = #self.navmeshes
 end
 
 function DrawManager:sortObjects()
@@ -138,22 +228,21 @@ function DrawManager:draw()
 
   end
 
-  for i = 1, self.areaCount do
+  for i = 1, self.groundCount do
 
-    --if (self:isInsideScreen(self.areas[i])) then
-      self.areas[i]:draw()
-    --end
+    self.grounds[i]:draw() -- todo chek if it is inside screen
 
   end
 
   for i = 1, self.movingCount do
 
     self.movingObjects[i]:draw()
+
   end
 
   for i = 1, self.objectCount do
 
-    if (self:isInsideScreen(self.objects[i])) then
+    if ( self:isInsideScreen( self.objects[i] ) ) then
       self.objects[i]:draw()
     end
 
@@ -164,6 +253,18 @@ function DrawManager:draw()
     --if (self:isInsideScreen(self.areas[i])) then
       self.lights[i]:draw()
     --end
+
+  end
+
+  for i = 1, self.spawnCount do
+
+    self.spawns[i]:draw()
+
+  end
+
+  for i = 1, self.navCount do
+
+    self.navmeshes[i]:draw()
 
   end
 

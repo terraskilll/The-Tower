@@ -56,9 +56,9 @@ end
 function PlayScreen:update(dt)
 
   if ( self.paused ) then
-    self:updatePaused(dt)
+    self:updatePaused( dt )
   else
-    self:updateInGame(dt)
+    self:updateInGame( dt )
   end
 
 end
@@ -70,21 +70,16 @@ function PlayScreen:draw()
 
   self.camera:set()
 
-  self.currentMap:draw()
-
   self.game:getDrawManager():draw()
-
-  --self.game:getPlayer():draw()
 
   for i=1, #self.navmaps do
     self.navmaps[i]:draw()
   end
 
-  self.camera:unset()
-
   love.graphics.setShader()
 
-  -- menus are not affected by camera
+  self.camera:unset()
+
   self.pauseMenu:draw()
 end
 
@@ -103,9 +98,9 @@ function PlayScreen:joystickPressed(joystick, button)
   end
 
   if ( self.paused ) then
-    self:handleInPauseMenu(joystick, button, self)
+    self:handleInPauseMenu( joystick, button, self )
   else
-    self:handleInGame(joystick, button, self)
+    self:handleInGame( joystick, button, self )
   end
 
 end
@@ -326,6 +321,8 @@ function PlayScreen:createTestMap()
   self.game:getDrawManager():addObject( spider1 )
   self.game:getDrawManager():addObject( spider2 )
   self.game:getDrawManager():addAllAreas( floor:getAreas() )
+  self.game:getDrawManager():addNavMesh( nav )
+  self.game:getDrawManager():addNavMesh( farNav )
   self.game:getDrawManager():addAllMovingObjects( floor:getMovingObjects() )
 
   self.game:getCollisionManager():addCollider( self.game:getPlayer():getCollider() )

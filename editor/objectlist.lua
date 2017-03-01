@@ -48,16 +48,11 @@ function ObjectList:ObjectList( ownerEditor, thegame )
 end
 
 function ObjectList:save()
-  saveFile("__objectlist", allObjects)
+  self.game:getObjectManager():save( allObjects )
 end
 
 function ObjectList:load()
-  allObjects, err = loadFile("__objectlist")
-
-  if ( allObjects == nil ) then
-    allObjects = {}
-  end
-
+  allObjects = self.game:getObjectManager():load()
 end
 
 function ObjectList:onEnter()
@@ -90,10 +85,11 @@ function ObjectList:draw()
     self.textInput:draw()
 
   elseif ( self.objectEditor ~= nil ) then
-      self.objectEditor:draw()
+    self.objectEditor:draw()
   else
+
     for i = 1, #options do
-      love.graphics.print(options[i], 16, (i * 16) + 40)
+      love.graphics.print( options[i], 16, (i * 16) + 40 )
     end
 
     self:drawObjectList()
@@ -248,7 +244,7 @@ function ObjectList:editSelected()
 
   self.mode = 4
 
-  self.objectEditor = ObjectEditor(self, objIndex, allObjects[objIndex][1])
+  self.objectEditor = ObjectEditor( self, objIndex, allObjects[objIndex][1], self.game )
 end
 
 function ObjectList:backFromEdit()

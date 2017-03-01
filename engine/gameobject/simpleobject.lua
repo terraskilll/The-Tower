@@ -21,6 +21,9 @@ function SimpleObject:SimpleObject( objectName, positionX, positionY, objectSpri
   self.quad     = drawQuad or nil
   self.scale    = objectScale or 1
 
+  self.width  = objectSprite:getWidth()
+  self.height = objectSprite:getHeight()
+
   self.animation   = nil
 
   self.collider    = nil
@@ -39,40 +42,43 @@ end
 
 function SimpleObject:draw()
 
-  if ( self.animation ~= nil ) then
+  if ( self.animation ) then
     self:drawAnimated()
   else
     self:drawStatic()
   end
 
-  if ( self.collider ~= nil ) then
+  if ( self.collider ) then
     self.collider:draw()
   end
 
-  if ( self.boundingbox ~= nil) then
+  if ( self.boundingbox ) then
     self.boundingbox:draw()
   end
 
-  if ( self.navmesh ~= nil) then
-    self.navmesh:draw()
-  end
 end
 
 function SimpleObject:drawStatic()
 
   if ( self.quad ) then
-    love.graphics.draw(self.image, self.quad, self.position.x, self.position.y, 0, self.scale, self.scale)
+    love.graphics.draw( self.image, self.quad, self.position.x, self.position.y, 0, self.scale, self.scale )
   else
-    love.graphics.draw(self.image, self.position.x, self.position.y, 0, self.scale, self.scale)
+    love.graphics.draw( self.image, self.position.x, self.position.y, 0, self.scale, self.scale )
   end
 
 end
 
 function SimpleObject:drawAnimated()
-  self.animation:draw(self.position.x, self.position.y)
+  self.animation:draw( self.position.x, self.position.y )
+end
+
+function SimpleObject:getDimensions()
+  return self.width, self.height
 end
 
 function SimpleObject:setCollider( colliderToSet )
+  print( colliderToSet:getKind() )
+
   self.collider = colliderToSet
 
   self.collider:setOwner( self )
@@ -85,7 +91,7 @@ end
 
 function SimpleObject:setBoundingBox( boundingboxToSet )
   self.boundingbox = boundingboxToSet
-  self.boundingbox:setScale(self.scale)
+  self.boundingbox:setScale( self.scale )
 end
 
 function SimpleObject:getBoundingBox()
@@ -94,6 +100,13 @@ end
 
 function SimpleObject:setAnimation( animationToSet )
   self.animation = animationToSet
+end
+
+function SimpleObject:setScale( scaleToSet )
+  self.scale = scaleToSet or 1
+
+  self.boundingbox:setScale( self.scale )
+  self.collider:setScale( self.scale )
 end
 
 function SimpleObject:changePosition( movementVector )
@@ -110,5 +123,5 @@ function SimpleObject:changePosition( movementVector )
 end
 
 function SimpleObject:onCollisionEnter( otherCollider )
-
+  -- nothing
 end

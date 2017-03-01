@@ -13,7 +13,9 @@ local allResources = {}
 
 class "ResourceManager"
 
-function ResourceManager:ResourceManager()
+function ResourceManager:ResourceManager( thegame )
+  self.game = thegame
+
   self:load()
 end
 

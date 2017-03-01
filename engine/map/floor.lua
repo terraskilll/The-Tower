@@ -56,6 +56,17 @@ function Floor:getAreaByName ( areaName )
   return self.areas[areaName]
 end
 
+function Floor:removeAreaByName( areaName )
+
+  if ( self.areas[areaName] ) then
+    self.areas[areaName] = nil
+    return true
+  else
+    return false
+  end
+
+end
+
 function Floor:addMovingObject( objectToAdd )
   self.movingObjects[objectToAdd:getName()] = objectToAdd
 end
@@ -66,6 +77,17 @@ end
 
 function Floor:getMovingObjectByName( objectName )
   return self.movingObjects[objectName]
+end
+
+function Floor:removeMovingObject( objectName )
+
+  if ( self.movingObjects[objectName] ) then
+    self.movingObjects[objectName] = nil
+    return true
+  else
+    return false
+  end
+
 end
 
 function Floor:checkChangedNavMesh( objectPosition, objectMovement )

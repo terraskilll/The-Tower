@@ -25,7 +25,7 @@ local options = {
 
 class "MapList"
 
-function MapList:MapList( ownerEditor )
+function MapList:MapList( ownerEditor, thegame )
   self.game      = thegame
   self.editor    = ownerEditor
 
@@ -277,7 +277,7 @@ function MapList:editSelected()
 
   self.mode = 4
 
-  self.mapEditor = MapEditor( self, mapindex, allmaps[mapindex][1] )
+  self.mapEditor = MapEditor( self, mapindex, allmaps[mapindex][1], self.game )
 
   self.mapEditor:onEnter()
 end
