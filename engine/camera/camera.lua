@@ -16,6 +16,7 @@ function Camera:Camera()
 end
 
 function Camera:update( dt )
+
   if ( self.target ~=  nil ) then
 
     local targetPosition = self.target:getPosition()
@@ -24,9 +25,15 @@ function Camera:update( dt )
     self:setPosition( targetPosition.x - screenWidth / 2, targetPosition.y - screenHeight / 2 )
 
   end
+
+end
+
+function Camera:drawPosition( x, y )
+  love.graphics.print( "Camera: " .. self.positionX .. " | " .. self.positionY, x, y )
 end
 
 function Camera:setTarget( newTarget )
+
   if ( not newTarget.getPosition ) then
     print("Target has no getPosition method")
     return
@@ -62,6 +69,10 @@ function Camera:setPosition( newX, newY )
   self.positionY = newY or self.positionY
 end
 
+function Camera:getPositionXY()
+  return self.positionX, self.positionY
+end
+
 function Camera:setScale( newScaleX, newScaleY )
   self.scaleX = newScaleX or self.scaleX
   self.scaleY = newScaleY or self.scaleY
@@ -84,8 +95,6 @@ function Camera:getVisibleArea( startXOffset, startYOffset, endXOffset, endYOffs
   local screenWidth, screenHeight = love.graphics.getDimensions()
 
   --print (endYOffset * self.scaleY)
-
-
 
   return
     ( self.positionX + startXOffset * self.scaleX ),

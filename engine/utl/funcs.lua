@@ -16,13 +16,13 @@ normalizeVec = function( v1, v2 )
 end
 
 rotateVec = function ( vector, angleInRadians )
-	local s = sinfun( angleInRadians );
-	local c = cosfun( angleInRadians );
+	local s = sinfun( angleInRadians )
+	local c = cosfun( angleInRadians )
 
-	local dx = vector.x * c - vector.y * s;
-	local dy = vector.x * s + vector.y * c;
+	local dx = vector.x * c - vector.y * s
+	local dy = vector.x * s + vector.y * c
 
-	return Vec( dx, dy );
+	return Vec( dx, dy )
 end
 
 angleBetween = function ( v1, v2 )
@@ -38,14 +38,26 @@ linesIntersectFunc = function ( x1, y1, x2, y2, x3, y3, x4, y4 )
 
 end
 
+pointInRect = function ( px, py, x, y, w, h )
+	--print ( "x : " .. px .. " y : " .. py .. " ")
+
+	return (
+		x <= px and
+		y <= py and
+		x + w >= px and
+		y + h >= py
+	)
+
+end
+
 function relativeCCW ( x1, y1, x2, y2, px, py )
 
-  x2 = x2 - x1;
-  y2 = y2 - y1;
-  px = px - x1;
-  py = py - y1;
+  x2 = x2 - x1
+  y2 = y2 - y1
+  px = px - x1
+  py = py - y1
 
-  local ccw = px * y2 - py * x2;
+  local ccw = px * y2 - py * x2
 
   if (ccw == 0.0) then
     --[[
@@ -57,7 +69,7 @@ function relativeCCW ( x1, y1, x2, y2, px, py )
     endpoint used as the origin for the projection.
     ]]--
 
-    ccw = px * x2 + py * y2;
+    ccw = px * x2 + py * y2
 
     if (ccw > 0.0) then
       --[[
@@ -70,12 +82,12 @@ function relativeCCW ( x1, y1, x2, y2, px, py )
       the inverse anyway - thus we leave x2 & y2 negated.
       ]]--
 
-      px = px - x2;
-      py = py - y2;
-      ccw = px * x2 + py * y2;
+      px = px - x2
+      py = py - y2
+      ccw = px * x2 + py * y2
 
       if (ccw < 0.0) then
-        ccw = 0.0;
+        ccw = 0.0
       end
 
     end

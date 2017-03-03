@@ -33,10 +33,10 @@ collision = {
     local x1, y1, w1, h1 = collider1:getBounds()
     local x2, y2, w2, h2 = collider2:getBounds()
 
-    if (x1 < x2 + w2 and
+    if ( x1 < x2 + w2 and
         x1 + w1 > x2 and
         y1 < y2 + h2 and
-        y1 + h1 > y2)  then
+        y1 + h1 > y2 )  then
 
       return true
     else
@@ -47,13 +47,14 @@ collision = {
 
   checkCircleToCircle = function ( collider1, collider2 )
     local x1, y1 = collider1:getCenter()
-    local r1 = collider1:getRadius()
+    local r1     = collider1:getRadius()
 
     local x2, y2 = collider2:getCenter()
-    local r2 = collider2:getRadius()
+    local r2     = collider2:getRadius()
 
-    local distance = (x1 - x2)^2 + (y1 - y2)^2
-    return distance <= (r1 + r2)^2
+    local distance = ( x1 - x2 ) ^ 2 + ( y1 - y2 ) ^ 2
+
+    return distance <= ( r1 + r2 ) ^ 2
   end,
 
   checkBoxToCircle = function ( boxcollider, circlecollider )
@@ -62,20 +63,19 @@ collision = {
     local circlex, circley = circlecollider:getCenter()
     local circler = circlecollider:getRadius()
 
-    local distX = absfun(circlex - boxx - boxw / 2);
-    local distY = absfun(circley - boxy - boxh / 2);
+    local distX = absfun( circlex - boxx - boxw / 2 )
+    local distY = absfun( circley - boxy - boxh / 2 )
 
-    if (distX > (boxw / 2 + circler)) then return false end
+    if ( distX > ( boxw / 2 + circler ) ) then return false end
 
-    if (distY > (boxh / 2 + circler)) then return false end
+    if ( distY > ( boxh / 2 + circler ) ) then return false end
 
-    if (distX <= (boxw / 2)) then return true; end
+    if ( distX <= ( boxw / 2 ) ) then return true end
 
-    if (distY <= (boxh / 2)) then return true; end
+    if ( distY <= ( boxh / 2 ) ) then return true end
 
-    local dx = distX - (boxw / 2);
-    local dy = distY - (boxh / 2);
+    local dx = distX - ( boxw / 2 )
 
-    return ( (dx * dx + dy * dy) <= (circler * circler) );
+    return ( ( dx * dx + dy * dy ) <= ( circler * circler ) )
   end
 }

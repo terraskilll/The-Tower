@@ -18,7 +18,9 @@ local config = {
 class "Game"
 
 function Game:Game()
+
   self.screens = {}
+
 end
 
 function Game:update(dt)

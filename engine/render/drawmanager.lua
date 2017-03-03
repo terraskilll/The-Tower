@@ -158,7 +158,10 @@ end
 
 function DrawManager:addGround( groundToAdd )
   table.insert( self.grounds, groundToAdd )
+
   self.groundCount = #self.grounds
+
+  table.sort( self.grounds, sortByY )
 end
 
 function DrawManager:addAllGrounds( groundsToAdd )

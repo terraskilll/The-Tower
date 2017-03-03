@@ -83,6 +83,10 @@ function MovingObject:setCircular( isCircular )
   self.circular = isCircular
 end
 
+function MovingObject:isCircular()
+  return self.circular
+end
+
 function MovingObject:setNavMesh( newNavMesh )
   self.navmesh = newNavMesh
   newNavMesh:setOwner( self )
@@ -115,8 +119,8 @@ function MovingObject:update( dt )
 
   self:checkNextPoint()
 
-  if ( self.navmesh ~= nil) then
-    self.navmesh:changePosition(movement)
+  if ( self.navmesh ) then
+    self.navmesh:changePosition( movement )
   end
 
 end
@@ -173,16 +177,46 @@ function MovingObject:checkNextPoint()
   end
 end
 
-function MovingObject:addObjectOver(objectName, object)
+function MovingObject:addObjectOver( objectName, object )
   self.objectsOver[objectName] = object
 end
 
-function MovingObject:removeObjectOver(objectName)
+function MovingObject:removeObjectOver( objectName )
   self.objectsOver[objectName] = nil
 end
 
-function MovingObject:updateObjectOver(movementVector)
-  for _,obj in pairs(self.objectsOver) do
-    obj:changePosition(movementVector)
+function MovingObject:updateObjectOver( movementVector )
+
+  for _,obj in pairs( self.objectsOver ) do
+    obj:changePosition( movementVector )
   end
+
+end
+
+function MovingObject:clone( newname )
+
+  local qd = nil
+
+  if ( self.quad ) then
+    local qx, qy, lx, ly = self.quad:getViewport()
+    local qw, qh = self.quad:getTextureDimensions()
+
+    qd = love.graphics.newQuad( qx, qy, lx, ly, qw, qh )
+  end
+
+  local cloned = MovingObject( newname, self.position.x, self.position.y, self.image, qd,  self.scale )
+
+  if ( self.navmesh ) then
+    local navms = self.navmesh:clone()
+    cloned:setNavMesh( navms )
+  end
+
+  for i = 1, #self.points do
+    cloned:addPoint( Vec( self.points[i].x, self.points[i].y ) )
+  end
+
+  cloned:setCircular( self:isCircular() )
+  cloned:setDelays( self.initialDelay, self.middleDelay, self.finalDelay )
+
+  return cloned
 end

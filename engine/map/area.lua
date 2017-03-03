@@ -34,10 +34,6 @@ function Area:draw()
 
 end
 
-function Area:addSpawnPoint( spawnPointToAdd )
-  self.spawns[spawnPointToAdd:getName()] = spawnPointToAdd
-end
-
 function Area:addSimpleObject( simpleObjectToAdd )
   self.simpleObjects[simpleObjectToAdd:getName()] = simpleObjectToAdd
 
@@ -59,6 +55,14 @@ function Area:getSimpleObjectByName( simpleObjectName )
 
 end
 
+function Area:removeSimpleObject( simpleObjectName )
+
+  if ( self.simpleObjects[simpleObjectName] ) then
+    self.simpleObjects[simpleObjects] = nil
+  end
+
+end
+
 function Area:addGround( groundToAdd )
   self.grounds[groundToAdd:getName()] = groundToAdd
 end
@@ -71,12 +75,32 @@ function Area:getGroundByName( groundName )
   return self.grounds[groundName]
 end
 
+function Area:removeGround( groundName )
+
+  if ( self.grounds[groundName] ) then
+    self.grounds[groundName] = nil
+  end
+
+end
+
+function Area:addSpawnPoint( spawnPointToAdd )
+  self.spawns[spawnPointToAdd:getName()] = spawnPointToAdd
+end
+
 function Area:getSpawnPoints()
   return self.spawns
 end
 
 function Area:getSpawnPointByName( spawnName )
   return self.spawns[spawnName]
+end
+
+function Area:removeSpawnPoint( spawnPointName )
+
+  if ( self.spawns[spawnPointName] ) then
+    self.spawns[spawnPointName] = nil
+  end
+
 end
 
 function Area:setNavMesh( newNavMesh )

@@ -77,8 +77,6 @@ function SimpleObject:getDimensions()
 end
 
 function SimpleObject:setCollider( colliderToSet )
-  print( colliderToSet:getKind() )
-
   self.collider = colliderToSet
 
   self.collider:setOwner( self )
@@ -109,14 +107,27 @@ function SimpleObject:setScale( scaleToSet )
   self.collider:setScale( self.scale )
 end
 
+function SimpleObject:setPosition( positionVector )
+  self.position.x = positionVector.x
+  self.position.y = positionVector.y
+
+  if ( self.collider ) then
+    self.collider:setPosition( self.position.x, self.position.y )
+  end
+
+  if ( self.boundingbox ) then
+    self.boundingbox:setPosition( self.position.x, self.position.y )
+  end
+end
+
 function SimpleObject:changePosition( movementVector )
   self.position = self.position + movementVector
 
-  if ( self.collider ~= nil ) then
+  if ( self.collider ) then
     self.collider:changePosition( movementVector.x, movementVector.y )
   end
 
-  if ( self.boundingbox ~= nil) then
+  if ( self.boundingbox ) then
     self.boundingbox:setPosition( self.position.x, self.position.y )
   end
 
@@ -124,4 +135,31 @@ end
 
 function SimpleObject:onCollisionEnter( otherCollider )
   -- nothing
+end
+
+function SimpleObject:clone( newName )
+
+  local qd = nil
+
+  if ( self.quad ) then
+    local qx, qy, lx, ly = self.quad:getViewport()
+    local qw, qh = self.quad:getTextureDimensions()
+
+    qd = love.graphics.newQuad( qx, qy, lx, ly, qw, qh )
+  end
+
+  local cloned = SimpleObject( newName, self.position.x, self.position.y, self.image, qd, self.scale )
+
+  if ( self.boundingbox ) then
+    local bdbox = self.boundingbox:clone()
+    cloned:setBoundingBox( bdbox )
+  end
+
+  if ( self.collider ) then
+    local colld = self.collider:clone()
+    cloned:setCollider( colld )
+  end
+
+  return cloned
+
 end

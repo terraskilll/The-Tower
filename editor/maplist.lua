@@ -220,7 +220,7 @@ end
 function MapList:onMouseRelease( x, y, button, istouch )
   if ( self.mapEditor ) then
 
-    if ( self.mapEditor.onMousePress ) then
+    if ( self.mapEditor.onMouseRelease ) then
       self.mapEditor:onMouseRelease( x, y, button, istouch )
     end
 
@@ -228,10 +228,11 @@ function MapList:onMouseRelease( x, y, button, istouch )
 end
 
 function MapList:onMouseMove( x, y, dx, dy )
+
   if ( self.mapEditor ) then
 
-    if ( self.mapEditor.onMousePress ) then
-      self.mapEditor:onMouseRelease( x, y, dx, dy )
+    if ( self.mapEditor.onMouseMove ) then
+      self.mapEditor:onMouseMove( x, y, dx, dy )
     end
 
   end
@@ -295,7 +296,7 @@ function MapList:refreshList()
 
   self.listEnd = self.listStart + 40 - 1
 
-  if (self.listEnd > #allmaps) then
+  if ( self.listEnd > #allmaps ) then
     self.listEnd   = #allmaps
   end
 end

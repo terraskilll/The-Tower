@@ -96,7 +96,7 @@ end
 function Editor:onMouseRelease( x, y, button, istouch )
   if (self.currentEditor ) then
 
-    if ( self.currentEditor.onMousePress ) then
+    if ( self.currentEditor.onMouseRelease ) then
       self.currentEditor:onMouseRelease( x, y, button, istouch )
     end
 
@@ -106,8 +106,8 @@ end
 function Editor:onMouseMove( x, y, dx, dy )
   if (self.currentEditor ) then
 
-    if ( self.currentEditor.onMousePress ) then
-      self.currentEditor:onMouseRelease( x, y, dx, dy )
+    if ( self.currentEditor.onMouseMove ) then
+      self.currentEditor:onMouseMove( x, y, dx, dy )
     end
 
   end

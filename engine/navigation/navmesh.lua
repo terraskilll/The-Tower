@@ -266,3 +266,7 @@ function NavMesh:countIntersections(centerX, centerY, endx, endy)
 
   return total
 end
+
+function NavMesh:clone()
+
+end
