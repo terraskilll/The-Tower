@@ -14,11 +14,11 @@ function NoAnimation:NoAnimation()
 end
 
 function NoAnimation:configure()
-   local w = i_char:getWidth()
+  local w = i_char:getWidth()
   local h = i_char:getHeight()
 
   local an = Animation()
-  an:addFrame(1, 0, 0, 128, 128, w, h)
+  an:createFrame(1, 0, 0, 128, 128, w, h)
 
   self:addAnimation(an)
 

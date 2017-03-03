@@ -4,26 +4,26 @@ class "ComplexAnimation"
 
 function ComplexAnimation:ComplexAnimation()
   self.currentAnimation = nil
-  self.animations = {}
+  self.animations       = {}
 end
 
-function ComplexAnimation:update(dt)
-  self.currentAnimation:update(dt)
+function ComplexAnimation:update( dt )
+  self.currentAnimation:update( dt )
 end
 
-function ComplexAnimation:draw(positionX, positionY)
-  self.currentAnimation:draw(positionX, positionY)
+function ComplexAnimation:draw( positionX, positionY )
+  self.currentAnimation:draw( positionX, positionY )
 end
 
-function ComplexAnimation:addAnimation(newAnimation)
-  table.insert(self.animations, newAnimation)
+function ComplexAnimation:addAnimation( newAnimation )
+  table.insert( self.animations, newAnimation )
 end
 
 function ComplexAnimation:start()
   self.currentAnimation:start()
 end
 
-function ComplexAnimation:setCurrentAnimation(index, start)
+function ComplexAnimation:setCurrentAnimation( index, start )
   start = start or false
 
   self.currentAnimation = self.animations[index]
@@ -33,8 +33,10 @@ function ComplexAnimation:setCurrentAnimation(index, start)
   end
 end
 
-function ComplexAnimation:setImage(newImage)
-  for _,v in ipairs(self.animations) do
-    v:setImage(newImage)
+function ComplexAnimation:setImage( newImage )
+
+  for _,v in ipairs( self.animations ) do
+    v:setImage( newImage )
   end
+
 end

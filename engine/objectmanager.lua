@@ -1,6 +1,8 @@
 require("../engine/lclass")
 require("../engine/io/io")
 require("../engine.gameobject.simpleobject")
+require("../engine.animation.animation")
+require("../engine.animation.frame")
 
 local basePath = love.filesystem.getSourceBaseDirectory() .. "/__data/"
 
@@ -55,7 +57,7 @@ function ObjectManager:loadSimpleObject( objectName, instanceName, posx, posy )
 
   local objdata = self:loadObjectData( objectName )
 
-  if ( index == 0 ) then
+  if ( objdata == nil ) then
     print( "Failed to load object data for name " .. objectName )
     return nil
   end
@@ -109,4 +111,58 @@ function ObjectManager:loadSimpleObject( objectName, instanceName, posx, posy )
   end
 
   return object
+end
+
+function ObjectManager:loadAnimData( animationFilename )
+
+  local animData, err = loadFile( "__animations/" .. animationFilename )
+
+  if ( animData ) then
+
+    return animData
+
+  else
+
+    print("Load error for " .. animationFilename)
+
+    return nil
+
+  end
+
+end
+
+function ObjectManager:loadAnimation( animationFilename )
+
+  local animdata = self:loadAnimData( animationFilename )
+
+  if ( animdata == nil ) then
+    print( "Failed to load animation data for name " .. animationFilename )
+    return nil
+  end
+
+  local animation = Animation( animdata.name )
+
+  local resname, restype, respath = self.game:getResourceManager():getResourceByName( animdata.resourcename )
+
+  local image = self.game:getResourceManager():loadImage( respath )
+
+  animation:setImage( image, resname )
+
+  for i=1, #animdata.frames do
+    animation:createFrame(
+      animdata.frames[i].duration,
+      animdata.frames[i].quadx,
+      animdata.frames[i].quady,
+      animdata.frames[i].quadw,
+      animdata.frames[i].quadh,
+      animdata.frames[i].imgw,
+      animdata.frames[i].imgh,
+      animdata.frames[i].offx,
+      animdata.frames[i].offy
+    )
+
+  end
+
+  return animation, image
+
 end

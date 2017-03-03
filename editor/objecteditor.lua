@@ -61,16 +61,14 @@ function ObjectEditor:ObjectEditor( objectListOwner, objectIndex, objectName, th
 
   self.incModifier = 1
 
-  self.resourceManager = ResourceManager()
-
   self.object = nil
 
   self.textInput = nil
 
   self:loadObjectWithName( objectName )
 
-  self.updatefunction = self.updateNone
-  self.keypressfunction = self.keypressNone
+  self.updatefunction = self.updategeneral
+  self.keypressfunction = self.keypressgeneral
 end
 
 function ObjectEditor:onEnter()
@@ -78,7 +76,7 @@ function ObjectEditor:onEnter()
 end
 
 function ObjectEditor:onExit()
-  self.resourceManager = nil
+
 end
 
 function ObjectEditor:draw()
@@ -142,17 +140,17 @@ function ObjectEditor:update(dt)
 
 end
 
-function ObjectEditor:updateNone(dt)
+function ObjectEditor:updategeneral(dt)
 
 end
 
 function ObjectEditor:updateGetResource( dt )
   if ( self.textInput:isFinished() ) then
 
-    local resname, restype, respath = self.resourceManager:getResourceByName( self.textInput:getText() )
+    local resname, restype, respath = self.game:getResourceManager():getResourceByName( self.textInput:getText() )
 
     if ( restype == "image" ) then
-      self.image = self.resourceManager:loadImage(respath)
+      self.image = self.game:getResourceManager():loadImage( respath )
 
       self.object = {}
       self.object.resourcename = resname
@@ -177,24 +175,24 @@ function ObjectEditor:updateGetResource( dt )
 
     self.mode = 0
 
-    self.updatefunction   = self.updateNone
-    self.keypressfunction = self.keypressNone
+    self.updatefunction   = self.updategeneral
+    self.keypressfunction = self.keypressgeneral
   end
 end
 
-function ObjectEditor:updateEditQuad(dt)
+function ObjectEditor:updateEditQuad( dt )
 end
 
-function ObjectEditor:updateEditBoundinBox(dt)
+function ObjectEditor:updateEditBoundinBox( dt )
 end
 
-function ObjectEditor:updateEditCollider(dt)
+function ObjectEditor:updateEditCollider( dt )
 
 end
 
 function ObjectEditor:doTextInput ( t )
 
-  if ( self.textInput ~= nil ) then
+  if ( self.textInput ) then
     self.textInput:input( t )
   end
 
@@ -245,8 +243,8 @@ function ObjectEditor:onKeyPress( key, scancode, isrepeat )
 
       options = mainOptions
 
-      self.updatefunction   = self.updateNone
-      self.keypressfunction = self.keypressNone
+      self.updatefunction   = self.updategeneral
+      self.keypressfunction = self.keypressgeneral
 
       return
     end
@@ -257,7 +255,7 @@ function ObjectEditor:onKeyPress( key, scancode, isrepeat )
 
 end
 
-function ObjectEditor:keypressNone( key )
+function ObjectEditor:keypressgeneral( key )
 
   if ( self.mode == 1 ) then
     self.textInput:keypressed( key )
@@ -576,9 +574,9 @@ function ObjectEditor:loadObjectWithName( objectFileName )
   if ( obdata ) then
     self.object = obdata
 
-    local resname, restype, respath = self.resourceManager:getResourceByName( self.object.resourcename )
+    local resname, restype, respath = self.game:getResourceManager():getResourceByName( self.object.resourcename )
 
-    self.image = self.resourceManager:loadImage( respath )
+    self.image = self.game:getResourceManager():loadImage( respath )
 
     if ( self.object.quaddata ~= nil ) then
 

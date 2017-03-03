@@ -5,17 +5,17 @@ require("../engine/io/io")
 
 require("../editor/textinput")
 
-local allmaps = {}
+local allanimations = {}
 
 local modfun = math.fmod
 local floorfun = math.floor
 
 local options = {
-  "F1 - New Map",
+  "F1 - New Animation",
   "F2 - Edit Name",
-  "F3 - Remove Map",
+  "F3 - Remove Animation",
   "",
-  "F4 - Edit Map",
+  "F4 - Edit Animation",
   "F9 - Save",
   "F11 - Back",
   "",
@@ -23,9 +23,9 @@ local options = {
   "Pg Down - Next Page"
 }
 
-class "MapList"
+class "AnimationList"
 
-function MapList:MapList( ownerEditor, thegame )
+function AnimationList:AnimationList( ownerEditor, thegame )
   self.game      = thegame
   self.editor    = ownerEditor
 
@@ -38,72 +38,72 @@ function MapList:MapList( ownerEditor, thegame )
   self.inputMode = 0
   self.textInput = nil
 
-  self.mapEditor = nil
+  self.animationEditor = nil
 
   self.tempData  = nil
 end
 
-function MapList:save()
-  saveFile("__maplist", allmaps)
+function AnimationList:save()
+  saveFile("__animationList", allanimations)
 end
 
-function MapList:load()
-  allmaps, err = loadFile("__maplist")
+function AnimationList:load()
+  allanimations, err = loadFile("__animationList")
 
-  if ( not allmaps ) then
-    allmaps = {}
+  if ( not allanimations ) then
+    allanimations = {}
   end
 end
 
-function MapList:onEnter()
-  print("Entered MapList")
+function AnimationList:onEnter()
+  print("Entered AnimationList")
 
   self:load()
   self:refreshList()
 end
 
-function MapList:onExit()
+function AnimationList:onExit()
 
 end
 
-function MapList:update(dt)
+function AnimationList:update(dt)
   if ( self.mode == 1 or self.mode == 2 ) then
     self:updateAddEdit( dt )
     return
   end
 
-  if ( self.mapEditor ~= nil ) then
-    self.mapEditor:update( dt )
+  if ( self.animationEditor ) then
+    self.animationEditor:update( dt )
     return
   end
 
 end
 
-function MapList:draw()
+function AnimationList:draw()
   if ( self.textInput ) then
 
     self.textInput:draw()
 
-  elseif ( self.mapEditor ) then
-      self.mapEditor:draw()
+  elseif ( self.animationEditor ) then
+      self.animationEditor:draw()
   else
     for i = 1, #options do
       love.graphics.print(options[i], 16, (i * 16) + 40)
     end
 
-    self:drawMapList()
+    self:drawAnimationList()
   end
 
 end
 
-function MapList:drawMapList()
+function AnimationList:drawAnimationList()
 
   love.graphics.setColor(0, 255, 100, 255)
   love.graphics.print("Name", 200, 56)
-  love.graphics.print("Engine Version", 500, 56)
+  --love.graphics.print("Engine Version", 500, 56)
   love.graphics.setColor(glob.defaultColor)
 
-  if ( #allmaps == 0) then
+  if ( #allanimations == 0) then
     return
   end
 
@@ -112,25 +112,24 @@ function MapList:drawMapList()
   love.graphics.setColor(glob.defaultColor)
 
   for i = self.listStart, self.listEnd do
-    love.graphics.print(allmaps[i][1], 200, ( (i - self.listStart + 1) * 16) + 56)
-    love.graphics.print(allmaps[i][2], 500, ( (i - self.listStart + 1) * 16) + 56)
+    love.graphics.print(allanimations[i][1], 200, ( (i - self.listStart + 1) * 16) + 56)
+    --love.graphics.print(allanimations[i][2], 500, ( (i - self.listStart + 1) * 16) + 56)
   end
 
 end
 
-function MapList:updateAddEdit(dt)
+function AnimationList:updateAddEdit(dt)
   if ( self.textInput:isFinished() ) then
     self.inputMode = self.inputMode + 1
 
     self.tempData[1] = self.textInput:getText()
 
     if ( self.inputMode == 2 ) then -- have everything
-      self.tempData[2] = glob.engineVersion
 
       if ( self.mode == 1 ) then
-        table.insert( allmaps, self.tempData )
+        table.insert( allanimations, self.tempData )
       else
-        allmaps[self.selIndex] = self.tempData
+        allanimations[self.selIndex] = self.tempData
       end
 
       self.tempData  = nil
@@ -144,14 +143,14 @@ function MapList:updateAddEdit(dt)
   end
 end
 
-function MapList:onKeyPress( key, scancode, isrepeat )
+function AnimationList:onKeyPress( key, scancode, isrepeat )
   if ( self.mode == 1 or self.mode == 2 ) then
     self.textInput:keypressed( key )
     return
   end
 
-  if ( self.mapEditor  ) then
-    self.mapEditor:onKeyPress( key, scancode, isrepeat )
+  if ( self.animationEditor  ) then
+    self.animationEditor:onKeyPress( key, scancode, isrepeat )
     return
   end
 
@@ -206,87 +205,87 @@ function MapList:onKeyPress( key, scancode, isrepeat )
   end
 end
 
-function MapList:onMousePress( x, y, button, istouch )
-  if ( self.mapEditor ) then
+function AnimationList:onMousePress( x, y, button, istouch )
+  if ( self.animationEditor ) then
 
-    if ( self.mapEditor.onMousePress ) then
-      self.mapEditor:onMousePress( x, y, button, istouch )
+    if ( self.animationEditor.onMousePress ) then
+      self.animationEditor:onMousePress( x, y, button, istouch )
     end
 
   end
 end
 
-function MapList:onMouseRelease( x, y, button, istouch )
-  if ( self.mapEditor ) then
+function AnimationList:onMouseRelease( x, y, button, istouch )
+  if ( self.animationEditor ) then
 
-    if ( self.mapEditor.onMouseRelease ) then
-      self.mapEditor:onMouseRelease( x, y, button, istouch )
+    if ( self.animationEditor.onMouseRelease ) then
+      self.animationEditor:onMouseRelease( x, y, button, istouch )
     end
 
   end
 end
 
-function MapList:onMouseMove( x, y, dx, dy )
+function AnimationList:onMouseMove( x, y, dx, dy )
 
-  if ( self.mapEditor ) then
+  if ( self.animationEditor ) then
 
-    if ( self.mapEditor.onMouseMove ) then
-      self.mapEditor:onMouseMove( x, y, dx, dy )
+    if ( self.animationEditor.onMouseMove ) then
+      self.animationEditor:onMouseMove( x, y, dx, dy )
     end
 
   end
 end
 
-function MapList:removeSelected()
+function AnimationList:removeSelected()
   local delIndex = self.selIndex + ( self.pageIndex - 1 ) * 40
 
-  table.remove(allmaps, delIndex)
+  table.remove( allanimations, delIndex )
 
   self:refreshList()
 end
 
-function MapList:doTextInput ( t )
+function AnimationList:doTextInput ( t )
   if ( self.textInput ) then
     self.textInput:input( t )
     return
   end
 
-  if ( self.mapEditor ) then
-    self.mapEditor:doTextInput( t )
+  if ( self.animationEditor ) then
+    self.animationEditor:doTextInput( t )
     return
   end
 
 end
 
-function MapList:addMode()
+function AnimationList:addMode()
   self.tempData  = {}
   self.mode      = 1
   self.inputMode = 1
-  self.textInput = TextInput( "Map Name:" )
+  self.textInput = TextInput( "Animation Name:" )
 end
 
-function MapList:editMode()
+function AnimationList:editMode()
   self.tempData  = {}
   self.mode      = 2
   self.inputMode = 1
-  self.textInput = TextInput( "Map Name:", allmaps[self.selIndex][1] )
+  self.textInput = TextInput( "Animation Name:", allanimations[self.selIndex][1] )
 end
 
-function MapList:editSelected()
-  local mapindex = self.selIndex + ( self.pageIndex - 1 ) * 40
+function AnimationList:editSelected()
+  local animationindex = self.selIndex + ( self.pageIndex - 1 ) * 40
 
   self.mode = 4
 
-  self.mapEditor = MapEditor( self, mapindex, allmaps[mapindex][1], self.game )
+  self.animationEditor = AnimationEditor( self, animationindex, allanimations[animationindex][1], self.game )
 
-  self.mapEditor:onEnter()
+  self.animationEditor:onEnter()
 end
 
-function MapList:backFromEdit()
-  self.mapEditor = nil
+function AnimationList:backFromEdit()
+  self.animationEditor = nil
 end
 
-function MapList:refreshList()
+function AnimationList:refreshList()
   --//TODO go to same page ?
   self.selIndex  = 1
   self.pageIndex = 1
@@ -295,12 +294,12 @@ function MapList:refreshList()
 
   self.listEnd = self.listStart + 40 - 1
 
-  if ( self.listEnd > #allmaps ) then
-    self.listEnd   = #allmaps
+  if ( self.listEnd > #allanimations ) then
+    self.listEnd   = #allanimations
   end
 end
 
-function MapList:selectPrevious( steps )
+function AnimationList:selectPrevious( steps )
   steps = steps or 1
 
   self.selIndex = self.selIndex - steps
@@ -310,7 +309,7 @@ function MapList:selectPrevious( steps )
   end
 end
 
-function MapList:selectNext( steps )
+function AnimationList:selectNext( steps )
   steps = steps or 1
 
   self.selIndex = self.selIndex + steps
@@ -325,7 +324,7 @@ function MapList:selectNext( steps )
   end
 end
 
-function MapList:listUp()
+function AnimationList:listUp()
   self.pageIndex = self.pageIndex - 1
 
   if (self.pageIndex == 0) then
@@ -336,24 +335,24 @@ function MapList:listUp()
 
   self.listEnd = self.listStart + 40 - 1
 
-  if (self.listEnd > #allmaps) then
-    self.listEnd = #allmaps
+  if (self.listEnd > #allanimations) then
+    self.listEnd = #allanimations
   end
 end
 
-function MapList:listDown()
+function AnimationList:listDown()
   self.pageIndex = self.pageIndex + 1
 
-  if (self.pageIndex > modfun(#allmaps, 40)) then
-    self.pageIndex = modfun(#allmaps, 40)
+  if (self.pageIndex > modfun(#allanimations, 40)) then
+    self.pageIndex = modfun(#allanimations, 40)
   end
 
   self.listStart = (self.pageIndex - 1) * 40 + 1
 
   self.listEnd = self.listStart + 40
 
-  if (self.listEnd > #allmaps) then
-    self.listEnd = #allmaps
+  if (self.listEnd > #allanimations) then
+    self.listEnd = #allanimations
   end
 
 end

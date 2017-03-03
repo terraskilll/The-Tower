@@ -10,6 +10,8 @@ require("../editor/objectlist")
 require("../editor/objecteditor")
 require("../editor/maplist")
 require("../editor/mapeditor")
+require("../editor/animationlist")
+require("../editor/animationeditor")
 
 local options = {
   "F1 - Edit Resources",
@@ -18,12 +20,22 @@ local options = {
   "F4 - Edit Animations"
 }
 
+local bgcolors = {
+  {0, 0, 0},
+  {150, 50, 50},
+  {25, 130, 25},
+  {50, 50, 150},
+  {220, 220, 220}
+}
+
 class "Editor" ("Screen")
 
 function Editor:Editor( thegame )
   self.game = thegame
   self.name = "EditorScreen"
   self.currentEditor = nil
+
+  self.bgcolorindex = 1
 
 end
 
@@ -62,11 +74,20 @@ function Editor:onExit()
 end
 
 function Editor:onKeyPress( key, scancode, isrepeat )
+
+  if ( key == "kp." ) then
+
+    self:changeBackgroundColor()
+
+    return
+  end
+
   if ( self.currentEditor ) then
     self.currentEditor:onKeyPress( key, scancode, isrepeat )
   else
     self:checkKey( key, scancode, isrepeat )
   end
+
 end
 
 function Editor:onKeyRelease( key, scancode, isrepeat )
@@ -129,9 +150,25 @@ function Editor:checkKey( key, scancode, isrepeat )
     self.currentEditor:onEnter()
   end
 
+  if ( key == "f4" ) then
+    self.currentEditor = AnimationList( self, self.game )
+    self.currentEditor:onEnter()
+  end
+
 end
 
 function Editor:backFromEdit()
   self.currentEditor:onExit()
   self.currentEditor = nil
+end
+
+function Editor:changeBackgroundColor()
+
+  self.bgcolorindex  = self.bgcolorindex + 1
+
+  if ( self.bgcolorindex > #bgcolors ) then
+    self.bgcolorindex = 1
+  end
+
+  love.graphics.setBackgroundColor( bgcolors[self.bgcolorindex] )
 end

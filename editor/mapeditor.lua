@@ -117,7 +117,7 @@ function MapEditor:onEnter()
 end
 
 function MapEditor:onExit()
-  self.resourceManager = nil
+  
 end
 
 function MapEditor:update( dt )

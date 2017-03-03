@@ -19,13 +19,13 @@ function IddleAnimation:configure()
   local h = i_character:getHeight()
 
   local toSouth = Animation()
-  toSouth:addFrame(1, 60, 30, 158, 342, w, h)
+  toSouth:createFrame(1, 60, 30, 158, 342, w, h)
 
   local toWest = Animation()
-  toWest:addFrame(1, 268, 70, 158, 342, w, h)
+  toWest:createFrame(1, 268, 70, 158, 342, w, h)
 
   local toNorth = Animation()
-  toNorth:addFrame(1, 476, 30, 158, 342, w, h)
+  toNorth:createFrame(1, 476, 30, 158, 342, w, h)
 
   self:addAnimation(toSouth)
   self:addAnimation(toWest)
