@@ -14,7 +14,7 @@ require("../engine/input")
 class "Area"
 
 function Area:Area( areaName )
-  self.name          = areaName
+  self.name = areaName
 
   self.grounds = {}
   self.spawns  = {}
@@ -35,6 +35,7 @@ function Area:draw()
 end
 
 function Area:addSimpleObject( simpleObjectToAdd )
+
   self.simpleObjects[simpleObjectToAdd:getName()] = simpleObjectToAdd
 
   if ( self.navmesh ) then
@@ -58,7 +59,7 @@ end
 function Area:removeSimpleObject( simpleObjectName )
 
   if ( self.simpleObjects[simpleObjectName] ) then
-    self.simpleObjects[simpleObjects] = nil
+    self.simpleObjects[simpleObjectName] = nil
   end
 
 end

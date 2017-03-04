@@ -21,7 +21,8 @@ local mainOptions = {
   "F2 - Edit Quad",
   "",
   "F4 - Edit Bounding Box",
-  "F5 - Edit Collider"
+  "F5 - Edit Collider",
+  "F6 - Set Animation"
 }
 
 local quadOptions = {
@@ -80,7 +81,7 @@ function ObjectEditor:onExit()
 end
 
 function ObjectEditor:draw()
-  if ( self.mode == 1 ) then
+  if ( self.textInput ) then
     self.textInput:draw()
     return
   end
@@ -337,6 +338,18 @@ function ObjectEditor:keypressgeneral( key )
     return
   end
 
+  if ( key == "f6" ) then
+
+    self.mode = 6
+
+    self.textInput = TextInput("Animation Name: ")
+
+    self.updatefunction   = self.updateSetAnimation
+    self.keypressfunction = self.keypressSetAnimation
+
+    return
+  end
+
   if ( key == "f11") then
     self.objectList:backFromEdit()
     return
@@ -561,6 +574,35 @@ function ObjectEditor:keypressEditCollider ( key )
 
 end
 
+function ObjectEditor:updateSetAnimation( dt )
+  if ( self.textInput:isFinished() ) then
+
+    local animationname = self.textInput:getText()
+
+    if ( animationname ~= "" ) then
+
+      if ( self.game:getAnimationManager():check( animationname ) ) then
+        print("Added a animation")
+        self.object.animationname = animationname
+      end
+
+    end
+
+    self.textInput = nil
+
+    self.mode = 0
+
+    self.updatefunction   = self.updategeneral
+    self.keypressfunction = self.keypressgeneral
+  end
+end
+
+function ObjectEditor:keypressSetAnimation( key )
+  self.textInput:keypressed( key )
+end
+
+---- LOAD / SAVE ---------------------------------------------------------------
+
 function ObjectEditor:saveObject( objectFileName )
   saveFile( "__objects/" .. objectFileName, self.object )
 
@@ -578,7 +620,7 @@ function ObjectEditor:loadObjectWithName( objectFileName )
 
     self.image = self.game:getResourceManager():loadImage( respath )
 
-    if ( self.object.quaddata ~= nil ) then
+    if ( self.object.quaddata ) then
 
       local qd = self.object.quaddata
 
@@ -586,7 +628,7 @@ function ObjectEditor:loadObjectWithName( objectFileName )
 
     end
 
-    if ( self.object.bboxdata ~= nil ) then
+    if ( self.object.bboxdata ) then
 
       local bb = self.object.bboxdata
 
@@ -594,7 +636,7 @@ function ObjectEditor:loadObjectWithName( objectFileName )
 
     end
 
-    if ( self.object.colldata ~= nil ) then
+    if ( self.object.colldata ) then
 
       local cd = self.object.colldata
 

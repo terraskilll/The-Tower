@@ -44,15 +44,16 @@ function AnimationList:AnimationList( ownerEditor, thegame )
 end
 
 function AnimationList:save()
-  saveFile("__animationList", allanimations)
+  self.game:getAnimationManager():save( allanimations )
 end
 
 function AnimationList:load()
-  allanimations, err = loadFile("__animationList")
+  allanimations = self.game:getAnimationManager():load()
 
   if ( not allanimations ) then
     allanimations = {}
   end
+
 end
 
 function AnimationList:onEnter()

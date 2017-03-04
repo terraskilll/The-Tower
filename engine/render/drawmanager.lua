@@ -16,6 +16,8 @@ objects not in-game (ui elements, menu buttons) are not affected by this
 
 --//TODO add Area support, instead of drawing the whole map
 
+--//TODO method to remove spawn points, lights and moving objects
+
 --//TODO use skiplist
 
 ]]--
@@ -69,6 +71,9 @@ function DrawManager:DrawManager( gameCamera )
 
   self.navCount   = 0
   self.navmeshes  = {}
+
+  self.groundVisible  = true
+  self.objectsVisible = true
 end
 
 function DrawManager:setScale( newScaleX, newScaleY )
@@ -102,6 +107,23 @@ function DrawManager:update( dt )
   table.sort( self.objects, sortByY )
 end
 
+function DrawManager:forceUpdate()
+  table.sort( self.objects, sortByY )
+  table.sort( self.grounds, sortByY )
+end
+
+function DrawManager:toogleGroundVisible( )
+  self.groundVisible = not self.groundVisible
+
+  print( "Ground visibility changed to " .. tostring( self.groundVisible ) )
+end
+
+function DrawManager:toogleObjectsVisible( )
+  self.objectsVisible = not self.objectsVisible
+
+  print( "Objects visibility changed to " .. tostring( self.objectsVisible ) )
+end
+
 function DrawManager:addObject( objectToAdd )
   table.insert( self.objects, objectToAdd )
   self.objectCount = #self.objects
@@ -110,19 +132,20 @@ end
 function DrawManager:removeObject( objectName )
   local index = 0
 
-  local i = 1
+  for i = 1, #self.objects do
 
-  for _,o in pairs( self.objects ) do
-    if ( o:getName() == objectName ) then
+    if ( self.objects[i]:getName() == objectName ) then
       index = i
     end
 
-    i = i + 1
   end
 
   if ( index > 0 ) then
-    table.remove(self.objects, index)
+    table.remove( self.objects, index )
   end
+
+  self.objectCount = #self.objects
+
 end
 
 function DrawManager:addLight( lightToAdd )
@@ -175,19 +198,19 @@ end
 function DrawManager:removeGround( groundName )
   local index = 0
 
-  local i = 1
+  for i = 1, #self.grounds do
 
-  for _,g in pairs( self.grounds ) do
-    if (g:getName() == groundName) then
+    if ( self.grounds[i]:getName() == groundName ) then
       index = i
     end
 
-    i = i + 1
   end
 
   if ( index > 0 ) then
     table.remove(self.grounds, index)
   end
+
+  self.groundCount = #self.grounds
 end
 
 function DrawManager:addArea( areaToAdd )
@@ -231,22 +254,22 @@ function DrawManager:draw()
 
   end
 
-  for i = 1, self.groundCount do
-
-    self.grounds[i]:draw() -- todo chek if it is inside screen
-
+  if ( self.groundVisible ) then
+    for i = 1, self.groundCount do
+      self.grounds[i]:draw() -- todo chek if it is inside screen
+    end
   end
 
-  for i = 1, self.movingCount do
+  if ( self.objectsVisible ) then
 
-    self.movingObjects[i]:draw()
+    for i = 1, self.movingCount do
+      self.movingObjects[i]:draw()
+    end
 
-  end
-
-  for i = 1, self.objectCount do
-
-    if ( self:isInsideScreen( self.objects[i] ) ) then
-      self.objects[i]:draw()
+    for i = 1, self.objectCount do
+      if ( self:isInsideScreen( self.objects[i] ) ) then
+        self.objects[i]:draw()
+      end
     end
 
   end

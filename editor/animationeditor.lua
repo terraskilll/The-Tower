@@ -10,11 +10,6 @@ an animation editor
 require("../engine/lclass")
 require("../engine/input")
 require("../engine/io/io")
-require("../engine/ui/uigroup")
-require("../engine/ui/button/button")
-require("../engine/gameobject/gameobject")
-require("../engine/gameobject/staticimage")
-require("../engine/gameobject/simpleobject")
 require("../engine/utl/funcs")
 
 local Vec = require("../engine.math.vector")
@@ -33,7 +28,7 @@ local editingOptions = {
   "F1 - Load Image",
   "F2 - Create Frame",
   "F3 - Set By Mouse",
-  "F4 - Change Duration",
+  "F4 - Change Duration (Ctrl: All)",
   "",
   "PgUp/PgDown - Previous/Next Frame",
   "Ctrl+Del - Delete Frame",
@@ -72,6 +67,8 @@ function AnimationEditor:AnimationEditor( animationListOwner, animationIndex, an
 
   self.viewing = false
 
+  self.applytoall = false
+
   self.updatefunction   = self.updategeneral
   self.keypressfunction = self.keypressgeneral
 
@@ -90,7 +87,7 @@ function AnimationEditor:onEnter()
 end
 
 function AnimationEditor:onExit()
-
+  self.game:getCamera():setPosition( 0, 0 )
 end
 
 function AnimationEditor:update( dt )
@@ -159,9 +156,13 @@ end
 
 function AnimationEditor:drawViewing()
 
+  self.game:getCamera():set()
+
   if ( self.animation ) then
-    self.animation:draw( 100, 100 )
+    self.animation:draw( 0, 0 )
   end
+
+  self.game:getCamera():unset()
 
   for i = 1, #generalOptions do
     love.graphics.print( generalOptions[i], 1000, (i * 16) )
@@ -312,13 +313,13 @@ end
 
 function AnimationEditor:saveAnimation( animationFileName )
 
-  self.animation:saveToFile( animationFileName )
+  self.game:getAnimationManager():saveAnimation( animationFileName, self.animation )
 
 end
 
 function AnimationEditor:loadAnimation( animationFileName )
 
-  self.animation, self.image = self.game:getObjectManager():loadAnimation( animationFileName )
+  self.animation, self.image = self.game:getAnimationManager():loadAnimation( animationFileName )
 
   if ( self.animation ) then
 
@@ -397,6 +398,10 @@ function AnimationEditor:keypressgeneral( key )
     self.updatefunction = self.updateSetFrameDuration
     self.keypressfunction = self.keypressSetFrameDuration
 
+    if ( Input:isKeyDown("lctrl") ) then
+      self.applytoall = true
+    end
+
   end
 
   if ( ( key == "delete" ) and ( Input:isKeyDown("lctrl") ) ) then
@@ -414,7 +419,7 @@ function AnimationEditor:keypressgeneral( key )
   end
 
   if ( key == "f11") then
-
+    self:onExit()
     self.animationList:backFromEdit()
     return
 
@@ -585,8 +590,18 @@ function AnimationEditor:updateSetFrameDuration( dt )
     if not tonumber(strdur) then
       print("Invalid duration value : " + strdur)
     else
-      self.frame:setDuration( tonumber(strdur) )
+      self.frame:setDuration( tonumber( strdur ) )
+
+      if ( self.applytoall ) then
+
+        for i = 1, self.animation:getFrameCount() do
+          self.animation:getFrame(i):setDuration( tonumber( strdur ) )
+        end
+
+      end
     end
+
+    self.applytoall = false
 
     self.textInput = nil
 

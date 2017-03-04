@@ -12,12 +12,22 @@ class "Ground" ("SimpleObject")
 
 function Ground:Ground( groundName, positionX, positionY, groundImage, groundQuad, objectScale )
   self.name     = groundName
-  self.position = Vec(positionX, positionY)
+  self.position = Vec( positionX, positionY )
   self.image    = groundImage
   self.quad     = groundQuad or nil
   self.scale    = objectScale or 1
 
+  self.width  = groundImage:getWidth()
+  self.height = groundImage:getHeight()
+
   self.stair = false
+
+  self.animation   = nil
+
+  self.collider    = nil
+  self.boundingbox = nil
+
+  self.onCollisionEnter = nil
 end
 
 function Ground:setAsStair( isStair )
@@ -44,4 +54,5 @@ function Ground:clone( newname )
   cloned:setAsStair( self.stair )
 
   return cloned
+
 end

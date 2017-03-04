@@ -283,6 +283,7 @@ function MapList:editSelected()
 end
 
 function MapList:backFromEdit()
+  self.mapEditor:onExit()
   self.mapEditor = nil
 end
 

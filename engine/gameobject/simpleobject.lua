@@ -16,13 +16,20 @@ class "SimpleObject" ("GameObject")
 function SimpleObject:SimpleObject( objectName, positionX, positionY, objectSprite, drawQuad, objectScale )
   self.name     = objectName
 
-  self.position = Vec(positionX, positionY)
+  self.position = Vec( positionX, positionY )
   self.image    = objectSprite
   self.quad     = drawQuad or nil
   self.scale    = objectScale or 1
 
   self.width  = objectSprite:getWidth()
   self.height = objectSprite:getHeight()
+
+  if ( self.quad ) then
+    local _x, _y, ww, hh = self.quad:getViewport()
+
+    self.width  = ww
+    self.height = hh
+  end
 
   self.animation   = nil
 
@@ -76,11 +83,42 @@ function SimpleObject:getDimensions()
   return self.width, self.height
 end
 
-function SimpleObject:setCollider( colliderToSet )
-  self.collider = colliderToSet
+function SimpleObject:getScale()
+  return self.scale
+end
 
-  self.collider:setOwner( self )
-  self.collider:setScale( self.scale )
+function SimpleObject:getQuad()
+
+  if ( self.quad ) then
+    local qx, qy, lx, ly = self.quad:getViewport()
+    local qw, qh = self.quad:getTextureDimensions()
+
+    return love.graphics.newQuad( qx, qy, lx, ly, qw, qh )
+  else
+    return nil
+  end
+
+end
+
+function SimpleObject:getImage()
+  return self.image
+end
+
+function SimpleObject:getAnimation()
+  return self.animation
+end
+
+function SimpleObject:setCollider( colliderToSet )
+
+  if ( colliderToSet ) then
+
+    self.collider = colliderToSet
+
+    self.collider:setOwner( self )
+    self.collider:setScale( self.scale )
+
+  end
+
 end
 
 function SimpleObject:getCollider()
@@ -88,8 +126,14 @@ function SimpleObject:getCollider()
 end
 
 function SimpleObject:setBoundingBox( boundingboxToSet )
-  self.boundingbox = boundingboxToSet
-  self.boundingbox:setScale( self.scale )
+
+  if ( boundingboxToSet ) then
+
+    self.boundingbox = boundingboxToSet
+    self.boundingbox:setScale( self.scale )
+
+  end
+
 end
 
 function SimpleObject:getBoundingBox()
@@ -118,9 +162,11 @@ function SimpleObject:setPosition( positionVector )
   if ( self.boundingbox ) then
     self.boundingbox:setPosition( self.position.x, self.position.y )
   end
+
 end
 
 function SimpleObject:changePosition( movementVector )
+
   self.position = self.position + movementVector
 
   if ( self.collider ) then
@@ -128,7 +174,7 @@ function SimpleObject:changePosition( movementVector )
   end
 
   if ( self.boundingbox ) then
-    self.boundingbox:setPosition( self.position.x, self.position.y )
+    self.boundingbox:changePosition( movementVector )
   end
 
 end
@@ -158,6 +204,11 @@ function SimpleObject:clone( newName )
   if ( self.collider ) then
     local colld = self.collider:clone()
     cloned:setCollider( colld )
+  end
+
+  if ( self.animation ) then
+    local animd = self.animation:clone()
+    cloned:setAnimation( animd )
   end
 
   return cloned

@@ -8,6 +8,7 @@ require("../engine/render/drawmanager")
 require("../engine/collision/collisionmanager")
 require("../engine/resourcemanager")
 require("../engine/objectmanager")
+require("..engine.animationmanager")
 
 local config = {
   gameScreenWidth = 1280,
@@ -82,6 +83,9 @@ function Game:configure()
   self.objectManager = ObjectManager( self )
   self.objectManager:load()
 
+  self.animationManager = AnimationManager( self )
+  self.animationManager:load()
+
   self.player = Player( "PLAYER", 0, 0 )
 
   self.camera = Camera()
@@ -121,6 +125,10 @@ end
 
 function Game:getObjectManager()
   return self.objectManager
+end
+
+function Game:getAnimationManager()
+  return self.animationManager
 end
 
 function Game:setCurrentScreen( screenName )

@@ -33,6 +33,10 @@ function Animation:setImage( imageToSet, resourceNameToSet )
   self.resourcename = resourceNameToSet
 end
 
+function Animation:getResourceName()
+  return self.resourcename
+end
+
 function Animation:update( dt )
 
   self.currentFrameTime = self.currentFrameTime + dt
@@ -103,32 +107,4 @@ end
 
 function Animation:getFrameCount()
   return self.frameCount
-end
-
-function Animation:saveToFile( filename )
-
-  local frms = {}
-
-  for i = 1, self.frameCount do
-    table.insert( frms, self.frames[i]:getDatAsTable() )
-  end
-
-  local animData = {
-    name = self.name,
-    resourcename = self.resourcename,
-    frames = frms
-  }
-
-  saveFile( "__animations/" .. filename, animData )
-end
-
-function Animation:loadFromFile( filename, resourcemanager )
-
-  local animData, err = loadFile( "__animations/" .. filename )
-
-  if ( err ) then
-    print("Failed to load animation from file : " .. filename )
-    return
-  end
-
 end

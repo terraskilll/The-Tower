@@ -89,5 +89,5 @@ function Map:loadFromFile( mapName )
     return
   end
 
-  --//TODO load map from file
+  --//TODO load map from file (use map manager?)
 end

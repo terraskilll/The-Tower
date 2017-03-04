@@ -31,7 +31,7 @@ end
 
 function BoundingBox:changePosition( movementVector )
   self.positionX = self.positionX + movementVector.x
-  self.positionY = self.positiony + movementVector.y
+  self.positionY = self.positionY + movementVector.y
 end
 
 function BoundingBox:setPosition( newX, newY )
