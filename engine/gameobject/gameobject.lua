@@ -12,6 +12,9 @@ function GameObject:GameObject( positionX, positionY )
   self.tag  = "None"
 
   self.position = Vec( positionX, positionY )
+
+  self.width  = 0
+  self.height = 0
 end
 
 function GameObject:getName()
@@ -36,6 +39,10 @@ end
 
 function GameObject:getPosition()
   return self.position
+end
+
+function GameObject:getDimensions()
+  return self.width, self.height
 end
 
 function GameObject:setPosition( newPosition )

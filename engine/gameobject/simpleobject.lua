@@ -79,10 +79,6 @@ function SimpleObject:drawAnimated()
   self.animation:draw( self.position.x, self.position.y )
 end
 
-function SimpleObject:getDimensions()
-  return self.width, self.height
-end
-
 function SimpleObject:getScale()
   return self.scale
 end

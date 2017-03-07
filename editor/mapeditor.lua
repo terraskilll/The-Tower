@@ -27,8 +27,8 @@ require("../editor/objectselector")
 local Vec = require("../engine.math.vector")
 
 local generalOptions = {
+  "/ - Help/Command List",
   "Numpad '+/-' - Change Inc Modifier",
-  --"F8 - Toogle View All/View Quad",
   "F9 - Save",
   "F11 - Back"
 }
@@ -75,6 +75,8 @@ function MapEditor:MapEditor( mapListOwner, mapIndex, mapName, thegame )
   self.index   = mapIndex
   self.name    = mapName
 
+  self.showHelp = false
+
   self.textInput = nil
 
   self.incModifier = 1
@@ -119,6 +121,11 @@ function MapEditor:update( dt )
 end
 
 function MapEditor:draw()
+
+  if ( self.showHelp ) then
+    self:drawHelp()
+    return
+  end
 
   if ( self.textInput ) then
     self.textInput:draw()
@@ -709,6 +716,10 @@ end
 
 function MapEditor:keypressMiscelaneous( key )
 
+  if ( key == "/" ) then
+    self.showHelp = not self.showHelp
+  end
+
   if ( ( key == "]" ) and ( Input:isKeyDown( "lctrl" ) ) ) then
     self:lockLayer( self.currentLayer )
   end
@@ -884,3 +895,45 @@ end
 function MapEditor:keypressCreateLayer( key )
   self.textInput:keypressed( key )
 end
+
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+function MapEditor:drawHelp()
+  --draws all editor commands and shortcuts
+  --//TODO allways update
+
+  local column1 = {
+    "? - Help/Command List",
+    "Numpad '+/-' - Change Inc Modifier",
+    "F9 - Save",
+    "F11 - Back"
+  }
+
+  local column2 = {
+    "F1 - Add Area",
+    "F2 - Select Area",
+    "Ctrl + F1 - Rename Area",
+    "Ctrl + Alt + F1 - Remove Area",
+    "F3 - Edit NavMesh",
+    "",
+    "F5 - Load Object From Library",
+    "Ctrl + D - Duplicate",
+    "DEL - Remove Object",
+    "Alt + PgUp - Layer Up",
+    "Alt + PgDown - Layer Down",
+    "Ctrl + L - Change Layer",
+    "Alt + L - Add Layer"
+  }
+
+  for i = 1, #column1 do
+    love.graphics.print( column1[i], 10, (i * 16) )
+  end
+
+  for i = 1, #column2 do
+    love.graphics.print( column2[i], 300, (i * 16) )
+  end
+
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------

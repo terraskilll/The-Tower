@@ -7,17 +7,24 @@ a spawn point in a map->area->floor that can be  refered by name
 
 require("../engine/lclass")
 
-local Vec = require("../engine/math/vector")
+local Vec = require("../engine.math.vector")
 
 class "SpawnPoint" ("GameObject")
 
 function SpawnPoint:SpawnPoint( spawnPointName , positionX, positionY )
   self.name     = spawnPointName
   self.position = Vec( positionX, positionY )
+
+  self.width  = 10
+  self.height = 10
 end
 
 function SpawnPoint:setPosition(newX, newY)
   self.position:set(newX, newY)
+end
+
+function SpawnPoint:changePosition( movementVector )
+  self.position = self.position + movementVector
 end
 
 function SpawnPoint:draw()
