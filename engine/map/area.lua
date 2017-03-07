@@ -4,7 +4,8 @@ an area is a isolated part of a floor (a room, for example)
 
 only one area is rendered at a time, instead of the whole map (this is not working now)
 
-
+--//TODO remove layer function
+--//TODO spawn point in layer
 
 ]]
 
@@ -16,10 +17,9 @@ class "Area"
 function Area:Area( areaName )
   self.name = areaName
 
-  self.grounds = {}
-  self.spawns  = {}
+  self.objects = {}
 
-  self.simpleObjects = {}
+  self.spawns  = {}
 
   self.navmesh = nil
 end
@@ -28,58 +28,50 @@ function Area:getName()
   return self.name
 end
 
+
 function Area:draw()
 
   -- Do Nothing?
 
 end
 
-function Area:addSimpleObject( simpleObjectToAdd )
+function Area:addObject( objectToAdd )
 
-  self.simpleObjects[simpleObjectToAdd:getName()] = simpleObjectToAdd
+  self.objects[objectToAdd:getName()] = objectToAdd
 
   if ( self.navmesh ) then
-    self.navmesh:addSimpleCollider( simpleObjectToAdd:getCollider() )
+    self.navmesh:addCollider( objectToAdd:getCollider() )
   end
 
 end
 
-function Area:getSimpleObjects()
-  return self.simpleObjects
+function Area:getObjects()
+  return self.objects
 end
 
-function Area:getSimpleObjectByName( simpleObjectName )
+function Area:getObjectByName( objectName )
 
-  if ( self.simpleObjects[simpleObjectName] ) then
-    return self.simpleObjects[simpleObjectName]
+  for i = 1, #self.objects do
+
+    if ( self.objects[objectName] ) then
+      return self.objects[objectName]
+    end
+
   end
 
-end
-
-function Area:removeSimpleObject( simpleObjectName )
-
-  if ( self.simpleObjects[simpleObjectName] ) then
-    self.simpleObjects[simpleObjectName] = nil
-  end
+  return nil
 
 end
 
-function Area:addGround( groundToAdd )
-  self.grounds[groundToAdd:getName()] = groundToAdd
-end
+function Area:removeObject( objectName )
 
-function Area:getGrounds()
-  return self.grounds
-end
+  for i = 1, #self.objects do
 
-function Area:getGroundByName( groundName )
-  return self.grounds[groundName]
-end
+    if ( self.objects[objectName] ) then
+      self.objects[objectName] = nil
+      return
+    end
 
-function Area:removeGround( groundName )
-
-  if ( self.grounds[groundName] ) then
-    self.grounds[groundName] = nil
   end
 
 end

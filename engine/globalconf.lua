@@ -1,6 +1,6 @@
 
 glob = {
-  engineVersion   = 100, --//TODO note: change this at each commit
+  engineVersion   = 110, --//TODO note: change this at each commit
   defaultFontSize = 12,
   defaultColor    = {255,255,255,255},
 

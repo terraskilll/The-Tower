@@ -1,7 +1,9 @@
 --[[
 
 a map is a big playable zone (a tower floor, in this game context),
-composed of many floors (rooms or similar)
+composed of many areas (rooms or similar)
+
+--//TODO remove layer function? duplicated in Area
 
 ]]
 
@@ -11,13 +13,11 @@ require("../engine/io/io")
 class "Map"
 
 function Map:Map( mapName )
-  self.name       = mapName
-  self.floors     = {}
-  self.floorCount = 0
+  self.name = mapName
 
-  self.currentFloor = nil
-
-  self.objectList = {}
+  self.areas         = {}
+  self.areaCount     = 0
+  self.movingObjects = {}
 
   self:loadFromFile( mapName )
 end
@@ -27,46 +27,39 @@ function Map:getName()
 end
 
 function Map:update( dt )
-
-  for _,a in pairs( self.floors ) do
+--[[
+  for _,a in pairs( self.areas ) do
     a:update( dt )
   end
+]]
 
-end
-
-function Map:draw()
-  self.currentFloor:draw()
-end
-
-function Map:getObjectList()
-  return self.objectList
-end
-
-function Map:addFloor( floorToAdd )
-  self.floors[floorToAdd:getName()] = floorToAdd
-
-  self.floorCount = self.floorCount + 1
-
-  if ( self.floorCount == 1 ) then
-    self.currentFloor = self.floors[floorToAdd:getName()]
+  for _,mo in pairs( self.movingObjects ) do
+    mo:update( dt )
   end
 
 end
 
-function Map:getFloorByName( floorName )
-
-  if ( self.floors[floorName] ) then
-    return self.floors[floorName]
-  else
-    return nil
-  end
-
+function Map:addArea( area )
+  self.areas[area:getName()] = area
+  self.areaCount = self.areaCount + 1
 end
 
-function Map:removeFloorByName( floorName )
+function Map:getAreas()
+  return self.areas
+end
 
-  if ( self.floors[floorName] ) then
-    self.floors[floorName] = nil
+function Map:getAreaByName ( areaName )
+  return self.areas[areaName]
+end
+
+function Map:getAreaCount()
+  return self.areaCount
+end
+
+function Map:removeAreaByName( areaName )
+
+  if ( self.areas[areaName] ) then
+    self.areas[areaName] = nil
     return true
   else
     return false
@@ -74,12 +67,60 @@ function Map:removeFloorByName( floorName )
 
 end
 
-function Map:setCurrentFloorByName( floorName )
-  self.currentFloor = self.floors[floorName]
+function Map:addMovingObject( objectToAdd )
+  self.movingObjects[objectToAdd:getName()] = objectToAdd
 end
 
-function Map:getFloorCount()
-  return self.floorCount
+function Map:getMovingObjects()
+  return self.movingObjects
+end
+
+function Map:getMovingObjectByName( objectName )
+  return self.movingObjects[objectName]
+end
+
+function Map:removeMovingObject( objectName )
+
+  if ( self.movingObjects[objectName] ) then
+    self.movingObjects[objectName] = nil
+    return true
+  else
+    return false
+  end
+
+end
+
+function Map:checkChangedNavMesh( objectPosition, objectMovement )
+  local pos = objectPosition + objectMovement
+
+  local nav = nil
+
+  local isIn = false
+
+  for i, fl in pairs( self.areas ) do
+
+    isIn = fl:getNavMesh():isInside( pos.x, pos.y )
+
+    if (isIn) then
+      nav = fl:getNavMesh()
+    end
+
+  end
+
+  for _,mo in pairs( self.movingObjects ) do
+    if ( mo:isWalkable() ) then
+
+      isIn = mo:getNavMesh():isInside( pos.x, pos.y )
+
+      if (isIn) then
+        nav = mo:getNavMesh()
+        --//TODO reprocess navmap for object when navmesh changed?
+      end
+
+    end
+  end
+
+  return nav
 end
 
 function Map:loadFromFile( mapName )

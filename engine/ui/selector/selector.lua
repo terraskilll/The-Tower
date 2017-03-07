@@ -15,8 +15,8 @@ local selectorShader = love.graphics.newShader("engine/shaders/ui.glsl")
 
 class "Selector"
 
-function Selector:Selector(positionX, positionY, captionText, selectorImage, selectorScale)
-  self.position   = Vec(positionX, positionY)
+function Selector:Selector( positionX, positionY, captionText, selectorImage, selectorScale )
+  self.position   = Vec( positionX, positionY )
   self.caption    = captionText
   self.image      = selectorImage
   self.scale      = selectorScale or 1
@@ -39,7 +39,7 @@ function Selector:Selector(positionX, positionY, captionText, selectorImage, sel
   self.onSelectorChange = nil
 end
 
-function Selector:update(dt)
+function Selector:update( dt )
   if (self.selected == false) then
     return
   end
@@ -68,12 +68,12 @@ function Selector:update(dt)
 end
 
 function Selector:draw()
-  selectorShader:send("uIsSelected", self.selected)
-  selectorShader:send("uIsEnabled", self.enabled)
+  selectorShader:send( "uIsSelected", self.selected )
+  selectorShader:send( "uIsEnabled", self.enabled )
 
   x, y = self:getPosition()
 
-  love.graphics.setShader(selectorShader)
+  love.graphics.setShader( selectorShader )
   love.graphics.draw(self.image, x, y, 0, self.scale, self.scale)
 
   love.graphics.setShader()
@@ -94,7 +94,7 @@ function Selector:getPositionByAnchor()
 end
 
 function Selector:drawText()
-  love.graphics.setNewFont(80 * self.scale)
+  love.graphics.setNewFont( 80 * self.scale )
 
   --// shader does not like transparency in text =(
   local a = 255
@@ -110,18 +110,18 @@ function Selector:drawText()
   love.graphics.print(self.currentOption, x + 800 * self.scale, y + 5 * self.scale)
   love.graphics.setColor( 255, 255, 255, 255)
 
-  love.graphics.setNewFont(glob.defaultFontSize)
+  love.graphics.setNewFont( glob.defaultFontSize )
 end
 
-function Selector:setAnchor(anchorPoint, offX, offY)
+function Selector:setAnchor( anchorPoint, offX, offY )
   self.anchor = anchorPoint or nil
   self.offsetX = offX
   self.offsetY = offY
 end
 
-function Selector:addOption(newOption, returnValue)
-  table.insert(self.options, newOption)
-  table.insert(self.optionValues, returnValue)
+function Selector:addOption( newOption, returnValue )
+  table.insert( self.options, newOption )
+  table.insert( self.optionValues, returnValue )
 end
 
 function Selector:selectNext()
@@ -150,7 +150,7 @@ function Selector:selectPrevious()
   self.changed = true
 end
 
-function Selector:setDefaultOptionIndex(defaultIndex)
+function Selector:setDefaultOptionIndex( defaultIndex )
   self.selectedIndex = defaultIndex
   self.currentOption = self.options[self.selectedIndex]
   self.currentValue  = self.optionValues[self.selectedIndex]
@@ -186,6 +186,6 @@ function Selector:getValue()
   return self.currentValue
 end
 
-function Selector:checkMouseOver( x, y )
+function Selector:isMouseOver( x, y )
   return false
 end

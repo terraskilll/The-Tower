@@ -26,6 +26,7 @@ end
 
 function Game:update(dt)
   Input:update(dt)
+
 	self.currentScreen:update( dt )
   self.drawManager:update( dt ) --//TODO check is gets slow
 end
@@ -154,15 +155,11 @@ end
 function Game:addScreen( screenName, screen )
 
   if ( self.screens[screenName] ) then
-
     print("Screen already exists: " .. screenName)
-
   else
-
     self.screens[screenName] = screen
-    print("Screen Added: " .. screenName)
-
   end
+
 end
 
 function Game:changeResolution( resolutionWidth, resolutionHeight, setFullScreen )

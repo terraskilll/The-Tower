@@ -4,7 +4,7 @@
 
 --[[
 
-a navmesh is the walkable part of an floor
+a navmesh is the walkable part of an area
 
 ]]
 
@@ -29,12 +29,10 @@ function NavMesh:NavMesh()
 
   self.mobile = false
 
-  self.obstacleColliders      = {}
-  self.obstacleCollidersCount = 0
+  --//TODO use layers for collision objects
+  self.colliders      = {}
+  self.collidersCount = 0
 
-  --//TODO obstacles and simple colliders are a bit redundant, no?
-  self.obstacles     = {}
-  self.obstacleCount = 0
 end
 
 function NavMesh:draw()
@@ -159,40 +157,17 @@ function NavMesh:changePosition( movementVector )
 
 end
 
-function NavMesh:addSimpleCollider( colliderToAdd )
+function NavMesh:addCollider( colliderToAdd )
   if ( colliderToAdd == nil ) then
     return
   end
 
-  table.insert( self.obstacleColliders, colliderToAdd )
-  self.obstacleCollidersCount = #self.obstacleColliders
-end
---[[
-function NavMesh:addObstacle( obstacleToAdd, addOffSet )
-  -- obstacle must be the rectangle of the objects boundingbox
-
-  --//TODO use this?
-
-  -- create a offset in the rectangle
-  if ( addOffSet == true ) then
-    obstacleToAdd[1] = obstacleToAdd[1] - 2
-    obstacleToAdd[2] = obstacleToAdd[2] - 2
-    obstacleToAdd[3] = obstacleToAdd[3] + 2
-    obstacleToAdd[4] = obstacleToAdd[4] + 2
-  end
-
-  table.insert( self.obstacles, obstacleToAdd )
-  self.obstacleCount = self.obstacleCount + 1
+  table.insert( self.colliders, colliderToAdd )
+  self.collidersCount = #self.colliders
 end
 
-]]
-
-function NavMesh:getObstacles()
-  return self.obstacles
-end
-
-function NavMesh:getObstacleColliders()
-  return self.obstacleColliders
+function NavMesh:getColliders()
+  return self.colliders
 end
 
 function NavMesh:getBounds()

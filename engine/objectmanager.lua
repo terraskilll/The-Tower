@@ -53,7 +53,7 @@ function ObjectManager:loadObjectData( objectFileName )
 
 end
 
-function ObjectManager:loadSimpleObject( objectName, instanceName, posx, posy )
+function ObjectManager:loadObject( objectName, instanceName, posx, posy )
 
   local objdata = self:loadObjectData( objectName )
 

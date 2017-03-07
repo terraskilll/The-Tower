@@ -174,10 +174,13 @@ function UIGroup:joystickPressed( joystick, button, sender )
 end
 
 function UIGroup:mousePressed( x, y, button, scaleX, scaleY, sender )
-  --//TODO check is mouse is over button before click
 
   if ( button == 1 ) then
-    self.items[self.selectedIndex]:onClick( sender )
+
+    if ( self.items[self.selectedIndex]:isMouseOver( x, y) ) then
+      self.items[self.selectedIndex]:onClick( sender )
+    end
+
   end
 
 end
@@ -196,7 +199,7 @@ function UIGroup:mouseMoved( x, y, dx, dy, scaleX, scaleY, sender )
   for _,v in ipairs( self.items ) do
     if ( not over ) then
 
-      over = v:checkMouseOver( x, y )
+      over = v:isMouseOver( x, y )
 
       if ( over ) then
         sel = i

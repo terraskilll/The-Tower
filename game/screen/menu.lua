@@ -16,6 +16,8 @@ require("../game/screen/play")
 
 class "MenuScreen" ("Screen")
 
+local mapShader = love.graphics.newShader( "engine/shaders/simplenormal.glsl" )
+
 function MenuScreen:MenuScreen( theGame )
   self.game = theGame
 

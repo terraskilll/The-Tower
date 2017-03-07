@@ -12,7 +12,6 @@ require("../engine/gameobject/ground")
 require("../engine/light/light")
 require("../engine/map/map")
 require("../engine/map/area")
-require("../engine/map/floor")
 require("../engine/map/spawnpoint")
 require("../engine/collision/collision")
 require("../engine/navigation/navmesh")
@@ -105,9 +104,9 @@ function PlayScreen:joystickPressed(joystick, button)
 
 end
 
-function PlayScreen:changeMap( newMap, newFloor, newArea, newSpawnPoint )
+function PlayScreen:changeMap( newMap, newArea, newSpawnPoint )
   self.currentMap = newMap
-  self.game:getPlayer():setMap( newMap, newFloor, newArea, newSpawnPoint )
+  self.game:getPlayer():setMap( newMap, newArea, newSpawnPoint )
 end
 
 function PlayScreen:createPauseMenu()
@@ -311,11 +310,6 @@ function PlayScreen:createTestMap()
   table.insert( self.navmaps, navmap1 )
   table.insert( self.navmaps, navmap2 )
 
-  local lit = Light( "", 800, 100, 5 )
-  lit:setImage( i__lit )
-
-  self.game:getDrawManager():addLight( lit )
-
   self.game:getDrawManager():addObject( self.game:getPlayer() )
   self.game:getDrawManager():addObject( self.tree )
   self.game:getDrawManager():addObject( spider1 )
@@ -330,5 +324,5 @@ function PlayScreen:createTestMap()
   self.game:getCollisionManager():addCollider( spider2:getCollider() )
   self.game:getCollisionManager():addCollider( self.tree:getCollider() )
 
-  self:changeMap( mapa, floor, area, spawnpt )
+  self:changeMap( mapa, area, spawnpt )
 end

@@ -23,7 +23,6 @@ function Player:Player( playerName, positionX, positionY )
 
   self.map    = nil
   self.area   = nil
-  self.floor  = nil
 
   self.boundingbox = nil
   self.collider    = nil

@@ -16,7 +16,7 @@ objects not in-game (ui elements, menu buttons) are not affected by this
 
 --//TODO add Area support, instead of drawing the whole map
 
---//TODO method to remove spawn points, lights and moving objects
+--//TODO method to remove spawn points, lights, layers and moving objects
 
 --//TODO use skiplist
 
@@ -48,23 +48,17 @@ end
 function DrawManager:DrawManager( gameCamera )
   self.camera = gameCamera
 
+  self.layers     = {}
+  self.layerCount = 0
+
   self.scaleX = 1
   self.scaleY = 1
-
-  self.lightCount  = 0
-  self.lights      = {} -- lights in map
 
   self.objectCount = 0
   self.objects     = {} -- objects currently being managed
 
-  self.movingCount   = 0
-  self.movingObjects = {} -- moving objects
-
   self.areaCount  = 0
   self.areas      = {} -- areas
-
-  self.groundCount  = 0
-  self.grounds      = {} -- grounds
 
   self.spawnCount  = 0
   self.spawns      = {} -- spawn points
@@ -76,6 +70,24 @@ function DrawManager:DrawManager( gameCamera )
   self.objectsVisible = true
 end
 
+function DrawManager:addLayer( layerName )
+
+  local layer = {
+    name        = layerName,
+    visible     = true,
+    objects     = {},
+    objectCount = 0
+  }
+
+  table.insert( self.layers, layer )
+
+  self.layerCount = self.layerCount + 1
+end
+
+function DrawManager:getLayerCount()
+  return self.layerCount
+end
+
 function DrawManager:setScale( newScaleX, newScaleY )
   self.scaleX = newScaleX or 1
   self.scaleY = newScaleY or 1
@@ -83,85 +95,89 @@ end
 
 function DrawManager:clear()
   -- removes all objects in lists
-  --// TODO check if this is expensive
 
-  self.lightCount  = 0
-  self.objectCount = 0
+  --//TODO check if this is expensive
+  --//TODO refactor for layers
+
   self.movingCount = 0
   self.areaCount   = 0
-  self.groundCount = 0
   self.spawnCount  = 0
   self.navCount    = 0
 
-  self.objects       = {}
-  self.lights        = {}
-  self.movingObjects = {}
   self.areas         = {}
-  self.grounds       = {}
   self.spawnPoints   = {}
   self.navmeshes     = {}
 end
 
 function DrawManager:update( dt )
   --//TODO sort less times, use skiplist
-  table.sort( self.objects, sortByY )
+
+  if ( self.layerCount == 0 ) then
+    return
+  end
+
+  for i = 1, #self.layers do
+    table.sort( self.layers[i].objects, sortByY )
+  end
 end
 
 function DrawManager:forceUpdate()
-  table.sort( self.objects, sortByY )
-  table.sort( self.grounds, sortByY )
+
+  --// TODO use skiplist
+  for i = 1, #self.layers do
+    table.sort( self.objects[i].objects, sortByY )
+  end
+
 end
 
-function DrawManager:toogleGroundVisible( )
-  self.groundVisible = not self.groundVisible
+function DrawManager:toogleLayerVisible( layerIndex )
+  if ( layerIndex ~= nil ) then
+    return
+  end
 
-  print( "Ground visibility changed to " .. tostring( self.groundVisible ) )
+  self.layers[layerIndex].visible = self.layers[layerIndex].visible
+
+  print( "Layer " .. layerIndex ..  "visibility changed to " .. tostring( self.layers[layerIndex].visible ) )
 end
 
-function DrawManager:toogleObjectsVisible( )
-  self.objectsVisible = not self.objectsVisible
-
-  print( "Objects visibility changed to " .. tostring( self.objectsVisible ) )
+function DrawManager:swapLayers( layerIndex1, layerIndex2 )
+  self.layers[layerIndex1], self.layers[layerIndex2] = self.layers[layerIndex2], self.layers[layerIndex1]
 end
 
-function DrawManager:addObject( objectToAdd )
-  table.insert( self.objects, objectToAdd )
-  self.objectCount = #self.objects
+function DrawManager:addObject( objectToAdd, layerIndex )
+  table.insert( self.layers[layerIndex].objects, objectToAdd )
+  self.layers[layerIndex].objectCount = #self.layers[layerIndex].objects
 end
 
-function DrawManager:removeObject( objectName )
+function DrawManager:removeObject( objectName, layerIndex )
   local index = 0
 
-  for i = 1, #self.objects do
+  local object = nil
 
-    if ( self.objects[i]:getName() == objectName ) then
+  for i = 1, #self.layers[layerIndex].objects do
+
+    if ( self.layers[layerIndex].objects[i]:getName() == objectName ) then
       index = i
     end
 
   end
 
   if ( index > 0 ) then
-    table.remove( self.objects, index )
+    object = self.layers[layerIndex].objects[index]
+    table.remove( self.layers[layerIndex].objects, index )
   end
 
-  self.objectCount = #self.objects
+  self.layers[layerIndex].objectCount = #self.layers[layerIndex].objects
 
+  return object
 end
 
-function DrawManager:addLight( lightToAdd )
-  table.insert ( self.lights, lightToAdd )
-  self.lightCount = #self.lights
-end
+function DrawManager:swapObjectLayer( objectName, currentLayer, newLayer )
 
-function DrawManager:addMovingObject ( objectToAdd )
-  table.insert( self.movingObjects, objectToAdd )
-  self.movingCount = #self.movingObjects
-end
+  local object = self:removeObject( objectName, currentLayer )
 
-function DrawManager:addAllMovingObjects( objectsToAdd )
-
-  for _,o in pairs( objectsToAdd ) do
-    self:addMovingObject( o )
+  if ( object ) then
+    self:addObject( object, newLayer )
   end
 
 end
@@ -177,40 +193,6 @@ function DrawManager:addAllSpawns( spawnsToAdd )
     self:addSpawnPoint( s )
   end
 
-end
-
-function DrawManager:addGround( groundToAdd )
-  table.insert( self.grounds, groundToAdd )
-
-  self.groundCount = #self.grounds
-
-  table.sort( self.grounds, sortByY )
-end
-
-function DrawManager:addAllGrounds( groundsToAdd )
-
-  for _,g in pairs( groundsToAdd ) do
-    self:addGround( g )
-  end
-
-end
-
-function DrawManager:removeGround( groundName )
-  local index = 0
-
-  for i = 1, #self.grounds do
-
-    if ( self.grounds[i]:getName() == groundName ) then
-      index = i
-    end
-
-  end
-
-  if ( index > 0 ) then
-    table.remove(self.grounds, index)
-  end
-
-  self.groundCount = #self.grounds
 end
 
 function DrawManager:addArea( areaToAdd )
@@ -234,67 +216,41 @@ function DrawManager:addNavMesh( navmeshToAdd )
   self.navCount = #self.navmeshes
 end
 
-function DrawManager:sortObjects()
-
-end
-
 function DrawManager:draw()
 
   if ( glob.devMode.lightsActive ) then
-
-    for i = 1, self.lightCount do
-
-      self.lights[i]:apply( lightShader )
-
-    end
-
-    if ( self.lightCount > 0 ) then
-      love.graphics.setShader( lightShader )
-    end
-
+    --//TODO lights
   end
 
-  if ( self.groundVisible ) then
-    for i = 1, self.groundCount do
-      self.grounds[i]:draw() -- todo chek if it is inside screen
+  for i = 1, #self.layers do
+
+    if ( self.layers[i].visible ) then
+      self:drawLayer( self.layers[i] )
     end
-  end
-
-  if ( self.objectsVisible ) then
-
-    for i = 1, self.movingCount do
-      self.movingObjects[i]:draw()
-    end
-
-    for i = 1, self.objectCount do
-      if ( self:isInsideScreen( self.objects[i] ) ) then
-        self.objects[i]:draw()
-      end
-    end
-
-  end
-
-  for i = 1, self.lightCount do
-
-    --if (self:isInsideScreen(self.areas[i])) then
-      self.lights[i]:draw()
-    --end
 
   end
 
   for i = 1, self.spawnCount do
-
     self.spawns[i]:draw()
-
   end
 
   for i = 1, self.navCount do
-
     self.navmeshes[i]:draw()
-
   end
 
   love.graphics.setShader( )
+
+end
+
+function DrawManager:drawLayer( layerToDraw )
+
+  for i = 1, #layerToDraw.objects do
+
+    if ( self:isInsideScreen( layerToDraw.objects[i] ) ) then
+      layerToDraw.objects[i]:draw()
+    end
+
+  end
 
 end
 

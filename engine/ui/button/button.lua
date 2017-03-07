@@ -49,7 +49,7 @@ function Button:draw()
 end
 
 function Button:drawText()
-  love.graphics.setNewFont(80 * self.scale)
+  love.graphics.setNewFont( 80 * self.scale )
 
   --// shader does not like transparency in text =(
   local a = 255
@@ -60,18 +60,18 @@ function Button:drawText()
     a = 153
   end
 
-  love.graphics.setColor( 255, 255, 255, a)
-  love.graphics.print(self.text, x + 96 * self.scale, y + 5 * self.scale)
-  love.graphics.setColor( 255, 255, 255, 255)
+  love.graphics.setColor( 255, 255, 255, a )
+  love.graphics.print(self.text, x + 96 * self.scale, y + 5 * self.scale )
+  love.graphics.setColor( 255, 255, 255, 255 )
 
-  love.graphics.setNewFont(glob.defaultFontSize)
+  love.graphics.setNewFont( glob.defaultFontSize )
 end
 
-function Button:setSelected(isSelected)
+function Button:setSelected( isSelected )
   self.selected = isSelected or false
 end
 
-function Button:setEnabled(isEnabled)
+function Button:setEnabled( isEnabled )
   self.enabled = isEnabled -- or true
 end
 
@@ -79,8 +79,8 @@ function Button:isEnabled()
   return self.enabled
 end
 
-function Button:setAnchor(anchorPoint, offX, offY)
-  self.anchor = anchorPoint or nil
+function Button:setAnchor( anchorPoint, offX, offY )
+  self.anchor  = anchorPoint or nil
   self.offsetX = offX
   self.offsetY = offY
 end
@@ -111,7 +111,7 @@ function Button:onClick( sender )
 
 end
 
-function Button:checkMouseOver( x, y )
+function Button:isMouseOver( x, y )
   local xi, yi = self.position.x, self.position.y
 
   if ( self.anchor ) then
