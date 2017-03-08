@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- simple static image 
+-- simple static image
 -------------------------------------------------------------------------------
 require("../engine/lclass")
 
@@ -23,8 +23,12 @@ function StaticImage:draw(light)
   love.graphics.setShader()
 end
 
+function StaticImage:getKind()
+  return "StaticImage"
+end
+
 function StaticImage:update(dt)
-  
+
 end
 
 function StaticImage:setImage(newImage)

@@ -53,8 +53,6 @@ function Spider:updateAI( dt, game )
   self.nextCheck = self.nextCheck - dt
 
   if ( self.nextCheck <= 0 ) then
-    self.nextCheck = 0.5
-
     local pos = self.target:getPosition()
 
     local nm = self.navagent:getNavMesh()
@@ -63,6 +61,7 @@ function Spider:updateAI( dt, game )
       self.navagent:findPathTo( self.target:getPosition() )
     end
 
+    self.nextCheck = 0.5
   end
 
   self:walk( dt, game )

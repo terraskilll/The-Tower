@@ -29,6 +29,15 @@ angleBetween = function ( v1, v2 )
   return atan2fun( v2.y - v1.y , v2.x - v1.x )
 end
 
+distanceSqBetween = function ( x1, y1, x2, y2 )
+	x2 = x2 - x1
+
+	y2 = y2 - y1
+
+	return x2 * x2 + y2 * y2
+
+end
+
 linesIntersectFunc = function ( x1, y1, x2, y2, x3, y3, x4, y4 )
 
   return (
@@ -39,7 +48,6 @@ linesIntersectFunc = function ( x1, y1, x2, y2, x3, y3, x4, y4 )
 end
 
 pointInRect = function ( px, py, x, y, w, h )
-	--print ( "x : " .. px .. " y : " .. py .. " ")
 
 	return (
 		x <= px and
@@ -47,6 +55,17 @@ pointInRect = function ( px, py, x, y, w, h )
 		x + w >= px and
 		y + h >= py
 	)
+
+end
+
+pointBetweenLines = function ( px, py, x1, y1, x2, y2 )
+	local threshold = 0.001
+
+	local dAC = distanceSqBetween( x1, y1, px, py )
+	local dBC = distanceSqBetween( x2, y2, px, py )
+	local dAB = distanceSqBetween( x1, y1, x2, y2 )
+
+	return dAC + dBC - dAB < threshold;
 
 end
 

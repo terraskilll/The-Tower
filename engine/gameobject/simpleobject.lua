@@ -35,8 +35,13 @@ function SimpleObject:SimpleObject( objectName, positionX, positionY, objectSpri
 
   self.collider    = nil
   self.boundingbox = nil
+  self.navbox      = nil
 
   self.onCollisionEnter = nil
+end
+
+function SimpleObject:getKind()
+  return "SimpleObject"
 end
 
 function SimpleObject:update( dt )
@@ -61,6 +66,10 @@ function SimpleObject:draw()
 
   if ( self.boundingbox ) then
     self.boundingbox:draw()
+  end
+
+  if ( self.navbox ) then
+    self.navbox:draw()
   end
 
 end
@@ -122,18 +131,31 @@ function SimpleObject:getCollider()
 end
 
 function SimpleObject:setBoundingBox( boundingboxToSet )
-
-  if ( boundingboxToSet ) then
-
-    self.boundingbox = boundingboxToSet
-    self.boundingbox:setScale( self.scale )
-
+  if ( not boundingboxToSet) then
+    return
   end
+
+  self.boundingbox = boundingboxToSet
+  self.boundingbox:setScale( self.scale )
 
 end
 
 function SimpleObject:getBoundingBox()
   return self.boundingbox
+end
+
+function SimpleObject:setNavBox( navboxToSet )
+  if ( not navboxToSet) then
+    return
+  end
+
+  self.navbox = navboxToSet
+  self.navbox:setScale( self.scale )
+
+end
+
+function SimpleObject:getNavBox()
+  return self.navbox
 end
 
 function SimpleObject:setAnimation( animationToSet )
@@ -144,6 +166,7 @@ function SimpleObject:setScale( scaleToSet )
   self.scale = scaleToSet or 1
 
   self.boundingbox:setScale( self.scale )
+  self.navbox:setScale( self.scale )
   self.collider:setScale( self.scale )
 end
 
@@ -159,6 +182,10 @@ function SimpleObject:setPosition( positionVector )
     self.boundingbox:setPosition( self.position.x, self.position.y )
   end
 
+  if ( self.navbox ) then
+    self.navbox:setPosition( self.position.x, self.position.y )
+  end
+
 end
 
 function SimpleObject:changePosition( movementVector )
@@ -171,6 +198,10 @@ function SimpleObject:changePosition( movementVector )
 
   if ( self.boundingbox ) then
     self.boundingbox:changePosition( movementVector )
+  end
+
+  if ( self.navbox ) then
+    self.navbox:changePosition( movementVector )
   end
 
 end
@@ -195,6 +226,11 @@ function SimpleObject:clone( newName )
   if ( self.boundingbox ) then
     local bdbox = self.boundingbox:clone()
     cloned:setBoundingBox( bdbox )
+  end
+
+  if ( self.navbox ) then
+    local navbox = self.navbox:clone()
+    cloned:setNavBox( navbox )
   end
 
   if ( self.collider ) then

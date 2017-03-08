@@ -54,7 +54,10 @@ local mapOptions = {
 }
 
 local editNavMeshOptions = {
-
+  "F3 - Back",
+  "Left Click: Add Point",
+  "Right Click: Remove Point",
+  "Drag Left - Move Point"
 }
 
 local spawnPtOptions = {
@@ -90,6 +93,14 @@ function MapEditor:MapEditor( mapListOwner, mapIndex, mapName, thegame )
   self.map   = nil
   self.area  = nil
 
+  self.navmesh = nil
+
+  self.navpoints     = {}
+  self.navinsets     = {}
+  self.navindexclick = 0
+
+  self.editNavMesh = false
+
   self.objectSelector = ObjectSelector()
 
   self.updatefunction   = self.updateEditMap
@@ -100,8 +111,9 @@ function MapEditor:MapEditor( mapListOwner, mapIndex, mapName, thegame )
 
   self.selectedCount = 0
 
+  self.leftisdown   = false
   self.middleisdown = false
-  self.leftisdown = false
+  self.rightisdown  = false
 
   self.mousewasdragged = false
 
@@ -155,6 +167,8 @@ function MapEditor:draw()
     end
 
   end
+
+  self:drawNavMesh()
 
   self.game:getCamera():unset()
 
@@ -271,8 +285,8 @@ function MapEditor:selectOnClick( cx, cy )
 
       if pointInRect(
           cx + ox, cy + oy,
-          self.allobjects[i].selbox[1] + ox, self.allobjects[i].selbox[2],
-          self.allobjects[i].selbox[3] + oy, self.allobjects[i].selbox[4] ) then
+          self.allobjects[i].selbox[1] + ox, self.allobjects[i].selbox[2] + oy,
+          self.allobjects[i].selbox[3], self.allobjects[i].selbox[4] ) then
 
           table.insert( sl, self.allobjects[i] )
           wasselected = true
@@ -336,19 +350,47 @@ end
 
 function MapEditor:onMousePress( x, y, button, istouch )
 
+  local cx, cy = self.game:getCamera():getPositionXY()
+
   self.leftisdown   = button == 1
+  self.rightisdown  = button == 2
   self.middleisdown = button == 3
+
+  if ( self.editNavMesh ) and ( #self.navinsets > 0 ) then
+
+    for i = 1, #self.navinsets do
+
+      local ptx = self.navinsets[i]
+
+      if ( pointInRect( x + cx, y + cy, ptx[1], ptx[2], ptx[3], ptx[4] ) ) then
+        self.navindexclick = i
+      end
+
+    end
+  end
 
 end
 
 function MapEditor:onMouseRelease( x, y, button, istouch )
 
-  if ( self.leftisdown ) and ( not self.mousewasdragged ) then
-    self:selectOnClick( x, y )
+  if ( not self.mousewasdragged ) then
+
+    if ( self.editNavMesh ) then
+      self:mouseClickNavMesh( button, x, y )
+    elseif ( self.leftisdown ) then
+      self:selectOnClick( x, y )
+    end
+
   end
 
+  self.navindexclick = 0
+
   if ( button == 1 ) then
-    self.leftisdown   = false
+    self.leftisdown = false
+  end
+
+  if ( button == 2 ) then
+    self.rightisdown = false
   end
 
   if ( button == 3 ) then
@@ -361,10 +403,20 @@ function MapEditor:onMouseMove( x, y, dx, dy )
 
   self.mousewasdragged = false
 
-  if ( self.leftisdown ) then
-    self:moveSelected( dx, dy )
+  if ( self.editNavMesh ) then
+    self:mouseMovedNavMesh( x, y, dx, dy )
 
-    self.mousewasdragged = true
+    if ( self.leftisdown ) then
+      self.mousewasdragged = true
+    end
+  else
+
+    if ( self.leftisdown ) then
+      self:moveSelected( dx, dy )
+
+      self.mousewasdragged = true
+    end
+
   end
 
   if ( self.middleisdown ) then
@@ -443,7 +495,7 @@ function MapEditor:replaceInAllObjects( newObject, index, isSelected )
 
 end
 
-function MapEditor:removeObject( objectindex, layerIndex )
+function MapEditor:removeObject( objectindex, layerindex )
 
   if ( self.layers[layerindex].locked ) then
     return
@@ -581,7 +633,7 @@ function MapEditor:removeSelected()
 
   end
 
-  table.sort( remindexes, function(a, b) return a > b end ) -- desc
+  table.sort( remindexes, function(a, b) return a.index > b.index end ) -- desc
 
   for i = 1, #remindexes do
     self:removeObject( remindexes[i].index, remindexes[i].layer )
@@ -738,6 +790,12 @@ function MapEditor:keypressMiscelaneous( key )
     self.keypressfunction = self.keypressCreateLayer
   end
 
+  if ( (key == "p")  and ( Input:isKeyDown( "lctrl" ) ) ) then
+    self.textInput        = TextInput( "Spawn Point Name:" )
+    self.updatefunction   = self.updateCreateSpawnPoint
+    self.keypressfunction = self.keypressCreateSpawnPoint
+  end
+
 end
 
 function MapEditor:keypressForAreas( key )
@@ -769,13 +827,19 @@ function MapEditor:keypressForAreas( key )
     print("Not implemented")
   end
 
-  if ( key == "f3" ) then
-    self:selectAll( false, self.currentLayer )
-    --//TODO edit navmesh
-    --optionsToShow = editNavMeshOptions
+  if ( key == "f3" ) and ( self.editNavMesh == false ) then
 
-    --self.updatefunction   = self.updateNavMesh
-    --self.keypressfunction = self.keypressNavMesh
+    self:selectAll( false, self.currentLayer )
+
+    optionsToShow = editNavMeshOptions
+
+    self:getNavMeshToNavPoints()
+
+    self.editNavMesh = true
+
+    self.updatefunction   = self.updateNavMesh
+    self.keypressfunction = self.keypressNavMesh
+
   end
 
 end
@@ -896,6 +960,186 @@ function MapEditor:keypressCreateLayer( key )
   self.textInput:keypressed( key )
 end
 
+--- CREATE SPAWN POINT ---------------------------------------------------------
+
+function MapEditor:updateCreateSpawnPoint( dt )
+  if ( self.textInput:isFinished() ) then
+
+    local spanwname = self.textInput:getText()
+
+    local px, py = Input.mousePosition()
+
+    local spawn = SpawnPoint( spanwname, px, py )
+
+    self:addObject( spawn, true )
+
+    self.area:addSpawnPoint( spawn )
+
+    self.game:getDrawManager():addSpawnPoint( spawn )
+
+    self.textInput = nil
+
+    self.updatefunction = self.updateEditMap
+    self.keypressfunction = self.keypressEditMap
+
+  end
+end
+
+function MapEditor:keypressCreateSpawnPoint( key )
+  self.textInput:keypressed( key )
+end
+
+----- NAV MESH -----------------------------------------------------------------
+
+function MapEditor:updateAreaNavMesh()
+  --//TODO update navmesh for current area with navpoints
+end
+
+function MapEditor:getNavMeshToNavPoints()
+  --//TODO update navpoints and insets with area navmesh
+
+  self.navpoints = {}
+  self.navinsets = {}
+
+  if ( self.area:getNavMesh() ~= nil ) then
+    self.navmesh = self.area:getNavMesh()
+  else
+    self.navmesh = NavMesh()
+  end
+
+  local coords = self.navmesh:getCoords()
+
+   if ( #coords > 0 ) then
+
+     for i = 1, #coords, 2 do
+       local point = { coords[i], coords[i + 1] }
+
+       local inset = { coords[i] - 4, coords[i + 1] - 4, 8, 8 }
+
+       table.insert( self.navpoints, point )
+       table.insert( self.navinsets, inset )
+     end
+
+   end
+end
+
+function MapEditor:drawNavMesh()
+
+  if ( self.navmesh ) then
+    self.navmesh:draw()
+  end
+
+  for i=1, #self.navinsets do
+    local inx = self.navinsets[i]
+
+    love.graphics.rectangle( "line", inx[1], inx[2], inx[3], inx[4] )
+  end
+
+end
+
+function MapEditor:updateNavMesh( dt )
+
+end
+
+function MapEditor:keypressNavMesh( key )
+
+  if ( key == "f3" ) then
+    optionsToShow = mapOptions
+
+    self.editNavMesh = false
+
+    self.area:setNavMesh( self.navmesh )
+
+    self.updatefunction = self.updateEditMap
+    self.keypressfunction = self.keypressEditMap
+  end
+
+end
+
+function MapEditor:mouseClickNavMesh( button, x, y )
+  local cx, cy = self.game:getCamera():getPositionXY()
+
+  if ( button == 1 ) then
+    local point = { x + cx, y + cy }
+
+    local inset = { x + cx - 4, y + cy - 4, 8, 8 }
+
+    if ( #self.navpoints > 1 ) then
+
+      local isbetween = false
+      local pointindex = #self.navpoints + 1
+
+      for i = 1, #self.navpoints - 1 do
+        local ptA = self.navpoints[i]
+        local ptB = self.navpoints[i + 1]
+
+        if ( not isbetween ) then
+
+          if ( pointBetweenLines( point[1], point[2], ptA[1], ptA[2], ptB[1], ptB[2] ) ) then
+            pointindex = i + 1
+            isbetween  = true
+          end
+
+        end
+
+      end
+
+      local ptA = self.navpoints[1]
+      local ptB = self.navpoints[#self.navpoints]
+
+      if ( pointBetweenLines( point[1], point[2], ptA[1], ptA[2], ptB[1], ptB[2] ) ) then
+        pointindex = 1
+        isbetween  = true
+      end
+
+      table.insert( self.navpoints, pointindex, point )
+      table.insert( self.navinsets, pointindex, inset )
+
+      if ( isbetween ) then -- overkill, but simpler
+        self.navmesh:clear()
+
+        self.navmesh:addAllPoints( self.navpoints )
+      else
+        self.navmesh:addPoint( point[1], point[2] )
+      end
+
+    else
+      table.insert( self.navpoints, point )
+      table.insert( self.navinsets, inset )
+
+      self.navmesh:addPoint( point[1], point[2] )
+    end
+
+  end
+
+  if ( button == 2 ) then
+    table.remove( self.navpoints, self.navindexclick )
+    table.remove( self.navinsets, self.navindexclick )
+
+    self.navmesh:clear()
+    self.navmesh:addAllPoints( self.navpoints )
+  end
+
+end
+
+function MapEditor:mouseMovedNavMesh( x, y, dx, dy )
+
+  if ( self.leftisdown ) then
+
+    if ( self.navindexclick > 0 ) then
+      self.navpoints[self.navindexclick][1] = self.navpoints[self.navindexclick][1] + dx
+      self.navpoints[self.navindexclick][2] = self.navpoints[self.navindexclick][2] + dy
+
+      self.navinsets[self.navindexclick][1] = self.navinsets[self.navindexclick][1] + dx
+      self.navinsets[self.navindexclick][2] = self.navinsets[self.navindexclick][2] + dy
+
+      self.navmesh:clear()
+      self.navmesh:addAllPoints( self.navpoints )
+    end
+
+  end
+
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -907,7 +1151,9 @@ function MapEditor:drawHelp()
     "? - Help/Command List",
     "Numpad '+/-' - Change Inc Modifier",
     "F9 - Save",
-    "F11 - Back"
+    "F11 - Back",
+    "",
+    "F12 - Developer Options Shortcuts"
   }
 
   local column2 = {

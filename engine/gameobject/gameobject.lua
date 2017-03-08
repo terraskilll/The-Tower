@@ -33,6 +33,10 @@ function GameObject:setTag( newTag )
   self.tag = newTag
 end
 
+function GameObject:getKind()
+  return "GameObject"
+end
+
 function GameObject:getPositionXY()
   return self.position.x, self.position.y
 end

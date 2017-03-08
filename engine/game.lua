@@ -7,7 +7,7 @@ require("../engine/camera/camera")
 require("../engine/render/drawmanager")
 require("../engine/collision/collisionmanager")
 require("../engine/resourcemanager")
-require("../engine/objectmanager")
+require("..engine.objectmanager")
 require("..engine.animationmanager")
 
 local config = {

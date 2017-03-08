@@ -15,8 +15,12 @@ function SpawnPoint:SpawnPoint( spawnPointName , positionX, positionY )
   self.name     = spawnPointName
   self.position = Vec( positionX, positionY )
 
-  self.width  = 10
-  self.height = 10
+  self.width  = 20
+  self.height = 20
+end
+
+function SpawnPoint:getKind()
+  return "SpawnPoint"
 end
 
 function SpawnPoint:setPosition(newX, newY)
@@ -31,9 +35,9 @@ function SpawnPoint:draw()
   if ( glob.devMode.drawNavMesh ) then
     love.graphics.setColor(255, 0, 255)
 
-    love.graphics.line( self.position.x - 8, self.position.y, self.position.x + 8, self.position.y)
-    love.graphics.line( self.position.x - 8, self.position.y, self.position.x, self.position.y - 8)
-    love.graphics.line( self.position.x + 8, self.position.y, self.position.x, self.position.y - 8)
+    love.graphics.line( self.position.x - 10, self.position.y, self.position.x + 10, self.position.y)
+    love.graphics.line( self.position.x - 10, self.position.y, self.position.x, self.position.y - 10)
+    love.graphics.line( self.position.x + 10, self.position.y, self.position.x, self.position.y - 10)
 
     love.graphics.setColor(glob.defaultColor)
   end

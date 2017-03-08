@@ -9,6 +9,7 @@ require("../engine/navigation/navagent")
 require("../engine/collision/boxcollider")
 require("../engine/collision/circlecollider")
 require("../engine/render/boundingbox")
+require("../engine/navigation/navbox")
 
 local Vec = require("../engine/math/vector")
 
@@ -25,6 +26,10 @@ function Actor:Actor( actorName, positionX, positionY )
 
   self.navagent = nil
   self.navmap   = nil
+end
+
+function Actor:getKind()
+  return "Actor"
 end
 
 function Actor:setMap( newMap, newArea, spawnPoint )

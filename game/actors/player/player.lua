@@ -4,6 +4,7 @@ require("../engine/navigation/navagent")
 require("../engine/collision/boxcollider")
 require("../engine/collision/circlecollider")
 require("../engine/render/boundingbox")
+require("../engine/navigation/navbox")
 
 require("../game/actors/player/states/iddlestate")
 require("../game/actors/player/states/walkingstate")

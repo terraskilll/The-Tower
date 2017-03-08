@@ -26,8 +26,13 @@ function Ground:Ground( groundName, positionX, positionY, groundImage, groundQua
 
   self.collider    = nil
   self.boundingbox = nil
+  self.navbox      = nil
 
   self.onCollisionEnter = nil
+end
+
+function Ground:getKind()
+  return "Ground"
 end
 
 function Ground:setAsStair( isStair )

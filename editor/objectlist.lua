@@ -245,9 +245,11 @@ function ObjectList:editSelected()
   self.mode = 4
 
   self.objectEditor = ObjectEditor( self, objIndex, allObjects[objIndex][1], self.game )
+  self.objectEditor:onEnter()
 end
 
 function ObjectList:backFromEdit()
+  self.objectEditor:onExit()
   self.objectEditor = nil
 end
 

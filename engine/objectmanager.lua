@@ -68,7 +68,7 @@ function ObjectManager:loadObject( objectName, instanceName, posx, posy )
 
   local quad = nil
 
-  if ( objdata.quaddata ~= nil ) then
+  if ( objdata.quaddata ) then
 
     local qd = objdata.quaddata
 
@@ -94,6 +94,16 @@ function ObjectManager:loadObject( objectName, instanceName, posx, posy )
 
   end
 
+  if ( objdata.navboxdata ) then
+
+    local bb = objdata.navboxdata
+
+    local navbox = NavBox( posx, posy, bb[3], bb[4], bb[5], bb[6], bb[7] )
+
+    object:setNavBox( navbox )
+
+  end
+
   if ( objdata.colldata ) then
 
     local collider = nil
@@ -103,7 +113,7 @@ function ObjectManager:loadObject( objectName, instanceName, posx, posy )
     if ( objdata.colltype == "box" ) then
       collider = BoxCollider( posx, posy, cd[3], cd[4], cd[5], cd[6], cd[7] )
     else
-      collider = CircleCollider( posx, posy, cd[2] + 100, cd[8], cd[5], cd[6], cd[7] )
+      collider = CircleCollider( posx, posy, cd[2], cd[8], cd[5], cd[6], cd[7] )
     end
 
     object:setCollider( collider )

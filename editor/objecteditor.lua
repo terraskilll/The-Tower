@@ -19,8 +19,8 @@ local generalOptions = {
 local mainOptions = {
   "F1 - Select Resource",
   "F2 - Edit Quad",
-  "",
-  "F4 - Edit Bounding Box",
+  "F3 - Edit Bounding Box",
+  "F4 - Edit Nav Box",
   "F5 - Edit Collider",
   "F6 - Set Animation"
 }
@@ -33,6 +33,12 @@ local quadOptions = {
 }
 
 local boundingboxOptions = {
+  "Numpad 5 - Use all image",
+  "Numpad 2,4,6,8 - Increase on direction",
+  "Numpad+Ctrl - Decrease on direction"
+}
+
+local navboxOptions = {
   "Numpad 5 - Use all image",
   "Numpad 2,4,6,8 - Increase on direction",
   "Numpad+Ctrl - Decrease on direction"
@@ -74,10 +80,12 @@ end
 
 function ObjectEditor:onEnter()
   print("Entered ObjectEditor")
+
+  self.game:getCamera():move( -300, -100 )
 end
 
 function ObjectEditor:onExit()
-
+  self.game:getCamera():setPosition( 0, 0 )
 end
 
 function ObjectEditor:draw()
@@ -94,44 +102,56 @@ function ObjectEditor:draw()
     love.graphics.print( generalOptions[i], 16, (i * 16) + 350 )
   end
 
+  love.graphics.print( "Inc Modifier: " .. self.incModifier, 16, 300 )
+
+  love.graphics.setColor( 150, 150, 255, 100 )
+
   love.graphics.line( 299, 0, 299, 2000 )
   love.graphics.line( 299, 99, 2000, 99 )
 
-  love.graphics.print( "Inc Modifier: " .. self.incModifier, 16, 300 )
+  love.graphics.setColor( glob.defaultColor )
 
-  self:printObject()
+  self:drawObject()
 end
 
-function ObjectEditor:printObject()
+function ObjectEditor:drawObject()
   if ( self.object == nil ) then
     return
   end
 
+  self.game:getCamera():set()
+
   if ( self.showQuad == true ) then
-    if ( self.object.quad ~= nil ) then
-      love.graphics.draw(self.image, self.object.quad, 300, 100, 0, self.object.scale, self.object.scale)
+    if ( self.object.quad ) then
+      love.graphics.draw( self.image, self.object.quad, 0, 0, 0, self.object.scale, self.object.scale )
 
       local x, y = self.object.quaddata[1], self.object.quaddata[2]
       local w, h = self.object.quaddata[3], self.object.quaddata[4]
 
-      love.graphics.setColor(255, 100, 100, 200)
-      love.graphics.rectangle("line", x + 300, y + 100, w, h)
-      love.graphics.setColor(glob.defaultColor)
+      love.graphics.setColor( 255, 100, 100, 200 )
+      love.graphics.rectangle( "line", x, y, w, h )
+      love.graphics.setColor( glob.defaultColor )
     else
-      love.graphics.draw(self.image, 300, 100, 0, self.object.scale, self.object.scale)
+      love.graphics.draw( self.image, 0, 0, 0, self.object.scale, self.object.scale )
     end
 
   else
-    love.graphics.draw(self.image, 300, 100, 0, self.object.scale, self.object.scale)
+    love.graphics.draw( self.image, 0, 0, 0, self.object.scale, self.object.scale )
   end
 
-  if  ( self.object.boundingbox ~= nil ) then
+  if  ( self.object.boundingbox ) then
     self.object.boundingbox:draw()
   end
 
-  if  ( self.object.collider ~= nil ) then
+  if  ( self.object.navbox ) then
+    self.object.navbox:draw()
+  end
+
+  if  ( self.object.collider ) then
     self.object.collider:draw()
   end
+
+  self.game:getCamera():unset()
 
 end
 
@@ -159,6 +179,7 @@ function ObjectEditor:updateGetResource( dt )
       self.object.scale       = 1
       self.object.quad        = nil
       self.object.boundingbox = nil
+      self.object.navbox      = nil
       self.object.collider    = nil
 
       local w, h = self.image:getWidth(), self.image:getHeight()
@@ -166,6 +187,8 @@ function ObjectEditor:updateGetResource( dt )
       self.object.quaddata = { 0, 0, w, h, w, h }
 
       self.object.bboxdata = { 0, 0, w, h, 0, 0, 0, 1 }
+
+      self.object.navboxdata = { 0, 0, w, h, 0, 0, 1 }
 
       self.object.colldata = { 0, 0, w, h, 0, 0, 1, w / 2 } -- last parameter is radius for circle
 
@@ -184,7 +207,12 @@ end
 function ObjectEditor:updateEditQuad( dt )
 end
 
-function ObjectEditor:updateEditBoundinBox( dt )
+function ObjectEditor:updateEditBoundingBox( dt )
+
+end
+
+function ObjectEditor:updateEditNavBox( dt )
+
 end
 
 function ObjectEditor:updateEditCollider( dt )
@@ -288,21 +316,42 @@ function ObjectEditor:keypressgeneral( key )
     return
   end
 
-  if ( key == "f4" ) then
+  if ( key == "f3" ) then
     self.mode = 4
 
     options = boundingboxOptions
 
     local bb = self.object.bboxdata
 
-    if ( self.object.quad ~= nil ) then
-      self.object.boundingbox = BoundingBox(bb[1] + 300, bb[2] + 100, self.object.quaddata[3], self.object.quaddata[4], bb[5], bb[6], bb[7], bb[8])
+    if ( self.object.quad ) then
+      self.object.boundingbox = BoundingBox( bb[1], bb[2], self.object.quaddata[3], self.object.quaddata[4], bb[5], bb[6], bb[7], bb[8] )
     else
-      self.object.boundingbox = BoundingBox(bb[1] + 300, bb[2] + 100, bb[3], bb[4], bb[5], bb[6], bb[7], bb[8])
+      self.object.boundingbox = BoundingBox( bb[1], bb[2], bb[3], bb[4], bb[5], bb[6], bb[7], bb[8] )
     end
 
-    self.updatefunction   = self.updateEditBoundinBox
-    self.keypressfunction = self.keypressEditBoundinBox
+    self.updatefunction   = self.updateEditBoundingBox
+    self.keypressfunction = self.keypressEditBoundingBox
+
+    return
+  end
+
+  if ( key == "f4" ) then
+    self.mode = 7
+
+    options = navboxOptions
+
+    local nb = self.object.navboxdata
+
+    --local nb = NavBox(1,2,3,4,5,6,7)
+
+    if ( self.object.quad ) then
+      self.object.navbox = NavBox( nb[1], nb[2], self.object.quaddata[3], self.object.quaddata[4], nb[5], nb[6], nb[7] )
+    else
+      self.object.navbox = NavBox( nb[1], nb[2], nb[3], nb[4], nb[5], nb[6], nb[7] )
+    end
+
+    self.updatefunction   = self.updateEditNavBox
+    self.keypressfunction = self.keypressEditNavBox
 
     return
   end
@@ -317,17 +366,17 @@ function ObjectEditor:keypressgeneral( key )
     if ( self.object.colltype == "box" ) then
 
       if ( self.object.quad ~= nil) then
-        self.object.collider = BoxCollider(cd[1] + 300, cd[2] + 100, self.object.quaddata[3], self.object.quaddata[4], cd[5], cd[6], cd[7])
+        self.object.collider = BoxCollider(cd[1], cd[2], self.object.quaddata[3], self.object.quaddata[4], cd[5], cd[6], cd[7])
       else
-        self.object.collider = BoxCollider(cd[1] + 300, cd[2] + 100, cd[3], cd[4], cd[5], cd[6], cd[7])
+        self.object.collider = BoxCollider(cd[1], cd[2], cd[3], cd[4], cd[5], cd[6], cd[7])
       end
 
     else
 
-      if ( self.object.quad ~= nil) then
-        self.object.collider = CircleCollider(cd[1] + 300, cd[2] + 100, self.object.quaddata[3], self.object.quaddata[4], cd[5], cd[6], cd[7])
+      if ( self.object.quad ) then
+        self.object.collider = CircleCollider( cd[1], cd[2], self.object.quaddata[3], self.object.quaddata[4], cd[5], cd[6], cd[7] )
       else
-        self.object.collider = CircleCollider(cd[1] + 300, cd[2] + 100, cd[3], cd[4], cd[5], cd[6], cd[7])
+        self.object.collider = CircleCollider( cd[1], cd[2], cd[3], cd[4], cd[5], cd[6], cd[7] )
       end
 
     end
@@ -421,11 +470,11 @@ function ObjectEditor:keypressEditQuad ( key )
   self.object.quad = love.graphics.newQuad( qd[1], qd[2], qd[3], qd[4], qd[5], qd[6] )
 end
 
-function ObjectEditor:keypressEditBoundinBox ( key )
+function ObjectEditor:keypressEditBoundingBox ( key )
   if ( key == "kp5" ) then
     local w, h = self.image:getWidth(), self.image:getHeight()
 
-    if ( self.object.quad ~= nil ) then
+    if ( self.object.quad ) then
       self.object.bboxdata = {0, 0, self.object.quaddata[3], self.object.quaddata[4], 0, 0, 0, 1}
     else
       self.object.bboxdata = {0, 0, w, h, 0, 0, 0, 1}
@@ -485,14 +534,83 @@ function ObjectEditor:keypressEditBoundinBox ( key )
 
   local bb = self.object.bboxdata
 
-  self.object.boundingbox = BoundingBox(bb[1] + 300, bb[2] + 100, bb[3], bb[4], bb[5], bb[6], bb[7], bb[8])
+  self.object.boundingbox = BoundingBox( unpack( bb ) )
+
+  --self.object.boundingbox = BoundingBox( bb[1], bb[2], bb[3], bb[4], bb[5], bb[6], bb[7], bb[8] )
+end
+
+function ObjectEditor:keypressEditNavBox ( key )
+  if ( key == "kp5" ) then
+    local w, h = self.image:getWidth(), self.image:getHeight()
+
+    if ( self.object.quad ) then
+      self.object.navboxdata = {0, 0, self.object.quaddata[3], self.object.quaddata[4], 0, 0, 1}
+    else
+      self.object.navboxdata = {0, 0, w, h, 0, 0, 1}
+    end
+
+  end
+
+  local inc = 1
+
+  if ( Input:isKeyDown("lctrl") ) then
+    inc = -1
+  end
+
+  inc = inc * self.incModifier
+
+  if  ( key == "kp2" ) then -- h
+    self.object.navboxdata[4] = self.object.navboxdata[1] + inc
+  end
+
+  if  ( key == "kp4" ) then -- off x, w
+    self.object.navboxdata[5] = self.object.navboxdata[5] - inc
+    self.object.navboxdata[3] = self.object.navboxdata[3] + inc
+  end
+
+  if  ( key == "kp6" ) then -- w
+    self.object.navboxdata[3] = self.object.navboxdata[3] + inc
+  end
+
+  if  ( key == "kp8" ) then -- off y, h
+    self.object.navboxdata[6] = self.object.navboxdata[6] - inc
+    self.object.navboxdata[4] = self.object.navboxdata[4] + inc
+  end
+
+  if  ( key == "left" ) then -- off x
+    inc = absfun(inc)
+
+    self.object.navboxdata[5] = self.object.navboxdata[5] - inc
+  end
+
+  if  ( key == "right" ) then -- off x
+    inc = absfun(inc)
+
+    self.object.navboxdata[5] = self.object.navboxdata[5] + inc
+  end
+
+  if  ( key == "up" ) then -- off y
+    inc = absfun(inc)
+
+    self.object.navboxdata[6] = self.object.navboxdata[6] - inc
+  end
+
+  if  ( key == "down" ) then -- off y
+    inc = absfun(inc)
+
+    self.object.navboxdata[6] = self.object.navboxdata[6] + inc
+  end
+
+  local nb = self.object.navboxdata
+
+  self.object.navbox = NavBox( unpack( nb ) )
 end
 
 function ObjectEditor:keypressEditCollider ( key )
   if ( key == "kp5" ) then
     local w, h = self.image:getWidth(), self.image:getHeight()
 
-    if ( self.object.quad ~= nil) then
+    if ( self.object.quad ) then
       self.object.colldata = {0, 0, self.object.quaddata[3], self.object.quaddata[4], 0, 0, 1, self.object.quaddata[3] / 2 } -- last parameter is radius for circle
     else
       self.object.colldata = {0, 0, w, h, 0, 0, 1, w / 2} -- last parameter is radius for circle
@@ -567,9 +685,10 @@ function ObjectEditor:keypressEditCollider ( key )
   local cd = self.object.colldata
 
   if ( self.object.colltype == "box" ) then
-    self.object.collider = BoxCollider( cd[1] + 300, cd[2] + 100, cd[3], cd[4], cd[5], cd[6], cd[7] )
+    self.object.collider = BoxCollider(  cd[1], cd[2], cd[3], cd[4], cd[5], cd[6], cd[7] )
   else
-    self.object.collider = CircleCollider( cd[1] + 300, cd[2] + 100, cd[8], cd[5], cd[6], cd[7] )
+
+    self.object.collider = CircleCollider( cd[1], cd[2], cd[8], cd[5], cd[6], cd[7] )
   end
 
 end
@@ -621,31 +740,31 @@ function ObjectEditor:loadObjectWithName( objectFileName )
     self.image = self.game:getResourceManager():loadImage( respath )
 
     if ( self.object.quaddata ) then
-
       local qd = self.object.quaddata
 
       self.object.quad = love.graphics.newQuad( qd[1], qd[2], qd[3], qd[4], qd[5], qd[6] )
-
     end
 
     if ( self.object.bboxdata ) then
-
       local bb = self.object.bboxdata
 
-      self.object.boundingbox = BoundingBox( bb[1] + 300, bb[2] + 100, bb[3], bb[4], bb[5], bb[6], bb[7], bb[8] )
+      self.object.boundingbox = BoundingBox( unpack( bb ) )
+    end
 
+    if ( self.object.navboxdata ) then
+      local nb = self.object.navboxdata
+
+      self.object.navbox = NavBox( unpack ( nb ) )
     end
 
     if ( self.object.colldata ) then
-
       local cd = self.object.colldata
 
       if ( self.object.colltype == "box" ) then
-        self.object.collider = BoxCollider( cd[1] + 300, cd[2] + 100, cd[3], cd[4], cd[5], cd[6], cd[7] )
+        self.object.collider = BoxCollider( cd[1], cd[2], cd[3], cd[4], cd[5], cd[6], cd[7] )
       else
-        self.object.collider = CircleCollider( cd[1] + 300, cd[2] + 100, cd[8], cd[5], cd[6], cd[7] )
+        self.object.collider = CircleCollider( cd[1], cd[2], cd[8], cd[5], cd[6], cd[7] )
       end
-
     end
 
     print( "Loaded " .. objectFileName )

@@ -49,6 +49,10 @@ function MovingObject:MovingObject( objectName, positionX, positionY, platformIm
   self.stopDelay = 0
 end
 
+function MovingObject:getKind()
+  return "MovingObject"
+end
+
 function MovingObject:setDelays( initial, middle, final )
   self.initialDelay = initial
   self.middleDelay  = middle

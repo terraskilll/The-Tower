@@ -39,9 +39,17 @@ function NavMesh:draw()
   if ( glob.devMode.drawNavMesh ) then
     love.graphics.setColor(0, 255, 255)
 
-    love.graphics.polygon( "line", self.coords )
+    if ( #self.coords > 1 ) then
 
-    love.graphics.setColor(0, 200, 255, 100 )
+      for i = 1, #self.coords - 1 do
+        love.graphics.line(self.coords[i][1], self.coords[i][2], self.coords[i+1][1], self.coords[i+1][2])
+      end
+
+      love.graphics.line(self.coords[#self.coords][1], self.coords[#self.coords][2], self.coords[1][1], self.coords[1][2])
+
+    end
+
+    love.graphics.setColor( 0, 200, 255, 100 )
 
     love.graphics.line( self.bounds[1], self.bounds[2], self.bounds[1], self.bounds[4] )
     love.graphics.line( self.bounds[1], self.bounds[2], self.bounds[3], self.bounds[2] )
@@ -61,10 +69,12 @@ function NavMesh:getOwner()
 end
 
 function NavMesh:addPoint( pointX, pointY )
-  table.insert(self.coords, pointX)
-  table.insert(self.coords, pointY)
+  --//TODO use pairs of points  =   { { x, y } , { x, y} , ...}
+  -- this requires changing map editor
 
-  if (#self.coords == 2) then
+  table.insert( self.coords, { pointX, pointY } )
+
+  if (#self.coords == 1) then
 
     self.bounds[1] = pointX
     self.bounds[2] = pointY
@@ -94,25 +104,44 @@ function NavMesh:addPoint( pointX, pointY )
   self:recomputeLines()
 end
 
+function NavMesh:addAllPoints( pointsToAdd )
+
+  for i = 1, #pointsToAdd do
+    self:addPoint( pointsToAdd[i][1], pointsToAdd[i][2])
+  end
+
+end
+
+function NavMesh:getCoords()
+  return self.coords
+end
+
+function NavMesh:clear()
+  self.coords = {}
+  self.lines  = {}
+
+  self.lineCount  = 0
+end
+
 function NavMesh:recomputeLines()
   --//TODO refactor make a better name and check for a better calling moment
 
   -- each time a point is created this is called
 
   -- create a line between the points
-  if ( #self.coords >= 4 ) then
+  if ( #self.coords >= 2 ) then
 
     self.lines = {}
 
     self.lineCount = 0
 
-    for i = 1, #self.coords - 2, 2 do
+    for i = 1, #self.coords - 2 do
 
       local line = {
-        self.coords[i],
-        self.coords[i + 1],
-        self.coords[i + 2],
-        self.coords[i + 3]
+        self.coords[i][1],
+        self.coords[i][2],
+        self.coords[i + 1][1],
+        self.coords[i + 1][2]
       }
 
       table.insert(self.lines, line)
@@ -138,9 +167,9 @@ end
 
 function NavMesh:changePosition( movementVector )
 
-  for i=1, #self.coords, 2 do
-    self.coords[i]   = self.coords[i] + movementVector.x
-    self.coords[i+1] = self.coords[i+1] + movementVector.y
+  for i=1, #self.coords do
+    self.coords[i][1] = self.coords[i][1] + movementVector.x
+    self.coords[i][2] = self.coords[i][2] + movementVector.y
   end
 
   for i=1, #self.lines do
