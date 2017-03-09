@@ -2,11 +2,11 @@
 
 --//TODO  check later http://www.gamasutra.com/blogs/SundaramRamaswamy/20161117/285708/Efficient_Field_of_View_and_Line_of_Sight_for_strategy_games.php
 
-require("../engine/lclass")
+require("..engine.lclass")
 
-require("../engine/utl/funcs")
+require("..engine.utl/funcs")
 
-local Vec = require("../engine/math/vector")
+local Vec = require("..engine.math/vector")
 
 local atan2fun = math.atan2
 local degfun   = math.deg

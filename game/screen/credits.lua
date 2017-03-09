@@ -1,9 +1,9 @@
-require("../engine/lclass")
+require("..engine.lclass")
 
-require("../engine/input")
-require("../engine/ui/uigroup")
-require("../engine/ui/button/button")
-require("../engine/screen/screen")
+require("..engine.input")
+require("..engine.ui/uigroup")
+require("..engine.ui/button/button")
+require("..engine.screen/screen")
 
 require("../resources")
 

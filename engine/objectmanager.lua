@@ -1,5 +1,5 @@
-require("../engine/lclass")
-require("../engine/io/io")
+require("..engine.lclass")
+require("..engine.io.io")
 require("../engine.gameobject.simpleobject")
 require("../engine.animation.animation")
 require("../engine.animation.frame")
@@ -80,7 +80,7 @@ function ObjectManager:loadObject( objectName, instanceName, posx, posy )
 
   end
 
-  local object = SimpleObject( instanceName, posx, posy, sprite, quad, 1 )
+  local object = SimpleObject( objectName, instanceName, posx, posy, sprite, quad, 1 )
 
   ------
 

@@ -1,8 +1,8 @@
 -- for testing purposes
 
-require("../engine/lclass")
-require("../engine/animation/animation")
-require("../engine/animation/complexanimation")
+require("..engine.lclass")
+require("..engine.animation/animation")
+require("..engine.animation/complexanimation")
 
 require("../resources")
 

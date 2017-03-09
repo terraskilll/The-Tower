@@ -1,4 +1,4 @@
-require("../engine/lclass")
+require("..engine.lclass")
 require("../resources")
 
 class "WalkingAnimation" ("ComplexAnimation")

@@ -1,7 +1,7 @@
 
 
-require("../engine/lclass")
-require("../engine/globalconf")
+require("..engine.lclass")
+require("..engine.globalconf")
 
 class "BoundingBox"
 

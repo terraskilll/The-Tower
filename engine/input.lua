@@ -9,7 +9,7 @@ TODO
 	nao repassar eventos para os demais listeners caso sejam processados pelo listener anterior (no chaining)
 --]]--
 
-local Vec = require("../engine/math/vector")
+local Vec = require("..engine.math/vector")
 
 local absfun = math.abs
 local sqrt   = math.sqrt

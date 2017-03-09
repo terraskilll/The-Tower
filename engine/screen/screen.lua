@@ -2,10 +2,10 @@
 -- gamescreen base class
 -------------------------------------------------------------------------------
 
-require ("../engine/lclass")
+require ("..engine.lclass")
 
 require("../resources")
-require("../engine/input")
+require("..engine.input")
 
 class "Screen"
 

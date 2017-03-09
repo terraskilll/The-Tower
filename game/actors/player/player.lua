@@ -1,19 +1,21 @@
-require("../engine/input")
-require("../engine/fsm/fsm")
-require("../engine/navigation/navagent")
-require("../engine/collision/boxcollider")
-require("../engine/collision/circlecollider")
-require("../engine/render/boundingbox")
-require("../engine/navigation/navbox")
+require("..engine.input")
+require("..engine.fsm/fsm")
+require("..engine.navigation/navagent")
+require("..engine.collision/boxcollider")
+require("..engine.collision/circlecollider")
+require("..engine.render/boundingbox")
+require("..engine.navigation/navbox")
 
 require("../game/actors/player/states/iddlestate")
 require("../game/actors/player/states/walkingstate")
 
-local Vec = require("../engine/math/vector")
+local Vec = require("..engine.math/vector")
 
-class "Player" ("Actor")
+class "Player" ( "Actor" )
 
-function Player:Player( playerName, positionX, positionY )
+function Player:Player( playerName, instName, positionX, positionY )
+  self.instancename = instName
+
   self.name      = playerName
   self.position  = Vec( positionX, positionY )
 

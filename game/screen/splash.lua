@@ -1,7 +1,7 @@
-require("../engine/lclass")
+require("..engine.lclass")
 
-require("../engine/input")
-require("../engine/screen/screen")
+require("..engine.input")
+require("..engine.screen/screen")
 
 class "SplashScreen" ("Screen")
 

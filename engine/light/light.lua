@@ -1,9 +1,9 @@
 
 
-require("../engine/lclass")
-require("../engine/gameobject/gameobject")
+require("..engine.lclass")
+require("..engine.gameobject/gameobject")
 
-local Vec = require("../engine/math/vector")
+local Vec = require("..engine.math/vector")
 
 class "Light" ("GameObject") --//TODO make a simpleobject?
 

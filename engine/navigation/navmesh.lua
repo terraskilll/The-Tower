@@ -6,13 +6,16 @@
 
 a navmesh is the walkable part of an area
 
+the navmesh owner is used when objects over this navmesh change from one
+owner to another (a player walking into another area, for example)
+
 ]]
 
-require("../engine/lclass")
-require("../engine/globalconf")
-require("../engine/utl/funcs")
+require("..engine.lclass")
+require("..engine.globalconf")
+require("..engine.utl/funcs")
 
-local Vec = require("../engine/math/vector")
+local Vec = require("..engine.math/vector")
 
 local linesIntersect = linesIntersectFunc
 
@@ -23,7 +26,7 @@ function NavMesh:NavMesh()
 
   self.bounds     = {}
 
-  self.coords     = {} --pairs of points of the mesh (polygon)
+  self.points     = {} --pairs of points of the mesh (polygon)
   self.lines      = {} -- precomputed for speed
   self.lineCount  = 0
 
@@ -39,13 +42,13 @@ function NavMesh:draw()
   if ( glob.devMode.drawNavMesh ) then
     love.graphics.setColor(0, 255, 255)
 
-    if ( #self.coords > 1 ) then
+    if ( #self.points > 1 ) then
 
-      for i = 1, #self.coords - 1 do
-        love.graphics.line(self.coords[i][1], self.coords[i][2], self.coords[i+1][1], self.coords[i+1][2])
+      for i = 1, #self.points - 1 do
+        love.graphics.line(self.points[i][1], self.points[i][2], self.points[i+1][1], self.points[i+1][2])
       end
 
-      love.graphics.line(self.coords[#self.coords][1], self.coords[#self.coords][2], self.coords[1][1], self.coords[1][2])
+      love.graphics.line(self.points[#self.points][1], self.points[#self.points][2], self.points[1][1], self.points[1][2])
 
     end
 
@@ -69,12 +72,10 @@ function NavMesh:getOwner()
 end
 
 function NavMesh:addPoint( pointX, pointY )
-  --//TODO use pairs of points  =   { { x, y } , { x, y} , ...}
-  -- this requires changing map editor
 
-  table.insert( self.coords, { pointX, pointY } )
+  table.insert( self.points, { pointX, pointY } )
 
-  if (#self.coords == 1) then
+  if (#self.points == 1) then
 
     self.bounds[1] = pointX
     self.bounds[2] = pointY
@@ -112,12 +113,12 @@ function NavMesh:addAllPoints( pointsToAdd )
 
 end
 
-function NavMesh:getCoords()
-  return self.coords
+function NavMesh:getPoints()
+  return self.points
 end
 
 function NavMesh:clear()
-  self.coords = {}
+  self.points = {}
   self.lines  = {}
 
   self.lineCount  = 0
@@ -129,19 +130,19 @@ function NavMesh:recomputeLines()
   -- each time a point is created this is called
 
   -- create a line between the points
-  if ( #self.coords >= 2 ) then
+  if ( #self.points >= 2 ) then
 
     self.lines = {}
 
     self.lineCount = 0
 
-    for i = 1, #self.coords - 2 do
+    for i = 1, #self.points - 2 do
 
       local line = {
-        self.coords[i][1],
-        self.coords[i][2],
-        self.coords[i + 1][1],
-        self.coords[i + 1][2]
+        self.points[i][1],
+        self.points[i][2],
+        self.points[i + 1][1],
+        self.points[i + 1][2]
       }
 
       table.insert(self.lines, line)
@@ -151,10 +152,10 @@ function NavMesh:recomputeLines()
     end
 
     line = {
-      self.coords[#self.coords - 1],
-      self.coords[#self.coords],
-      self.coords[1],
-      self.coords[2]
+      self.points[#self.points - 1],
+      self.points[#self.points],
+      self.points[1],
+      self.points[2]
     }
 
     table.insert(self.lines, line)
@@ -167,9 +168,9 @@ end
 
 function NavMesh:changePosition( movementVector )
 
-  for i=1, #self.coords do
-    self.coords[i][1] = self.coords[i][1] + movementVector.x
-    self.coords[i][2] = self.coords[i][2] + movementVector.y
+  for i=1, #self.points do
+    self.points[i][1] = self.points[i][1] + movementVector.x
+    self.points[i][2] = self.points[i][2] + movementVector.y
   end
 
   for i=1, #self.lines do

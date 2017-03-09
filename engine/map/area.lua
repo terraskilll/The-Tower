@@ -9,8 +9,8 @@ only one area is rendered at a time, instead of the whole map (this is not worki
 
 ]]
 
-require("../engine/lclass")
-require("../engine/input")
+require("..engine.lclass")
+require("..engine.input")
 
 class "Area"
 
@@ -28,7 +28,6 @@ function Area:getName()
   return self.name
 end
 
-
 function Area:draw()
 
   -- Do Nothing?
@@ -37,10 +36,10 @@ end
 
 function Area:addObject( objectToAdd )
 
-  self.objects[objectToAdd:getName()] = objectToAdd
+  self.objects[objectToAdd:getInstanceName()] = objectToAdd
 
   if ( self.navmesh ) then
-    self.navmesh:addCollider( objectToAdd:getCollider() )
+    self.navmesh:addCollider( objectToAdd:getCollider() ) --//TODO change to navbox
   end
 
 end
@@ -49,35 +48,27 @@ function Area:getObjects()
   return self.objects
 end
 
-function Area:getObjectByName( objectName )
+function Area:getObjectByName( instanceName )
 
-  for i = 1, #self.objects do
-
-    if ( self.objects[objectName] ) then
-      return self.objects[objectName]
-    end
-
+  if ( self.objects[instanceName] ) then
+    return self.objects[instanceName]
   end
 
   return nil
 
 end
 
-function Area:removeObject( objectName )
+function Area:removeObject( instanceName )
 
-  for i = 1, #self.objects do
-
-    if ( self.objects[objectName] ) then
-      self.objects[objectName] = nil
-      return
-    end
-
+  if ( self.objects[instanceName] ) then
+    self.objects[instanceName] = nil
+    return
   end
 
 end
 
 function Area:addSpawnPoint( spawnPointToAdd )
-  self.spawns[spawnPointToAdd:getName()] = spawnPointToAdd
+  self.spawns[spawnPointToAdd:getInstanceName()] = spawnPointToAdd
 end
 
 function Area:getSpawnPoints()

@@ -1,6 +1,6 @@
-require("../engine/lclass")
+require("..engine.lclass")
 
-local Vec = require("../engine/math/vector")
+local Vec = require("..engine.math/vector")
 
 class "CollisionManager"
 

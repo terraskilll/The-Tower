@@ -1,16 +1,18 @@
-require("../engine/lclass")
+require("..engine.lclass")
 
-require("../engine/gameobject/actor")
-require("../engine/fsm/fsm")
-require("../engine/collision/boxcollider")
-require("../engine/collision/circlecollider")
-require("../engine/ai/fov")
+require("..engine.gameobject/actor")
+require("..engine.fsm/fsm")
+require("..engine.collision/boxcollider")
+require("..engine.collision/circlecollider")
+require("..engine.ai/fov")
 
-local Vec = require("../engine/math/vector")
+local Vec = require("..engine.math/vector")
 
 class "Spider" ("Actor")
 
-function Spider:Spider( spiderName, positionX, positionY )
+function Spider:Spider( spiderName, instName, positionX, positionY )
+  self.instancename = instName
+
   self.name      = spiderName
   self.position  = Vec( positionX, positionY )
   self.direction = Vec( 0, 0 )

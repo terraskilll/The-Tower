@@ -22,7 +22,7 @@ objects not in-game (ui elements, menu buttons) are not affected by this
 
 ]]--
 
-require("../engine/lclass")
+require("...engine.lclass")
 
 local lightShader = love.graphics.newShader("engine/shaders/lightspot.glsl")
 
@@ -131,7 +131,7 @@ function DrawManager:forceUpdate()
 end
 
 function DrawManager:toogleLayerVisible( layerIndex )
-  if ( layerIndex ~= nil ) then
+  if ( layerIndex == nil ) then
     return
   end
 
@@ -149,14 +149,14 @@ function DrawManager:addObject( objectToAdd, layerIndex )
   self.layers[layerIndex].objectCount = #self.layers[layerIndex].objects
 end
 
-function DrawManager:removeObject( objectName, layerIndex )
+function DrawManager:removeObject( instanceName, layerIndex )
   local index = 0
 
   local object = nil
 
   for i = 1, #self.layers[layerIndex].objects do
 
-    if ( self.layers[layerIndex].objects[i]:getName() == objectName ) then
+    if ( self.layers[layerIndex].objects[i]:getInstanceName() == instanceName ) then
       index = i
     end
 
@@ -260,12 +260,12 @@ function DrawManager:isInsideScreen( object )
 
   --//TODO fix isInside when changed resolution
 
-  if ( object:getName() == "onetree") then
-    objX = objX * self.scaleX
-    objY = objY * self.scaleY
+  --if ( object:getName() == "onetree") then
+  --  objX = objX * self.scaleX
+  --  objY = objY * self.scaleY
 
     --print(objX .. " " .. objY .. " " .. objW .. " " .. objH)
-  end
+  --end
 
   --print(camX .. " " .. camY .. " " .. camW .. " " .. camH)
 

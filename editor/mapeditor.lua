@@ -4,27 +4,25 @@ the engine map editor
 
 ]]
 
-require("../engine/lclass")
-require("../engine/input")
-require("../engine/ui/uigroup")
-require("../engine/ui/button/button")
-require("../engine/screen/screen")
-require("../engine/gameobject/gameobject")
-require("../engine/gameobject/staticimage")
-require("../engine/gameobject/simpleobject")
-require("../engine/gameobject/movingobject")
-require("../engine/light/light")
-require("../engine/map/map")
-require("../engine/map/area")
-require("../engine/map/spawnpoint")
-require("../engine/collision/collision")
-require("../engine/navigation/navmesh")
-require("../engine/navigation/navmap")
-require("../engine/utl/funcs")
+require("..engine.lclass")
+require("..engine.input")
+require("..engine.ui/uigroup")
+require("..engine.ui/button/button")
+require("..engine.screen/screen")
+require("..engine.gameobject/gameobject")
+require("..engine.gameobject/staticimage")
+require("..engine.gameobject/simpleobject")
+require("..engine.gameobject/movingobject")
+require("..engine.light/light")
+require("..engine.map/map")
+require("..engine.map/area")
+require("..engine.map/spawnpoint")
+require("..engine.collision/collision")
+require("..engine.navigation/navmesh")
+require("..engine.navigation/navmap")
+require("..engine.utl/funcs")
 
-require("../editor/objectselector")
-
-local Vec = require("../engine.math.vector")
+local Vec = require("..engine.math.vector")
 
 local generalOptions = {
   "/ - Help/Command List",
@@ -36,10 +34,9 @@ local generalOptions = {
 local mapOptions = {
   "=== AREA OPTIONS ===",
   "F1 - Add Area",
-  "F2 - Select Area",
+  "F2 - Next Area (Ctrl:Previous)",
   "Ctrl + F1 - Rename Area",
   "Ctrl + Alt + F1 - Remove Area",
-  --"F2 - Next Area (Ctrl:Previous)",
   "F3 - Edit NavMesh",
   "",
   "=== OBJECT OPTIONS ===",
@@ -72,13 +69,15 @@ local optionsToShow = mapOptions
 
 class "MapEditor"
 
-function MapEditor:MapEditor( mapListOwner, mapIndex, mapName, thegame )
-  self.game    = thegame
-  self.mapList = mapListOwner
-  self.index   = mapIndex
-  self.name    = mapName
+function MapEditor:MapEditor( mapListOwner, mapIndex, mapName, mapFile, thegame )
+  self.game     = thegame
+  self.mapList  = mapListOwner
+  self.index    = mapIndex
+  self.mapname  = mapName
+  self.filename = mapFile
 
-  self.showHelp = false
+  self.showHelp    = false
+  self.lastMessage = ""
 
   self.textInput = nil
 
@@ -93,6 +92,8 @@ function MapEditor:MapEditor( mapListOwner, mapIndex, mapName, thegame )
   self.map   = nil
   self.area  = nil
 
+  self.areaindex = 0
+
   self.navmesh = nil
 
   self.navpoints     = {}
@@ -101,13 +102,10 @@ function MapEditor:MapEditor( mapListOwner, mapIndex, mapName, thegame )
 
   self.editNavMesh = false
 
-  self.objectSelector = ObjectSelector()
-
   self.updatefunction   = self.updateEditMap
   self.keypressfunction = self.keypressEditMap
 
   self.allobjects = {}
-  self.library    = {}
 
   self.selectedCount = 0
 
@@ -117,7 +115,7 @@ function MapEditor:MapEditor( mapListOwner, mapIndex, mapName, thegame )
 
   self.mousewasdragged = false
 
-  self:loadMap( mapName )
+  self:loadMap( mapName, mapFile )
 end
 
 function MapEditor:onEnter()
@@ -182,27 +180,54 @@ function MapEditor:draw()
     love.graphics.print( optionsToShow[i], 1050, (i * 16) + 100 )
   end
 
-  --self.objectSelector:draw()
-
   love.graphics.print( "Inc Modifier: " .. self.incModifier, 1050, 700 )
   self.game:getCamera():drawPosition( 1050, 680 )
 
   self:drawMapName()
+
+  self:drawLastMessage()
 
 end
 
 function MapEditor:drawMapName()
   if ( self.map ) then
 
-    love.graphics.print( "Map: " .. self.map:getName(), 10, 700 )
+    love.graphics.print( "Map: " .. self.map:getName(), 10, 680 )
 
     if ( self.area ) then
-      love.graphics.print( "Area: " .. self.area:getName(), 310, 700 )
+      love.graphics.print( "Area: " .. self.area:getName(), 310, 680 )
     end
 
   end
 
-  love.graphics.print( "Layer: " .. self.currentLayer, 610, 700 )
+  love.graphics.print( "Layer: " .. self.currentLayer, 610, 680 )
+
+end
+
+function MapEditor:selectArea( inc )
+  self.areaindex = self.areaindex + inc
+
+  if ( self.areaindex > self.map:getAreaCount() ) then
+    self.areaindex = 1
+  end
+
+  if ( self.areaindex == 0 ) then
+    self.areaindex = self.map:getAreaCount()
+  end
+
+  if ( self.map:getAreaCount() > 0 ) then
+
+    self.area = self.map:getAreaByIndex( self.areaindex )
+
+    local nm = self.area:getNavMesh()
+
+    if ( nm ) then
+      self.navmesh = nm
+
+      self:getNavMeshToNavPoints()
+    end
+
+  end
 
 end
 
@@ -216,7 +241,7 @@ function MapEditor:selectObject( objectToSelect )
 
   while not done do
 
-    done = self.allobjects[i].object:getName() == objectToSelect:getName()
+    done = self.allobjects[i].object:getInstanceName() == objectToSelect:getInstanceName()
 
     if ( done ) then
       self.allobjects[i].selected = true
@@ -236,7 +261,7 @@ function MapEditor:objectIsSelected( object )
 
   for i = 1, #self.allobjects do
 
-    if ( self.allobjects[i].object:getName() == object:getName() ) then
+    if ( self.allobjects[i].object:getInstanceName() == object:getInstanceName() ) then
       sell = self.allobjects[i].selected
 
       if ( sell ) then
@@ -340,7 +365,7 @@ function MapEditor:onKeyPress( key, scancode, isrepeat )
   end
 
   if ( key == "f9" ) then
-    self:saveMap( self.name )
+    self:saveMap( )
 
     return
   end
@@ -435,26 +460,38 @@ function MapEditor:doTextInput ( t )
 
 end
 
-function MapEditor:saveMap( mapFileName )
-  print("TODO save")
+function MapEditor:saveMap()
+  self.game:getMapManager():saveMap( self.mapname, self.filename, self.map )
 end
 
-function MapEditor:loadMap( mapName )
+function MapEditor:loadMap()
 
-  self.map = Map( mapName )
+  self.map = self.game:getMapManager():loadMap( self.mapname, self.filename )
 
-  self:addLayer( "default" )
-  self.game:getDrawManager():addLayer( "default" )
+  if ( self.map ) then
+
+    local lls = self.map:getLayers()
+
+    for i = 1, #lls do
+      self:addLayer( lls[i].name )
+      self.game:getDrawManager():addLayer( lls[i].name )
+    end
+
+  else
+
+    self.map = Map( self.mapname, self.filename )
+
+    self.map:addLayer( "default", 1 )
+    self.game:getDrawManager():addLayer( "default" )
+    self:addLayer( "default" )
+
+  end
+
+  self:selectArea( 0 )
 
   self.currentLayer = 1
-  self.layerCount   = self.game:getDrawManager():getLayerCount()
+  self.layerCount   = self.map:getLayerCount()
 
-end
-
-function MapEditor:getNextGeneratedName()
-  self.objectNameIndex = self.objectNameIndex + 1
-
-  return "obj" .. self.objectNameIndex
 end
 
 --- OBJECT MANAGEMENT ----------------------------------------------------------
@@ -477,6 +514,8 @@ function MapEditor:addObject( objectToAdd, addSelected )
     selected = addSelected,
     selbox   = qd
   }
+
+  objectToAdd:setLayer( self.currentLayer )
 
   if ( addSelected ) then
     self.selectedCount = self.selectedCount + 1
@@ -504,14 +543,12 @@ function MapEditor:removeObject( objectindex, layerindex )
   local obj = self.allobjects[objectindex].object
 
   if ( obj ) then
+    self.area:removeObject( obj:getInstanceName() )
+    self.area:removeSpawnPoint( obj:getInstanceName() )
 
-    self.area:removeObject( obj:getName() )
-    self.area:removeSpawnPoint( obj:getName() )
-
-    self.game:getDrawManager():removeObject( obj:getName(), self.allobjects[objectindex].layer )
+    self.game:getDrawManager():removeObject( obj:getInstanceName(), self.allobjects[objectindex].layer )
 
     table.remove( self.allobjects, objectindex )
-
   end
 
 end
@@ -528,11 +565,13 @@ function MapEditor:duplicateSelectedObjects( layerindex )
 
     if ( self.allobjects[i].selected ) then
 
-      local newname = self:getNextGeneratedName()
+      local instancename = self.map:getNextGeneratedName()
 
-      local dp = self.allobjects[i].object:clone( newname )
+      local dp = self.allobjects[i].object:clone( self.allobjects[i].object:getName(), instancename )
 
       dp:changePosition( Vec( 40, 40) )
+
+      dp:setLayer( self.currentLayer )
 
       index = self:addObject( dp, true )
 
@@ -584,11 +623,12 @@ function MapEditor:moveObjectsToLayer( layerindex, incLayer )
 
     if ( self.allobjects[i].selected ) then
       self.game:getDrawManager():swapObjectLayer(
-          self.allobjects[i].object:getName(),
+          self.allobjects[i].object:getInstanceName(),
           self.allobjects[i].layer,
           self.allobjects[i].layer + incLayer )
 
       self.allobjects[i].layer = self.allobjects[i].layer + incLayer
+      self.allobjects[i]:setLayer( self.allobjects[i].layer )
     end
 
   end
@@ -732,9 +772,13 @@ function MapEditor:updateAddArea( dt )
 
       self.map:addArea( area )
 
-      print( "Area Added '" .. areaname .. "' " )
+      self:setLastMessage("Area Added '" .. areaname .. "' ")
 
       self.area = area
+
+      if ( self.areaindex == 0 ) then
+        self.areaindex = 1
+      end
 
       self.updatefunction = self.updateEditMap
       self.keypressfunction = self.keypressEditMap
@@ -772,11 +816,11 @@ function MapEditor:keypressMiscelaneous( key )
     self.showHelp = not self.showHelp
   end
 
-  if ( ( key == "]" ) and ( Input:isKeyDown( "lctrl" ) ) ) then
+  if ( ( key == "k" ) and ( Input:isKeyDown( "lctrl" ) ) ) then
     self:lockLayer( self.currentLayer )
   end
 
-  if ( ( key == "]" ) and ( Input:isKeyDown( "lshift" ) ) ) then
+  if ( ( key == "h" ) and ( Input:isKeyDown( "lshift" ) ) ) then
     self.game:getDrawManager():toogleLayerVisible( self.currentLayer )
   end
 
@@ -807,15 +851,16 @@ function MapEditor:keypressForAreas( key )
   end
 
   if ( key == "f2" ) then
-    --//TODO select Area
-    --self.textInput        = TextInput( "Area Name:" )
-    --self.updatefunction   = self.updateAddArea
-    --self.keypressfunction = self.keypressAddArea
+    if ( Input:isKeyDown( "lctrl" ) ) then
+      self:selectArea( -1 )
+    else
+      self:selectArea( 1 )
+    end
   end
 
   if ( ( key == "f1" ) and ( Input:isKeyDown( "lctrl" ) ) ) then
 
-    self.textInput        = TextInput( "Area Name: ", self.area.getName() )
+    self.textInput        = TextInput( "Area Name: ", self.area:getName() )
 
     self.updatefunction   = self.updateRenameArea
     self.keypressfunction = self.keypressRenameArea
@@ -824,7 +869,7 @@ function MapEditor:keypressForAreas( key )
 
   if ( ( key == "f1" ) and ( Input:isKeyDown( "lctrl" ) ) and ( Input:isKeyDown( "lalt" ) ) ) then
     --//TODO remove current area
-    print("Not implemented")
+    self:setLastMessage("Ctrl+Alt+F1 Not implemented")
   end
 
   if ( key == "f3" ) and ( self.editNavMesh == false ) then
@@ -900,30 +945,30 @@ function MapEditor:updateSelectFromLibrary( dt )
 
     local cx, cy = self.game:getCamera():getPositionXY()
 
-    local instancename =  self:getNextGeneratedName()
+    local instancename =  self.map:getNextGeneratedName()
 
-    if ( self.library[objectname] ) then
+    local fromLibrary = self.map:getObjectFromLibrary ( objectname )
 
-      object = self.library[objectname]:clone( instancename )
-
-      object:setPosition( Vec( px + cx, py + cy ) )
-
+    if ( fromLibrary ) then
+      object = fromLibrary:clone( objectname, instancename )
     else
+      tolibrary = self.game:getObjectManager():loadObject( objectname, instancename, px + cx, py + cy )
 
-      object = self.game:getObjectManager():loadObject( objectname, instancename, px + cx, py + cy )
+      self.map:addToLibrary( objectname, tolibrary )
 
-      self.library[objectname] = object
+      instancename =  self.map:getNextGeneratedName()
 
+      object = tolibrary:clone( objectname, instancename )
     end
 
     if ( object ) then
+      object:setPosition( Vec( px + cx, py + cy ) )
 
       self.area:addObject( object )
 
       self.game:getDrawManager():addObject( object, self.currentLayer )
 
       self:addObject( object, "object", true )
-
     end
 
     self.textInput = nil
@@ -944,13 +989,14 @@ function MapEditor:updateCreateLayer( dt )
 
     local layername = self.textInput:getText()
 
+    self.map:addLayer( layername, self.map:getLayerCount() + 1 )
     self.game:getDrawManager():addLayer( layername )
 
     self:addLayer( layername )
 
     self.textInput = nil
 
-    self.updatefunction = self.updateEditMap
+    self.updatefunction   = self.updateEditMap
     self.keypressfunction = self.keypressEditMap
 
   end
@@ -991,30 +1037,25 @@ end
 
 ----- NAV MESH -----------------------------------------------------------------
 
-function MapEditor:updateAreaNavMesh()
-  --//TODO update navmesh for current area with navpoints
-end
-
 function MapEditor:getNavMeshToNavPoints()
-  --//TODO update navpoints and insets with area navmesh
 
   self.navpoints = {}
   self.navinsets = {}
 
-  if ( self.area:getNavMesh() ~= nil ) then
+  if ( self.area:getNavMesh() ) then
     self.navmesh = self.area:getNavMesh()
   else
     self.navmesh = NavMesh()
   end
 
-  local coords = self.navmesh:getCoords()
+  local points = self.navmesh:getPoints()
 
-   if ( #coords > 0 ) then
+   if ( #points > 0 ) then
 
-     for i = 1, #coords, 2 do
-       local point = { coords[i], coords[i + 1] }
+     for i = 1, #points do
+       local point = { points[i][1], points[i][2] }
 
-       local inset = { coords[i] - 4, coords[i + 1] - 4, 8, 8 }
+       local inset = { points[i][1] - 4, points[i][2] - 4, 8, 8 }
 
        table.insert( self.navpoints, point )
        table.insert( self.navinsets, inset )
@@ -1143,12 +1184,24 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+function MapEditor:setLastMessage( str )
+  self.lastMessage = str
+  print( self.lastMessage )
+end
+
+function MapEditor:drawLastMessage()
+  love.graphics.setColor( 225, 175, 255, 255 )
+  love.graphics.print( "# # " .. self.lastMessage .. " # #", 10, 700 )
+  love.graphics.setColor( glob.defaultColor )
+end
+
 function MapEditor:drawHelp()
   --draws all editor commands and shortcuts
   --//TODO allways update
 
   local column1 = {
-    "? - Help/Command List",
+    "/ - Help/Command List",
     "Numpad '+/-' - Change Inc Modifier",
     "F9 - Save",
     "F11 - Back",
@@ -1158,17 +1211,20 @@ function MapEditor:drawHelp()
 
   local column2 = {
     "F1 - Add Area",
-    "F2 - Select Area",
-    "Ctrl + F1 - Rename Area",
-    "Ctrl + Alt + F1 - Remove Area",
+    "F2 - Select Next Area (Ctrl:Previous)",
+    "Ctrl + F1 - Rename Area ** ",
+    "Ctrl + Alt + F1 - Remove Area ** ",
     "F3 - Edit NavMesh",
     "",
     "F5 - Load Object From Library",
     "Ctrl + D - Duplicate",
     "DEL - Remove Object",
-    "Alt + PgUp - Layer Up",
-    "Alt + PgDown - Layer Down",
-    "Ctrl + L - Change Layer",
+    "",
+    "Alt + PgUp - Object Layer Up",
+    "Alt + PgDown - Object Layer Down",
+    "Ctrl + L - Change Active Layer",
+    "Ctrl + K - Lock Layer",
+    "Ctrl + H - Hide Layer",
     "Alt + L - Add Layer"
   }
 

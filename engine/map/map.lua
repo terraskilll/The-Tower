@@ -7,36 +7,55 @@ composed of many areas (rooms or similar)
 
 ]]
 
-require("../engine/lclass")
-require("../engine/io/io")
+require("..engine.lclass")
+require("..engine.io.io")
 
 class "Map"
 
-function Map:Map( mapName )
+function Map:Map( mapName, mapFile )
   self.name = mapName
+  self.file = mapFile or ""
 
-  self.areas         = {}
-  self.areaCount     = 0
+  self.nameindex = 0
+
+  self.areas     = {}
+  self.areaCount = 0
+
+  self.layers = {}
+
+  self.objectLibrary = {}
+
   self.movingObjects = {}
-
-  self:loadFromFile( mapName )
 end
 
 function Map:getName()
   return self.name
 end
 
+function Map:getFileName()
+  return self.file
+end
+
 function Map:update( dt )
---[[
-  for _,a in pairs( self.areas ) do
-    a:update( dt )
-  end
-]]
 
   for _,mo in pairs( self.movingObjects ) do
     mo:update( dt )
   end
 
+end
+
+function Map:setNameIndex( nameIndexToSet )
+  self.nameindex = nameIndexToSet
+end
+
+function Map:getNameIndex()
+  return self.nameindex
+end
+
+function Map:getNextGeneratedName()
+  self.nameindex = self.nameindex + 1
+
+  return "obj" .. self.nameindex
 end
 
 function Map:addArea( area )
@@ -52,6 +71,20 @@ function Map:getAreaByName ( areaName )
   return self.areas[areaName]
 end
 
+function Map:getAreaByIndex ( areaIndex )
+  local i = 1
+
+  for _,area in pairs(self.areas) do
+    if ( i == areaIndex ) then
+      return area
+    end
+
+    i = i + 1
+  end
+
+  return nil
+end
+
 function Map:getAreaCount()
   return self.areaCount
 end
@@ -65,6 +98,25 @@ function Map:removeAreaByName( areaName )
     return false
   end
 
+end
+
+function Map:addLayer( layerName, layerIndex )
+  table.insert( self.layers, { name = layerName, index = layerIndex })
+
+  table.sort( self.layers , function ( l1, l2 ) return l1.index < l2.index end )
+end
+
+function Map:getLayers()
+  return self.layers
+end
+
+function Map:getLayerByName ( areaName )
+  --return self.areas[areaName]
+  --//TODO
+end
+
+function Map:getLayerCount()
+  return #self.layers
 end
 
 function Map:addMovingObject( objectToAdd )
@@ -90,7 +142,23 @@ function Map:removeMovingObject( objectName )
 
 end
 
+function Map:getObjectFromLibrary( objectName )
+  local obj = self.objectLibrary[objectName]
+
+  return obj
+end
+
+function Map:addToLibrary( objectName, object )
+  self.objectLibrary[objectName] = object
+end
+
+function Map:getLibrary()
+  return self.objectLibrary
+end
+
 function Map:checkChangedNavMesh( objectPosition, objectMovement )
+  --//TODO reprocess navmap for object when navmesh changed?
+
   local pos = objectPosition + objectMovement
 
   local nav = nil
@@ -101,7 +169,7 @@ function Map:checkChangedNavMesh( objectPosition, objectMovement )
 
     isIn = fl:getNavMesh():isInside( pos.x, pos.y )
 
-    if (isIn) then
+    if ( isIn ) then
       nav = fl:getNavMesh()
     end
 
@@ -112,23 +180,12 @@ function Map:checkChangedNavMesh( objectPosition, objectMovement )
 
       isIn = mo:getNavMesh():isInside( pos.x, pos.y )
 
-      if (isIn) then
+      if ( isIn ) then
         nav = mo:getNavMesh()
-        --//TODO reprocess navmap for object when navmesh changed?
       end
 
     end
   end
 
   return nav
-end
-
-function Map:loadFromFile( mapName )
-  mapdata, err = loadFile("__maps/" .. mapName)
-
-  if ( err ) then
-    return
-  end
-
-  --//TODO load map from file (use map manager?)
 end

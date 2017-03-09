@@ -4,8 +4,8 @@ list all static game objects and allow to add and edit objects
 
 ]]
 
-require("../engine/lclass")
-require("../engine/io/io")
+require("..engine.lclass")
+require("..engine.io.io")
 
 require("../editor/textinput")
 
@@ -18,7 +18,8 @@ local options = {
   "F3 - Remove Object",
   "",
   "F4 - Edit Object",
-  "F9 - Save",
+  "",
+  "F9 - Save List",
   "F11 - Back",
   "",
   "Pg Up - Previous Page",

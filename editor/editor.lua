@@ -1,23 +1,26 @@
-require("../engine/lclass")
+require("..engine.lclass")
 
-require("../engine/input")
-require("../engine/ui/uigroup")
-require("../engine/ui/button/button")
-require("../engine/screen/screen")
+require("..engine.input")
+require("..engine.ui.uigroup")
+require("..engine.ui.button.button")
+require("..engine.screen.screen")
 
-require("../editor/resourcelist")
-require("../editor/objectlist")
-require("../editor/objecteditor")
-require("../editor/maplist")
-require("../editor/mapeditor")
-require("../editor/animationlist")
-require("../editor/animationeditor")
+require("..editor.resourcelist")
+require("..editor.objectlist")
+require("..editor.objecteditor")
+require("..editor.maplist")
+require("..editor.mapeditor")
+require("..editor.animationlist")
+require("..editor.animationeditor")
+require("..editor.gameplayeditor")
 
 local options = {
   "F1 - Edit Resources",
   "F2 - Edit Simple Objects",
   "F3 - Edit Maps",
-  "F4 - Edit Animations"
+  "F4 - Edit Animations",
+  "",
+  "F8 - Edit Game Play Config"
 }
 
 local bgcolors = {
@@ -95,7 +98,7 @@ function Editor:onKeyRelease( key, scancode, isrepeat )
 end
 
 function Editor:textInput( t )
-  if (self.currentEditor ) then
+  if ( self.currentEditor ) then
 
     if ( self.currentEditor.doTextInput ) then
       self.currentEditor:doTextInput( t )
@@ -152,6 +155,11 @@ function Editor:checkKey( key, scancode, isrepeat )
 
   if ( key == "f4" ) then
     self.currentEditor = AnimationList( self, self.game )
+    self.currentEditor:onEnter()
+  end
+
+  if ( key == "f8" ) then
+    self.currentEditor = GamePlayEditor( self, self.game )
     self.currentEditor:onEnter()
   end
 

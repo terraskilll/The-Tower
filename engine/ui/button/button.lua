@@ -5,12 +5,12 @@ must be used with a buttongroup for menu management (focus and click)
 
 ------------------------------------------------------------------------------]]--
 
-require("../engine/lclass")
+require("..engine.lclass")
 
-require("../engine/globalconf")
-require("../engine/ui/anchor")
+require("..engine.globalconf")
+require("..engine.ui/anchor")
 
-local Vec = require("../engine/math/vector")
+local Vec = require("..engine.math/vector")
 
 local buttonShader = love.graphics.newShader("engine/shaders/ui.glsl")
 

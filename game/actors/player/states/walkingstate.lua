@@ -1,5 +1,5 @@
-require("../engine/lclass")
-require("../engine/animation/animation")
+require("..engine.lclass")
+require("..engine.animation/animation")
 require("../game/actors/player/animation/walkinganimation")
 
 require("../resources")

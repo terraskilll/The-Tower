@@ -1,6 +1,6 @@
-require("../engine/lclass")
+require("..engine.lclass")
 
-require("../engine/fsm/state")
+require("..engine.fsm/state")
 
 class "FSM"
 

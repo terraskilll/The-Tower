@@ -3,18 +3,19 @@
 a walkable part in a area
 ]]
 
-require("../engine/lclass")
+require("..engine.lclass")
 
-require("../engine/collision/boxcollider")
+require("..engine.collision/boxcollider")
 
-local Vec = require("../engine/math/vector")
+local Vec = require("..engine.math/vector")
 
 local absfun = math.abs
 
 class "MovingObject" ("SimpleObject")
 
-function MovingObject:MovingObject( objectName, positionX, positionY, platformImage, platformQuad, platformScale )
-  self.name     = objectName
+function MovingObject:MovingObject( objectName, instName, positionX, positionY, platformImage, platformQuad, platformScale )
+  self.name         = objectName
+  self.instancename = instName
 
   self.position = Vec(positionX, positionY)
   self.image    = platformImage

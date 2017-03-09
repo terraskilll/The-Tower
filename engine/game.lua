@@ -1,14 +1,15 @@
-require("../engine/lclass")
+require("..engine.lclass")
 
-require("../engine/input")
-require("../engine/io/io")
-require("../engine/globalconf")
-require("../engine/camera/camera")
-require("../engine/render/drawmanager")
-require("../engine/collision/collisionmanager")
-require("../engine/resourcemanager")
+require("..engine.input")
+require("..engine.io.io")
+require("..engine.globalconf")
+require("..engine.camera.camera")
+require("..engine.render.drawmanager")
+require("..engine.collision.collisionmanager")
+require("..engine.resourcemanager")
 require("..engine.objectmanager")
 require("..engine.animationmanager")
+require("..engine.mapmanager")
 
 local config = {
   gameScreenWidth = 1280,
@@ -87,6 +88,9 @@ function Game:configure()
   self.animationManager = AnimationManager( self )
   self.animationManager:load()
 
+  self.mapManager = MapManager( self )
+  self.mapManager:loadList()
+
   self.player = Player( "PLAYER", 0, 0 )
 
   self.camera = Camera()
@@ -130,6 +134,10 @@ end
 
 function Game:getAnimationManager()
   return self.animationManager
+end
+
+function Game:getMapManager()
+  return self.mapManager
 end
 
 function Game:setCurrentScreen( screenName )

@@ -1,6 +1,6 @@
 -- based on http://nova-fusion.com/2011/04/19/cameras-in-love2d-part-1-the-basics/
 
-require("../engine/lclass")
+require("..engine.lclass")
 
 -- no rotation support for camera
 

@@ -3,19 +3,21 @@
 an actor is a interactive gameobject object (player, npc, enemy)
 
 ]]
-require("../engine/lclass")
+require("..engine.lclass")
 
-require("../engine/navigation/navagent")
-require("../engine/collision/boxcollider")
-require("../engine/collision/circlecollider")
-require("../engine/render/boundingbox")
-require("../engine/navigation/navbox")
+require("..engine.navigation/navagent")
+require("..engine.collision/boxcollider")
+require("..engine.collision/circlecollider")
+require("..engine.render/boundingbox")
+require("..engine.navigation/navbox")
 
-local Vec = require("../engine/math/vector")
+local Vec = require("..engine.math/vector")
 
 class "Actor" ("GameObject")
 
-function Actor:Actor( actorName, positionX, positionY )
+function Actor:Actor( actorName, instName, positionX, positionY )
+  self.instancename = instName
+
   self.name      = actorName
   self.position  = Vec( positionX, positionY )
 

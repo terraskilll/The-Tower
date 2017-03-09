@@ -1,17 +1,21 @@
 -------------------------------------------------------------------------------
 -- gameobject base class
 -------------------------------------------------------------------------------
-require ("../engine/lclass")
+require ("..engine.lclass")
 
-local Vec = require("../engine/math/vector")
+local Vec = require("..engine.math/vector")
 
 class "GameObject"
 
-function GameObject:GameObject( positionX, positionY )
+function GameObject:GameObject( instName, positionX, positionY )
+  self.instancename = instName
+
   self.name = "Unnamed Game Object"
   self.tag  = "None"
 
   self.position = Vec( positionX, positionY )
+
+  self.layer  = 1
 
   self.width  = 0
   self.height = 0
@@ -21,16 +25,28 @@ function GameObject:getName()
   return self.name
 end
 
-function GameObject:setName( newName )
-  self.name = newName
+function GameObject:setName( nameToSet )
+  self.name = nameToSet
+end
+
+function GameObject:getInstanceName()
+  return self.instancename
 end
 
 function GameObject:getTag()
   return self.tag
 end
 
-function GameObject:setTag( newTag )
-  self.tag = newTag
+function GameObject:setTag( tagToSet )
+  self.tag = tagToSet
+end
+
+function GameObject:getLayer()
+  return self.layer
+end
+
+function GameObject:setLayer( layerToSet )
+  self.layer = layerToSet
 end
 
 function GameObject:getKind()
@@ -49,8 +65,8 @@ function GameObject:getDimensions()
   return self.width, self.height
 end
 
-function GameObject:setPosition( newPosition )
-  self.position:set( newPosition.x, newPosition.y )
+function GameObject:setPosition( positionToSet )
+  self.position:set( positionToSet.x, positionToSet.y )
 end
 
 function GameObject:update( dt )

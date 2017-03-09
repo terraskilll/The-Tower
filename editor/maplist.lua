@@ -1,7 +1,7 @@
 
 
-require("../engine/lclass")
-require("../engine/io/io")
+require("..engine.lclass")
+require("..engine.io.io")
 
 require("../editor/textinput")
 
@@ -16,7 +16,8 @@ local options = {
   "F3 - Remove Map",
   "",
   "F4 - Edit Map",
-  "F9 - Save",
+  "",
+  "F9 - Save List",
   "F11 - Back",
   "",
   "Pg Up - Previous Page",
@@ -44,15 +45,12 @@ function MapList:MapList( ownerEditor, thegame )
 end
 
 function MapList:save()
-  saveFile("__maplist", allmaps)
+  self.game:getMapManager():saveList( allmaps )
+
 end
 
 function MapList:load()
-  allmaps, err = loadFile("__maplist")
-
-  if ( not allmaps ) then
-    allmaps = {}
-  end
+  allmaps = self.game:getMapManager():loadList()
 end
 
 function MapList:onEnter()
@@ -72,7 +70,7 @@ function MapList:update(dt)
     return
   end
 
-  if ( self.mapEditor ~= nil ) then
+  if ( self.mapEditor ) then
     self.mapEditor:update( dt )
     return
   end
@@ -98,34 +96,39 @@ end
 
 function MapList:drawMapList()
 
-  love.graphics.setColor(0, 255, 100, 255)
-  love.graphics.print("Name", 200, 56)
-  love.graphics.print("Engine Version", 500, 56)
-  love.graphics.setColor(glob.defaultColor)
+  love.graphics.setColor( 0, 255, 100, 255 )
+  love.graphics.print( "Name", 200, 56 )
+  love.graphics.print( "File", 500, 56 )
+  love.graphics.print( "Engine Version", 800, 56 )
+  love.graphics.setColor( glob.defaultColor )
 
   if ( #allmaps == 0) then
     return
   end
 
-  love.graphics.setColor(255, 255, 255, 80)
-  love.graphics.rectangle("fill", 190, (self.selIndex * 16) + 56, 1000, 18)
-  love.graphics.setColor(glob.defaultColor)
+  love.graphics.setColor( 255, 255, 255, 80 )
+  love.graphics.rectangle( "fill", 190, ( self.selIndex * 16 ) + 56, 1000, 18 )
+  love.graphics.setColor( glob.defaultColor )
 
   for i = self.listStart, self.listEnd do
-    love.graphics.print(allmaps[i][1], 200, ( (i - self.listStart + 1) * 16) + 56)
-    love.graphics.print(allmaps[i][2], 500, ( (i - self.listStart + 1) * 16) + 56)
+    love.graphics.print( allmaps[i][1], 200, ( ( i - self.listStart + 1 ) * 16) + 56 )
+    love.graphics.print( allmaps[i][2], 500, ( ( i - self.listStart + 1 ) * 16) + 56 )
+    love.graphics.print( allmaps[i][3], 800, ( ( i - self.listStart + 1 ) * 16) + 56 )
   end
 
 end
 
 function MapList:updateAddEdit(dt)
   if ( self.textInput:isFinished() ) then
+
+    self.tempData[self.inputMode] = self.textInput:getText()
+
     self.inputMode = self.inputMode + 1
 
-    self.tempData[1] = self.textInput:getText()
+    self.textInput = TextInput( "File Name: " )
 
-    if ( self.inputMode == 2 ) then -- have everything
-      self.tempData[2] = glob.engineVersion
+    if ( self.inputMode == 3 ) then -- have everything
+      self.tempData[3] = glob.engineVersion
 
       if ( self.mode == 1 ) then
         table.insert( allmaps, self.tempData )
@@ -277,7 +280,7 @@ function MapList:editSelected()
 
   self.mode = 4
 
-  self.mapEditor = MapEditor( self, mapindex, allmaps[mapindex][1], self.game )
+  self.mapEditor = MapEditor( self, mapindex, allmaps[mapindex][1], allmaps[mapindex][2], self.game )
 
   self.mapEditor:onEnter()
 end

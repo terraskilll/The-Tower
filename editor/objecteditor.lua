@@ -1,7 +1,7 @@
-require("../engine/lclass")
-require("../engine/input")
-require("../engine/io/io")
-require("../engine/resourcemanager")
+require("..engine.lclass")
+require("..engine.input")
+require("..engine.io.io")
+require("..engine.resourcemanager")
 
 require("../editor/textinput")
 
@@ -74,7 +74,7 @@ function ObjectEditor:ObjectEditor( objectListOwner, objectIndex, objectName, th
 
   self:loadObjectWithName( objectName )
 
-  self.updatefunction = self.updategeneral
+  self.updatefunction   = self.updategeneral
   self.keypressfunction = self.keypressgeneral
 end
 

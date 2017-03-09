@@ -1,5 +1,5 @@
 
-local Vec = require("../engine/math/vector")
+local Vec = require("..engine.math/vector")
 
 local sinfun = math.sin
 local cosfun = math.cos

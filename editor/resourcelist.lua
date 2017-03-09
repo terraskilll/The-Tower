@@ -8,8 +8,8 @@ a resource is identified by a name, a type and a path.
 
 ]]
 
-require("../engine/lclass")
-require("../engine/io/io")
+require("..engine.lclass")
+require("..engine.io.io")
 
 require("../editor/textinput")
 
@@ -21,7 +21,7 @@ local options = {
   "F2 - Edit Resource",
   "F3 - Remove Resource",
   "",
-  "F9 - Save",
+  "F9 - Save List",
   "F11 - Back",
   "",
   "Pg Up - Previous Page",
@@ -32,7 +32,7 @@ class "ResourceList"
 
 local allResources = {}
 
-function ResourceList:ResourceList( ownerEditor , thegame )
+function ResourceList:ResourceList( ownerEditor, thegame )
   self.game      = thegame
   self.editor    = ownerEditor
 

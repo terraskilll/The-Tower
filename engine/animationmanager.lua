@@ -4,8 +4,8 @@ a animation manager: loads, saves and retrieves
 
 ]]
 
-require("../engine/lclass")
-require("../engine/io/io")
+require("..engine.lclass")
+require("..engine.io.io")
 
 local basePath = love.filesystem.getSourceBaseDirectory() .. "/__data/"
 

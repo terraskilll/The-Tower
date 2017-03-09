@@ -1,6 +1,6 @@
 
-require("../engine/globalconf")
-require("../engine/input")
+require("..engine.globalconf")
+require("..engine.input")
 
 require("../game/thetower")
 

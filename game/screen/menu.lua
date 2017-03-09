@@ -1,14 +1,14 @@
-require("../engine/lclass")
+require("..engine.lclass")
 
-require("../engine/input")
+require("..engine.input")
 require("../editor/editor")
-require("../engine/ui/uigroup")
-require("../engine/ui/button/button")
-require("../engine/ui/selector/selector")
-require("../engine/screen/screen")
-require("../engine/light/light")
-require("../engine/gameobject/gameobject")
-require("../engine/gameobject/staticimage")
+require("..engine.ui/uigroup")
+require("..engine.ui/button/button")
+require("..engine.ui/selector/selector")
+require("..engine.screen/screen")
+require("..engine.light/light")
+require("..engine.gameobject/gameobject")
+require("..engine.gameobject/staticimage")
 
 require("../resources")
 

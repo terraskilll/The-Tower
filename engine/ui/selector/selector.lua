@@ -5,11 +5,11 @@ simple selector class for menus.
 must be used with a buttongroup for menu management (focus and click)
 
 ------------------------------------------------------------------------------]]--
-require("../engine/globalconf")
-require("../engine/lclass")
-require("../engine/ui/anchor")
+require("..engine.globalconf")
+require("..engine.lclass")
+require("..engine.ui/anchor")
 
-local Vec = require("../engine/math/vector")
+local Vec = require("..engine.math/vector")
 
 local selectorShader = love.graphics.newShader("engine/shaders/ui.glsl")
 

@@ -1,6 +1,6 @@
-require("../engine/lclass")
+require("..engine.lclass")
 
-require("../engine/input")
+require("..engine.input")
 
 class "UIGroup"
 

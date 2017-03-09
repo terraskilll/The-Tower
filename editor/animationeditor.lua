@@ -7,10 +7,10 @@ an animation editor
 
 ]]
 
-require("../engine/lclass")
-require("../engine/input")
-require("../engine/io/io")
-require("../engine/utl/funcs")
+require("..engine.lclass")
+require("..engine.input")
+require("..engine.io.io")
+require("..engine.utl/funcs")
 
 local Vec = require("../engine.math.vector")
 

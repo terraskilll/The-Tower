@@ -10,15 +10,15 @@ and passes it to the owner, who can or cannot go there
 
 ]]
 
-require("../engine/lclass")
-require("../engine/input")
-require("../engine/fsm/fsm")
-require("../engine/globalconf")
+require("..engine.lclass")
+require("..engine.input")
+require("..engine.fsm/fsm")
+require("..engine.globalconf")
 
-local Grid = require ("../engine/navigation/jumper.grid")
-local Pathfinder = require ("../engine/navigation/jumper.pathfinder")
+local Grid = require ("..engine.navigation/jumper.grid")
+local Pathfinder = require ("..engine.navigation/jumper.pathfinder")
 
-local Vec = require("../engine/math/vector")
+local Vec = require("..engine.math/vector")
 
 class "NavAgent"
 

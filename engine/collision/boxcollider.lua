@@ -1,7 +1,7 @@
 --https://love2d.org/wiki/PointWithinShape
 
-require("../engine/lclass")
-require("../engine/globalconf")
+require("..engine.lclass")
+require("..engine.globalconf")
 
 class "BoxCollider"
 

@@ -7,14 +7,15 @@ TODO add shaders
 
 ]]--
 
-require ("../engine/lclass")
+require ("..engine.lclass")
 
-local Vec = require("../engine/math/vector")
+local Vec = require("..engine.math/vector")
 
 class "SimpleObject" ("GameObject")
 
-function SimpleObject:SimpleObject( objectName, positionX, positionY, objectSprite, drawQuad, objectScale )
-  self.name     = objectName
+function SimpleObject:SimpleObject( objectName, instName, positionX, positionY, objectSprite, drawQuad, objectScale )
+  self.name         = objectName
+  self.instancename = instName
 
   self.position = Vec( positionX, positionY )
   self.image    = objectSprite
@@ -210,7 +211,7 @@ function SimpleObject:onCollisionEnter( otherCollider )
   -- nothing
 end
 
-function SimpleObject:clone( newName )
+function SimpleObject:clone( objectName, newInstanceName )
 
   local qd = nil
 
@@ -221,7 +222,7 @@ function SimpleObject:clone( newName )
     qd = love.graphics.newQuad( qx, qy, lx, ly, qw, qh )
   end
 
-  local cloned = SimpleObject( newName, self.position.x, self.position.y, self.image, qd, self.scale )
+  local cloned = SimpleObject( objectName, newInstanceName, self.position.x, self.position.y, self.image, qd, self.scale )
 
   if ( self.boundingbox ) then
     local bdbox = self.boundingbox:clone()

@@ -1,8 +1,8 @@
 
-require("../engine/lclass")
-require("../engine/io/io")
-require("../engine/ui/uigroup")
-require("../engine/ui/button/button")
+require("..engine.lclass")
+require("..engine.io.io")
+require("..engine.ui/uigroup")
+require("..engine.ui/button/button")
 
 require("../editor/textinput")
 

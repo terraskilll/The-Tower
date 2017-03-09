@@ -1,10 +1,12 @@
 -------------------------------------------------------------------------------
 -- simple static image
--------------------------------------------------------------------------------
-require("../engine/lclass")
 
-require ("../engine/gameobject/gameobject")
-require ("../engine/materials/normalmaterial")
+--//TODO refactor or remove
+-------------------------------------------------------------------------------
+require("..engine.lclass")
+
+require ("..engine.gameobject/gameobject")
+require ("..engine.materials/normalmaterial")
 
 class "StaticImage" ("GameObject")
 

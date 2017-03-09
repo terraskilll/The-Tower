@@ -4,7 +4,7 @@ an audio manager class
 
 ]]
 
-require("../engine/lclass")
+require("..engine.lclass")
 
 class "Audio"
 

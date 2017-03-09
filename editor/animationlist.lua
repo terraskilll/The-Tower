@@ -1,7 +1,7 @@
 
 
-require("../engine/lclass")
-require("../engine/io/io")
+require("..engine.lclass")
+require("..engine.io.io")
 
 require("../editor/textinput")
 

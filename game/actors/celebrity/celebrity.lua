@@ -1,12 +1,12 @@
-require("../engine/lclass")
+require("..engine.lclass")
 
-require("../engine/gameobject/actor")
-require("../engine/fsm/fsm")
-require("../engine/collision/boxcollider")
-require("../engine/collision/circlecollider")
-require("../engine/ai/fov")
+require("..engine.gameobject/actor")
+require("..engine.fsm/fsm")
+require("..engine.collision/boxcollider")
+require("..engine.collision/circlecollider")
+require("..engine.ai/fov")
 
-local Vec = require("../engine/math/vector")
+local Vec = require("..engine.math/vector")
 
 class "Celebrity" ("Actor")
 

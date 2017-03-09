@@ -13,11 +13,11 @@ WISHLIST: use threads for parallel A star search
 
 ]]
 
-require("../engine/lclass")
+require("..engine.lclass")
 
-require("../engine/globalconf")
+require("..engine.globalconf")
 
-local Vec = require("../engine/math/vector")
+local Vec = require("..engine.math/vector")
 
 local absfun, ceilfun, maxfun = math.abs, math.ceil, math.max
 

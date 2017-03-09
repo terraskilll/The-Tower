@@ -1,6 +1,6 @@
 
 
-require("../engine/lclass")
+require("..engine.lclass")
 
 class "MapLoader"
 
