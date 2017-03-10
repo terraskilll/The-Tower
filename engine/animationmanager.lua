@@ -66,7 +66,7 @@ function AnimationManager:saveAnimation( animationFileName, animation )
   local frms = {}
 
   for i = 1, framecount do
-    table.insert( frms, animation:getFrame(i):getDatAsTable() )
+    table.insert( frms, animation:getFrame(i):getDataAsTable() )
   end
 
   local animData = {

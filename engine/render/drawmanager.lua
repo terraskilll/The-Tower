@@ -66,8 +66,7 @@ function DrawManager:DrawManager( gameCamera )
   self.navCount   = 0
   self.navmeshes  = {}
 
-  self.groundVisible  = true
-  self.objectsVisible = true
+  self.clipping = true
 end
 
 function DrawManager:addLayer( layerName )
@@ -195,11 +194,10 @@ function DrawManager:addAllSpawns( spawnsToAdd )
 
 end
 
-function DrawManager:addArea( areaToAdd )
+function DrawManager:addArea( areaToAdd ) --//TODO remove ?
   table.insert( self.areas, areaToAdd )
   self.areaCount = #self.areas
 
-  self:addAllGrounds( areaToAdd:getGrounds() )
   self:addAllSpawns( areaToAdd:getSpawnPoints() )
 end
 
@@ -209,6 +207,28 @@ function DrawManager:addAllAreas( areasToAdd )
     self:addArea( f )
   end
 
+end
+
+function DrawManager:getObjectsFromMap( map )
+  local areas = map:getAreas()
+
+  for _,aa in pairs( areas ) do
+    local objects = aa:getObjects()
+
+    for _,oo in pairs( objects ) do
+      self:addObject( oo, oo:getLayer() )
+    end
+
+    for _,ss in pairs( aa:getSpawnPoints() ) do
+      self:addSpawnPoint( ss, ss:getLayer() )
+    end
+
+    local nm = aa:getNavMesh()
+
+    if ( nm ) then
+      self:addNavMesh( nm )
+    end
+  end
 end
 
 function DrawManager:addNavMesh( navmeshToAdd )
@@ -258,9 +278,13 @@ function DrawManager:isInsideScreen( object )
   local camX, camY, camW, camH = self.camera:getVisibleArea(-300, -300, 400, 400) -- arbitrary values?
   local objX, objY, objW, objH = object:getBoundingBox():getBounds()
 
+  if ( self.clipping == false ) then
+    return true
+  end
+
   --//TODO fix isInside when changed resolution
 
-  --if ( object:getName() == "onetree") then
+  --if ( object:getInstanceName() == "onetree") then
   --  objX = objX * self.scaleX
   --  objY = objY * self.scaleY
 

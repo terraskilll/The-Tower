@@ -6,7 +6,7 @@ function Frame:Frame()
   self.duration  = 1
   self.offsetX   = 0
   self.offsetY   = 0
-  self.framequad = nil
+  self.quad      = nil
 end
 
 function Frame:setQuad( quadToSet )
@@ -17,8 +17,8 @@ function Frame:getQuad()
   return self.quad
 end
 
-function Frame:setDuration( newDuration )
-  self.duration = newDuration
+function Frame:setDuration( durationToSet )
+  self.duration = durationToSet
 end
 
 function Frame:setOffset( newOffSetX, newOffSetY )
@@ -42,7 +42,7 @@ function Frame:drawRect( positionX, positionY )
 
 end
 
-function Frame:getDatAsTable()
+function Frame:getDataAsTable()
 
   local qx, qy, lx, ly = self.quad:getViewport()
   local qw, qh = self.quad:getTextureDimensions()
@@ -60,5 +60,21 @@ function Frame:getDatAsTable()
   }
 
   return data
+
+end
+
+function Frame:clone()
+  local theclone = Frame()
+
+  local qx, qy, lx, ly = self.quad:getViewport()
+  local qw, qh = self.quad:getTextureDimensions()
+
+  local quad = love.graphics.newQuad( qx, qy, lx, ly, qw, qh )
+
+  theclone:setQuad( quad )
+  theclone:setDuration( self.duration )
+  theclone:setOffset( self.offsetX, self.offsetY )
+
+  return theclone
 
 end

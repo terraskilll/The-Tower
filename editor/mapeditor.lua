@@ -24,6 +24,10 @@ require("..engine.utl/funcs")
 
 local Vec = require("..engine.math.vector")
 
+local absfun   = math.abs
+local ceilfun  = math.ceil
+local floorfun = math.ceil
+
 local generalOptions = {
   "/ - Help/Command List",
   "Numpad '+/-' - Change Inc Modifier",
@@ -42,6 +46,7 @@ local mapOptions = {
   "=== OBJECT OPTIONS ===",
   "F5 - Load Object From Library",
   "Ctrl + D - Duplicate",
+  "Ctrl + N - Rename",
   "DEL - Remove Object",
   "Alt + PgUp - Layer Up",
   "Alt + PgDown - Layer Down",
@@ -113,6 +118,8 @@ function MapEditor:MapEditor( mapListOwner, mapIndex, mapName, mapFile, thegame 
   self.middleisdown = false
   self.rightisdown  = false
 
+  self.dragthreshold = { x = 0, y = 0 }
+
   self.mousewasdragged = false
 
   self:loadMap( mapName, mapFile )
@@ -167,6 +174,8 @@ function MapEditor:draw()
   end
 
   self:drawNavMesh()
+
+  self:drawGrid()
 
   self.game:getCamera():unset()
 
@@ -244,9 +253,13 @@ function MapEditor:selectObject( objectToSelect )
     done = self.allobjects[i].object:getInstanceName() == objectToSelect:getInstanceName()
 
     if ( done ) then
-      self.allobjects[i].selected = true
+      self.allobjects[i].selected = not self.allobjects[i].selected
 
-      self.selectedCount = self.selectedCount + 1
+      if ( self.allobjects[i].selected ) then
+        self.selectedCount = self.selectedCount + 1
+      else
+        self.selectedCount = self.selectedCount - 1
+      end
     end
 
     i = i + 1
@@ -295,6 +308,10 @@ function MapEditor:selectAll( trueToSelect, layerindex )
 
   end
 
+  if ( not trueToSelect )  then
+    self.selectedCount = 0
+  end
+
 end
 
 function MapEditor:selectOnClick( cx, cy )
@@ -320,7 +337,7 @@ function MapEditor:selectOnClick( cx, cy )
 
     end
 
-  end
+  end -- for
 
   if ( not Input:isKeyDown("lctrl") ) then
     self:selectAll( false, self.currentLayer )
@@ -340,28 +357,8 @@ end
 
 function MapEditor:onKeyPress( key, scancode, isrepeat )
 
-  if ( key == "kp+" ) then
-
-    if ( self.incModifier == 1 ) then
-      self.incModifier = 5
-    else
-      self.incModifier = self.incModifier + 5
-
-      if ( self.incModifier > 50 ) then
-        self.incModifier = 50
-      end
-    end
-
-  end
-
-  if ( key == "kp-" ) then
-
-    if ( self.incModifier <= 5 ) then
-      self.incModifier = 1
-    else
-      self.incModifier = self.incModifier - 5
-    end
-
+  if ( key == "kp+" or key == "kp-") then
+    self:changeIncModifier( key )
   end
 
   if ( key == "f9" ) then
@@ -477,6 +474,10 @@ function MapEditor:loadMap()
       self.game:getDrawManager():addLayer( lls[i].name )
     end
 
+    self.game:getDrawManager():getObjectsFromMap( self.map )
+
+    self:getMapObjectsIntoAllObjects()
+
   else
 
     self.map = Map( self.mapname, self.filename )
@@ -494,9 +495,28 @@ function MapEditor:loadMap()
 
 end
 
+function MapEditor:getMapObjectsIntoAllObjects()
+  local areas = self.map:getAreas()
+
+  for _,aa in pairs( areas ) do
+    local objects = aa:getObjects()
+
+    for _,oo in pairs( objects ) do
+      self:addObject( oo, false, oo:getLayer() )
+    end
+
+    for _,ss in pairs( aa:getSpawnPoints() ) do
+      self:addObject( ss, false, ss:getLayer() )
+    end
+  end
+
+end
+
 --- OBJECT MANAGEMENT ----------------------------------------------------------
 
-function MapEditor:addObject( objectToAdd, addSelected )
+function MapEditor:addObject( objectToAdd, addSelected, addToLayer )
+
+  addToLayer = addToLayer or self.currentLayer
 
   if ( addSelected == nil ) then
     addSelected = false
@@ -510,12 +530,12 @@ function MapEditor:addObject( objectToAdd, addSelected )
 
   local obj = {
     object   = objectToAdd,
-    layer    = self.currentLayer,
+    layer    = addToLayer,
     selected = addSelected,
     selbox   = qd
   }
 
-  objectToAdd:setLayer( self.currentLayer )
+  --objectToAdd:setLayer( addToLayer )
 
   if ( addSelected ) then
     self.selectedCount = self.selectedCount + 1
@@ -587,20 +607,62 @@ function MapEditor:duplicateSelectedObjects( layerindex )
 
 end
 
-function MapEditor:moveSelected( dx, dy )
+function MapEditor:moveSelected( dx, dy, forceApply )
 
-  local c = #self.allobjects
+  if ( forceApply == nil ) then
+    forceApply = true
+  end
+
+  local willapply = false
 
   local v = Vec ( dx, dy )
 
-  for i = 1, c do
+  if ( ( self.incModifier == 1 ) or ( forceApply == true ) ) then
+    willapply = true
+  else
+    self.dragthreshold.x = self.dragthreshold.x + dx
+    self.dragthreshold.y = self.dragthreshold.y + dy
 
-    if ( self.allobjects[i].selected ) then
-      self.allobjects[i].object:changePosition( v )
+    if ( absfun( self.dragthreshold.x ) > self.incModifier ) then
+      if ( self.dragthreshold.x < 0 ) then
+        v.x = -self.incModifier
+      else
+        v.x = self.incModifier
+      end
 
-      self.allobjects[i].selbox[1] = self.allobjects[i].selbox[1] + dx
-      self.allobjects[i].selbox[2] = self.allobjects[i].selbox[2] + dy
+      self.dragthreshold.x = 0
+
+      willapply = true
     end
+
+    if ( absfun( self.dragthreshold.y )  > self.incModifier ) then
+      if ( self.dragthreshold.y < 0 ) then
+        v.y = -self.incModifier
+      else
+        v.y = self.incModifier
+      end
+
+      self.dragthreshold.y = 0
+
+      willapply = true
+    end
+
+  end
+
+  if ( willapply ) then
+
+    local c = #self.allobjects
+
+    for i = 1, c do
+
+      if ( self.allobjects[i].selected ) then
+        self.allobjects[i].object:changePosition( v )
+
+        self.allobjects[i].selbox[1] = self.allobjects[i].selbox[1] + v.x
+        self.allobjects[i].selbox[2] = self.allobjects[i].selbox[2] + v.y
+      end
+
+    end -- for
 
   end
 
@@ -655,7 +717,7 @@ function MapEditor:moveSelectedByKeys( key )
     xd = 1
   end
 
-  self:moveSelected( self.incModifier * xd, self.incModifier * yd )
+  self:moveSelected( self.incModifier * xd, self.incModifier * yd, true )
 
 end
 
@@ -716,6 +778,34 @@ function MapEditor:keypressEditMap( key )
 
   end
 
+end
+
+function MapEditor:changeIncModifier( key )
+  if ( key == "kp+" ) then
+
+    if ( self.incModifier == 1 ) then
+      self.incModifier = 4
+    else
+      self.incModifier = self.incModifier * 2
+
+      if ( self.incModifier > 512 ) then
+        self.incModifier = 1
+      end
+    end
+
+  end
+
+  if ( key == "kp-" ) then
+
+    if ( self.incModifier == 1 ) then
+      self.incModifier = 512
+    elseif ( self.incModifier == 4 ) then
+      self.incModifier = 1
+    else
+      self.incModifier = self.incModifier / 2
+    end
+
+  end
 end
 
 ---- LAYER FUNCTIONS -----------------------------------------------------------
@@ -816,8 +906,39 @@ function MapEditor:keypressMiscelaneous( key )
     self.showHelp = not self.showHelp
   end
 
+  if ( key == ";" ) then
+    self.game:getCamera():setScale( 10 , 10 )
+  end
+
   if ( ( key == "k" ) and ( Input:isKeyDown( "lctrl" ) ) ) then
     self:lockLayer( self.currentLayer )
+  end
+
+  if ( ( key == "n" ) and ( Input:isKeyDown( "lctrl" ) ) ) then
+    if ( self.selectedCount > 0 ) then
+      local index = 0
+
+      local i = 1
+
+      while ( index == 0 ) do
+        if ( self.allobjects[i].selected ) then
+          index = i
+        end
+
+        i = i + 1
+      end
+
+      self.textInput = TextInput("New Name: ", self.allobjects[index].object:getInstanceName() )
+
+      self.updatefunction   = self.updateRenameObject
+      self.keypressfunction = self.keypressRenameObject
+    end
+  end
+
+  if ( ( key == "i" ) and ( Input:isKeyDown( "lctrl" ) ) ) then
+    local enabled = self.map:getCollisionEnabledForLayer( self.currentLayer )
+    self.map:enableCollisionForLayer( self.currentLayer, not enabled )
+    self:setLastMessage( "Layer Collision Set To " .. tostring( not enabled ) )
   end
 
   if ( ( key == "h" ) and ( Input:isKeyDown( "lshift" ) ) ) then
@@ -835,9 +956,7 @@ function MapEditor:keypressMiscelaneous( key )
   end
 
   if ( (key == "p")  and ( Input:isKeyDown( "lctrl" ) ) ) then
-    self.textInput        = TextInput( "Spawn Point Name:" )
-    self.updatefunction   = self.updateCreateSpawnPoint
-    self.keypressfunction = self.keypressCreateSpawnPoint
+    self:createSpawnPoint()
   end
 
 end
@@ -869,7 +988,7 @@ function MapEditor:keypressForAreas( key )
 
   if ( ( key == "f1" ) and ( Input:isKeyDown( "lctrl" ) ) and ( Input:isKeyDown( "lalt" ) ) ) then
     --//TODO remove current area
-    self:setLastMessage("Ctrl+Alt+F1 Not implemented")
+    self:setLastMessage("Ctrl+Alt+F1 ( Remove Current Area ) Not implemented")
   end
 
   if ( key == "f3" ) and ( self.editNavMesh == false ) then
@@ -945,30 +1064,36 @@ function MapEditor:updateSelectFromLibrary( dt )
 
     local cx, cy = self.game:getCamera():getPositionXY()
 
+    local lx, ly = px + cx, py + cy
+
     local instancename =  self.map:getNextGeneratedName()
 
     local fromLibrary = self.map:getObjectFromLibrary ( objectname )
 
     if ( fromLibrary ) then
       object = fromLibrary:clone( objectname, instancename )
+
+      object:setLayer( self.currentLayer )
     else
-      tolibrary = self.game:getObjectManager():loadObject( objectname, instancename, px + cx, py + cy )
+      tolibrary = self.game:getObjectManager():loadObject( objectname, instancename, lx, ly )
 
       self.map:addToLibrary( objectname, tolibrary )
 
       instancename =  self.map:getNextGeneratedName()
 
       object = tolibrary:clone( objectname, instancename )
+
+      object:setLayer( self.currentLayer )
     end
 
     if ( object ) then
-      object:setPosition( Vec( px + cx, py + cy ) )
+      object:setPosition( Vec( lx, ly ) )
 
       self.area:addObject( object )
 
       self.game:getDrawManager():addObject( object, self.currentLayer )
 
-      self:addObject( object, "object", true )
+      self:addObject( object, true )
     end
 
     self.textInput = nil
@@ -1006,16 +1131,60 @@ function MapEditor:keypressCreateLayer( key )
   self.textInput:keypressed( key )
 end
 
---- CREATE SPAWN POINT ---------------------------------------------------------
+--- RENAME OBJECT --------------------------------------------------------------
 
-function MapEditor:updateCreateSpawnPoint( dt )
+function MapEditor:renameSelectedObjects( newname )
+  --//TODO check if name already exists
+
+  local counter = 1
+
+  for i = 1, #self.allobjects do
+    if ( self.allobjects[i].selected ) then
+
+      print("Renaming: " .. self.allobjects[i].object:getInstanceName())
+
+      if ( self.selectedCount == 1 ) then
+        self.allobjects[i].object:setInstanceName( newname )
+      else
+        self.allobjects[i].object:setInstanceName( newname ..tostring( counter ) )
+
+        counter = counter + 1
+      end
+
+    end
+  end
+
+end
+
+function MapEditor:updateRenameObject( dt )
   if ( self.textInput:isFinished() ) then
 
-    local spanwname = self.textInput:getText()
+    local newname = self.textInput:getText()
+
+    self:renameSelectedObjects( newname )
+
+    self.textInput = nil
+
+    self.updatefunction   = self.updateEditMap
+    self.keypressfunction = self.keypressEditMap
+
+  end
+end
+
+function MapEditor:keypressRenameObject( key )
+  self.textInput:keypressed( key )
+end
+
+--- CREATE SPAWN POINT ---------------------------------------------------------
+
+function MapEditor:createSpawnPoint( )
+    local spawnname =  self.map:getNextGeneratedName()
 
     local px, py = Input.mousePosition()
 
-    local spawn = SpawnPoint( spanwname, px, py )
+    local spawn = SpawnPoint( spawnname, px, py )
+
+    spawn:setLayer( self.currentLayer )
 
     self:addObject( spawn, true )
 
@@ -1023,16 +1192,8 @@ function MapEditor:updateCreateSpawnPoint( dt )
 
     self.game:getDrawManager():addSpawnPoint( spawn )
 
-    self.textInput = nil
-
     self.updatefunction = self.updateEditMap
     self.keypressfunction = self.keypressEditMap
-
-  end
-end
-
-function MapEditor:keypressCreateSpawnPoint( key )
-  self.textInput:keypressed( key )
 end
 
 ----- NAV MESH -----------------------------------------------------------------
@@ -1076,6 +1237,29 @@ function MapEditor:drawNavMesh()
     love.graphics.rectangle( "line", inx[1], inx[2], inx[3], inx[4] )
   end
 
+end
+
+function MapEditor:drawGrid()
+
+  if ( self.incModifier < 4 ) then
+    return
+  end
+
+  --//TODO draw a simpler grid (according to camera position)
+  --local sw, sh = love.graphics.getDimensions()
+
+  --local cx, cy = self.game:getCamera():getPositionXY()
+
+  --local sx, sy = sw / 2 + cx, sh / 2 + cy
+
+  love.graphics.setColor( 0, 255, 0, 40 )
+
+  for i = -10000, 10000, self.incModifier do
+    love.graphics.line( i, -10000, i, 10000 )
+    love.graphics.line( -10000, i, 10000, i )
+  end
+
+  love.graphics.setColor( glob.defaultColor )
 end
 
 function MapEditor:updateNavMesh( dt )
@@ -1218,6 +1402,7 @@ function MapEditor:drawHelp()
     "",
     "F5 - Load Object From Library",
     "Ctrl + D - Duplicate",
+    "Ctrl + N - Rename",
     "DEL - Remove Object",
     "",
     "Alt + PgUp - Object Layer Up",

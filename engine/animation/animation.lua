@@ -15,9 +15,15 @@ function Animation:Animation( animationName )
   self.frames     = {}
   self.frameCount = 0
 
+  self.resourcename = nil
+
   self.currentFrame       = nil
   self.currentFrameNumber = 1
   self.currentFrameTime   = 0
+
+  self.running = false
+
+  self.one = 1
 end
 
 function Animation:setName( nameToSet )
@@ -38,10 +44,14 @@ function Animation:getResourceName()
 end
 
 function Animation:update( dt )
+  if ( not self.running ) then
+    return
+  end
 
   self.currentFrameTime = self.currentFrameTime + dt
 
   if ( self.currentFrameTime >= self.currentFrame:getDuration() ) then
+
     self.currentFrameTime = 0
 
     self.currentFrameNumber = self.currentFrameNumber + 1
@@ -51,6 +61,7 @@ function Animation:update( dt )
     end
 
     self.currentFrame = self.frames[self.currentFrameNumber]
+
   end
 
 end
@@ -62,6 +73,12 @@ end
 function Animation:start()
   self.currentFrameNumber = 1
   self.currentFrame = self.frames[self.currentFrameNumber]
+
+  self.running = true
+end
+
+function Animation:stop()
+  self.running = false
 end
 
 function Animation:addFrame( frameToAdd )
@@ -94,17 +111,28 @@ end
 function Animation:getFrame( index )
 
   if ( self.frames[index] ) then
-
     return self.frames[index]
-
   else
-
     return nil
-
   end
 
 end
 
 function Animation:getFrameCount()
   return self.frameCount
+end
+
+function Animation:clone()
+  local theclone = Animation( self.name )
+
+  theclone:setImage( self.image, self.resourcename )
+
+  for i = 1, self.frameCount do
+    local frameclone = self.frames[i]:clone()
+
+    theclone:addFrame( frameclone )
+  end
+
+  return theclone
+
 end

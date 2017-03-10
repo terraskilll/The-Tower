@@ -110,5 +110,5 @@ function Player:configure()
 end
 
 function Player:onCollisionEnter( otherCollider )
-  --print( "Player Collided with " .. otherCollider:getOwner():getName() )
+  --print( "Player Collided with " .. otherCollider:getOwner():getInstanceName() )
 end

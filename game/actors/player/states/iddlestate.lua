@@ -17,7 +17,7 @@ function IddleState:onEnter()
 end
 
 function IddleState:onUpdate(dt)
-  self.animation:update(dt)
+  --self.animation:update(dt) --//TODO
 end
 
 function IddleState:onExit()

@@ -57,8 +57,8 @@ end
 
 function NavBox:clone()
 
-  local cloned = NavBox( self.positionX, self.positionY, self.width, self.height,
-                         self.offsetX, self.offsetY, self.scale )
+  local theclone = NavBox( self.positionX, self.positionY, self.width, self.height,
+                           self.offsetX, self.offsetY, self.scale )
 
-  return cloned
+  return theclone
 end

@@ -56,10 +56,10 @@ function Ground:clone( newname )
     qd = love.graphics.newQuad( qx, qy, lx, ly, qw, qh )
   end
 
-  local cloned = Ground(newname, self.position.x, self.position.y, self.image, qd, self.scale)
+  local theclone = Ground(newname, self.position.x, self.position.y, self.image, qd, self.scale)
 
-  cloned:setAsStair( self.stair )
+  theclone:setAsStair( self.stair )
 
-  return cloned
+  return theclone
 
 end

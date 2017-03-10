@@ -32,6 +32,8 @@ function SimpleObject:SimpleObject( objectName, instName, positionX, positionY, 
     self.height = hh
   end
 
+  self.layer = 1
+
   self.animation   = nil
 
   self.collider    = nil
@@ -46,8 +48,8 @@ function SimpleObject:getKind()
 end
 
 function SimpleObject:update( dt )
-
-  if ( self.animation ~= nil ) then
+  --//TODO call update in game for SimpleObjects
+  if ( self.animation ) then
     self.animation:update( dt )
   end
 
@@ -110,6 +112,11 @@ function SimpleObject:getImage()
   return self.image
 end
 
+function SimpleObject:setAnimation( animationToSet )
+  self.animation = animationToSet
+  self.animation:start() --//TODO check for a better place to start animation
+end
+
 function SimpleObject:getAnimation()
   return self.animation
 end
@@ -157,10 +164,6 @@ end
 
 function SimpleObject:getNavBox()
   return self.navbox
-end
-
-function SimpleObject:setAnimation( animationToSet )
-  self.animation = animationToSet
 end
 
 function SimpleObject:setScale( scaleToSet )
@@ -222,28 +225,28 @@ function SimpleObject:clone( objectName, newInstanceName )
     qd = love.graphics.newQuad( qx, qy, lx, ly, qw, qh )
   end
 
-  local cloned = SimpleObject( objectName, newInstanceName, self.position.x, self.position.y, self.image, qd, self.scale )
+  local theclone = SimpleObject( objectName, newInstanceName, self.position.x, self.position.y, self.image, qd, self.scale )
 
   if ( self.boundingbox ) then
     local bdbox = self.boundingbox:clone()
-    cloned:setBoundingBox( bdbox )
+    theclone:setBoundingBox( bdbox )
   end
 
   if ( self.navbox ) then
     local navbox = self.navbox:clone()
-    cloned:setNavBox( navbox )
+    theclone:setNavBox( navbox )
   end
 
   if ( self.collider ) then
     local colld = self.collider:clone()
-    cloned:setCollider( colld )
+    theclone:setCollider( colld )
   end
 
   if ( self.animation ) then
     local animd = self.animation:clone()
-    cloned:setAnimation( animd )
+    theclone:setAnimation( animd )
   end
 
-  return cloned
+  return theclone
 
 end

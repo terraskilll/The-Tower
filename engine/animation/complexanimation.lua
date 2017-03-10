@@ -8,7 +8,7 @@ function ComplexAnimation:ComplexAnimation()
 end
 
 function ComplexAnimation:update( dt )
-  self.currentAnimation:update( dt )
+  self.currentAnimation:update( dt, " XXX " )
 end
 
 function ComplexAnimation:draw( positionX, positionY )

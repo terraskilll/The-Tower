@@ -6,7 +6,9 @@ require("..engine.io.io")
 require("..editor.textinput")
 
 local options = {
-  "F1 - Set Start Map"
+  "F1 - Set Start Map",
+  "F9 - Save",
+  "F11 - Back"
 }
 
 class "GamePlayEditor"

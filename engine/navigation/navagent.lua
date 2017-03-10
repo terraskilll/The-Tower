@@ -91,11 +91,11 @@ function NavAgent:update( dt, axisVector, collisionManager )
   if ( changedNavMesh ~= nil ) and ( changedNavMesh ~= self.navmesh ) then
 
       if ( changedNavMesh:isMobile() ) then
-        changedNavMesh:getOwner():addObjectOver( self.owner:getName(), self.owner )
+        changedNavMesh:getOwner():addObjectOver( self.owner:getInstanceName(), self.owner )
       end
 
       if ( self.navmesh:isMobile() ) then
-        self.navmesh:getOwner():removeObjectOver( self.owner:getName() )
+        self.navmesh:getOwner():removeObjectOver( self.owner:getInstanceName() )
       end
 
       self.navmesh = changedNavMesh
@@ -107,7 +107,12 @@ function NavAgent:update( dt, axisVector, collisionManager )
   local boundedMov = self.navmesh:getInsidePosition( offsettedPosition, movement )
 
   --//TODO allow movement if it is diagonal and collision is on one direction (x or y)
-  local collisionCheckedMov = self.navmesh:getCollisionCheckedPosition( offsettedPosition, boundedMov, self.owner:getCollider(), collisionManager )
+  local collisionCheckedMov = self.navmesh:getCollisionCheckedPosition(
+        offsettedPosition,
+        boundedMov,
+        self.owner:getCollider(),
+        collisionManager,
+        self.owner:getLayer() )
 
   --self.position = self.position + collisionCheckedMov
 

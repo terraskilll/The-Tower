@@ -16,6 +16,8 @@ function SpawnPoint:SpawnPoint( spawnPointName , positionX, positionY )
   self.name         = "SpawnPoint"
   self.position     = Vec( positionX, positionY )
 
+  self.layer  = 1
+
   self.width  = 20
   self.height = 20
 end

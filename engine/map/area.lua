@@ -36,7 +36,7 @@ end
 
 function Area:addObject( objectToAdd )
 
-  self.objects[objectToAdd:getInstanceName()] = objectToAdd
+  table.insert( self.objects, objectToAdd )
 
   if ( self.navmesh ) then
     self.navmesh:addCollider( objectToAdd:getCollider() ) --//TODO change to navbox
@@ -50,25 +50,30 @@ end
 
 function Area:getObjectByName( instanceName )
 
-  if ( self.objects[instanceName] ) then
-    return self.objects[instanceName]
+  for i = 1, #self.objects do
+    if ( self.objects[i]:getInstanceName() == instanceName ) then
+      return self.objects[i], i
+    end
   end
 
-  return nil
+  return nil, 0
 
 end
 
 function Area:removeObject( instanceName )
 
-  if ( self.objects[instanceName] ) then
-    self.objects[instanceName] = nil
-    return
+  local obj, index = self:getObjectByName( instanceName )
+
+  if ( index > 0 ) then
+    table.remove( self.objects, index )
+    return true
   end
 
+  return false
 end
 
 function Area:addSpawnPoint( spawnPointToAdd )
-  self.spawns[spawnPointToAdd:getInstanceName()] = spawnPointToAdd
+  table.insert( self.spawns, spawnPointToAdd )
 end
 
 function Area:getSpawnPoints()
@@ -76,15 +81,26 @@ function Area:getSpawnPoints()
 end
 
 function Area:getSpawnPointByName( spawnName )
-  return self.spawns[spawnName]
-end
 
-function Area:removeSpawnPoint( spawnPointName )
-
-  if ( self.spawns[spawnPointName] ) then
-    self.spawns[spawnPointName] = nil
+  for i = 1, #self.spawns do
+    if ( self.spawns[i]:getInstanceName() == spawnName ) then
+      return self.spawns[i], i
+    end
   end
 
+  return nil, 0
+end
+
+function Area:removeSpawnPoint( spawnName )
+
+  local obj, index = self:getSpawnPointByName( spawnName )
+
+  if ( index > 0 ) then
+    table.remove( self.spawns, index )
+    return true
+  end
+
+  return false
 end
 
 function Area:setNavMesh( newNavMesh )

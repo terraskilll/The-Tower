@@ -76,6 +76,8 @@ collision = {
 
     local dx = distX - ( boxw / 2 )
 
+    local dy = distY - ( boxh / 2 )
+
     return ( ( dx * dx + dy * dy ) <= ( circler * circler ) )
   end
 }

@@ -20,6 +20,10 @@ class "TheTower" ("Game")
 function TheTower:TheTower()
   self.screens = {}
 
+  self.savegame  = nil
+
+  self.gameobjects = {}
+
   self:configure()
 
   self:addScreen( "EditorScreen", Editor( self ) )

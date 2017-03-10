@@ -209,19 +209,19 @@ function MovingObject:clone( newname )
     qd = love.graphics.newQuad( qx, qy, lx, ly, qw, qh )
   end
 
-  local cloned = MovingObject( newname, self.position.x, self.position.y, self.image, qd,  self.scale )
+  local theclone = MovingObject( newname, self.position.x, self.position.y, self.image, qd,  self.scale )
 
   if ( self.navmesh ) then
     local navms = self.navmesh:clone()
-    cloned:setNavMesh( navms )
+    theclone:setNavMesh( navms )
   end
 
   for i = 1, #self.points do
-    cloned:addPoint( Vec( self.points[i].x, self.points[i].y ) )
+    theclone:addPoint( Vec( self.points[i].x, self.points[i].y ) )
   end
 
-  cloned:setCircular( self:isCircular() )
-  cloned:setDelays( self.initialDelay, self.middleDelay, self.finalDelay )
+  theclone:setCircular( self:isCircular() )
+  theclone:setDelays( self.initialDelay, self.middleDelay, self.finalDelay )
 
-  return cloned
+  return theclone
 end

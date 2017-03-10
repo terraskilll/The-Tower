@@ -113,7 +113,7 @@ function ObjectManager:loadObject( objectName, instanceName, posx, posy )
     if ( objdata.colltype == "box" ) then
       collider = BoxCollider( posx, posy, cd[3], cd[4], cd[5], cd[6], cd[7] )
     else
-      collider = CircleCollider( posx, posy, cd[2], cd[8], cd[5], cd[6], cd[7] )
+      collider = CircleCollider( posx, posy, cd[8], cd[5], cd[6], cd[7] )
     end
 
     object:setCollider( collider )
@@ -121,6 +121,14 @@ function ObjectManager:loadObject( objectName, instanceName, posx, posy )
   end
 
   --//TODO load animation
+
+  if ( ( objdata.animationname ) and ( objdata.animationname ~= "") ) then
+    local anim = self.game:getAnimationManager():loadAnimation( objdata.animationname )
+
+    anim:start()
+
+    object:setAnimation( anim )
+  end
 
   return object
 end

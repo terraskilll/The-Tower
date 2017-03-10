@@ -39,6 +39,18 @@ function MapManager:loadList()
 end
 
 function MapManager:loadMap( mapName, mapFileName )
+  --//TODO fill CollisionManager
+
+  if ( mapName == nil ) then
+
+    for i = 1, #self.maplist do
+      if ( self.maplist[i][2] == mapFileName ) then
+        mapName = self.maplist[i][1]
+      end
+    end
+
+  end
+
   local mapdata = loadFile( "__maps/" .. mapFileName, mapdata )
 
   if ( not mapdata ) then
@@ -57,11 +69,15 @@ function MapManager:loadMap( mapName, mapFileName )
   --- LAYERS ---
   for i = 1, #layers do
     map:addLayer( layers[i].name, layers[i].index )
+
+    map:enableCollisionForLayer( layers[i].index, layers[i].collision == 1 )
   end
 
   --- LIBRARY ---
   for i = 1, #library do
     local object = self.game:getObjectManager():loadObject( library[i].name, library[i].instname, 0, 0 )
+
+    object:setLayer( 1 )
 
     map:addToLibrary( library[i].name, object )
   end
@@ -77,18 +93,26 @@ function MapManager:loadMap( mapName, mapFileName )
       local object = map:getObjectFromLibrary( objects[i].name ):clone( objects[i].name, objects[i].instname )
 
       if ( object ) then
-        object:setPosition( Vec( objects[i].px, objects[i].py ) )
+        object:setPosition( Vec( objects[i].posx, objects[i].posy ) )
         object:setLayer( objects[i].layer )
+
+        local colld = object:getCollider()
+
+        if ( colld ) then
+          object:getCollider():setSolid( objects[i].solidcollider == 1 )
+        end
 
         area:addObject( object )
       end
     end
 
     --- SPAWN POINTS ---
-    local spawns = areas[i].objects
+    local spawns = areas[i].spawns
 
     for i = 1, #spawns  do
       local spawn = SpawnPoint( spawns[i].instname, spawns[i].posx, spawns[i].posy )
+
+      spawn:setLayer( spawns[i].layer )
 
       area:addSpawnPoint( spawn )
     end
@@ -106,7 +130,7 @@ function MapManager:loadMap( mapName, mapFileName )
     map:addArea( area )
   end
 
-  return nil
+  return map
 end
 
 function MapManager:saveMap( mapName, mapFileName, map )
@@ -120,7 +144,13 @@ function MapManager:saveMap( mapName, mapFileName, map )
 
   --- LAYERS ---
   for _,ll in pairs( maplayers ) do
-    table.insert( layers, { name = ll.name, index = ll.index } )
+    local cll = 1
+
+    if ( ll.collision == false ) then
+      cll = 0
+    end
+
+    table.insert( layers, { name = ll.name, index = ll.index, collision = cll } )
   end
 
   --- LIBRARY ---
@@ -138,13 +168,25 @@ function MapManager:saveMap( mapName, mapFileName, map )
     for _,oo in pairs( aaobjects ) do
       local px, py = oo:getPositionXY()
 
-      table.insert( areaobjects, {
+      local objdata = {
           name     = oo:getName(),
           instname = oo:getInstanceName(),
           posx     = px,
           posy     = py,
           layer    = oo:getLayer()
-      })
+      }
+
+      local colld = oo:getCollider()
+
+      if ( colld ) then
+        if ( colld:isSolid() ) then
+          objdata.solidcollider = 1
+        else
+          objdata.solidcollider = 0
+        end
+      end
+
+      table.insert( areaobjects, objdata )
     end
 
     --- SPAWN POINTS ---

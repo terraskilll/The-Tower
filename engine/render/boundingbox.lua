@@ -62,8 +62,8 @@ end
 function BoundingBox:clone()
   local colr = { self.color[1], self.color[2], self.color[3], self.color[4] }
 
-  local cloned = BoundingBox( self.positionX, self.positionY, self.width, self.height,
-                              self.zIndex, self.offsetX, self.offsetY, self.scale, colr )
+  local theclone = BoundingBox( self.positionX, self.positionY, self.width, self.height,
+                                self.zIndex, self.offsetX, self.offsetY, self.scale, colr )
 
-  return cloned
+  return theclone
 end

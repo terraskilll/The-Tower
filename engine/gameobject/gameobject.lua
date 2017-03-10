@@ -33,6 +33,10 @@ function GameObject:getInstanceName()
   return self.instancename
 end
 
+function GameObject:setInstanceName( nameToSet )
+  self.instancename = nameToSet
+end
+
 function GameObject:getTag()
   return self.tag
 end

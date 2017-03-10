@@ -5,41 +5,67 @@ local Vec = require("..engine.math/vector")
 class "CollisionManager"
 
 function CollisionManager:CollisionManager()
-  self.collidersCount = 0
-  self.colliders = {}
+  self.layers = {}
 end
 
-function CollisionManager:addCollider( objectWithCollider )
-  if ( objectWithCollider == nil ) then
-    return  -- not a collider
+function CollisionManager:addLayer( layerIndex, layerName, collisionEnabled )
+  local layer = {
+    name      = layerName,
+    enabled   = collisionEnabled,
+    colliders = {},
+    collcount = 0
+  }
+
+  self.layers[layerIndex] = layer
+end
+
+function CollisionManager:enableLayer( layerIndex, trueToEnable )
+  self.layers[layerIndex].enabled = trueToEnable
+end
+
+function CollisionManager:addCollider( objectCollider, layer )
+  if ( ( objectCollider == nil ) or ( layer == nil ) ) then
+    return  -- not a collider, or layer is incorrect
   end
 
-  table.insert( self.colliders, objectWithCollider )
-  self.collidersCount = #self.colliders
+  table.insert( self.layers[layer].colliders, objectCollider )
+  self.layers[layer].collcount = self.layers[layer].collcount + 1
 end
 
-function CollisionManager:checkCollisions()
+function CollisionManager:checkollisionForLayer( layer )
+  if ( not layer.enabled ) then
+    return
+  end
 
-  for i=1, self.collidersCount do
-    for j=1, self.collidersCount do
+  for i = 1, layer.collcount do
+    for j = 1, layer.collcount do
 
       if (i ~= j) then
 
-        local coll = collision.check( self.colliders[i], self.colliders[j] )
+        local coll = collision.check( layer.colliders[i], layer.colliders[j] )
 
         if ( coll ) then
-          self.colliders[i]:collisionEnter( self.colliders[j] )
-          self.colliders[j]:collisionEnter( self.colliders[i] )
+          layer.colliders[i]:collisionEnter( layer.colliders[j] )
+          layer.colliders[j]:collisionEnter( layer.colliders[i] )
         end
 
       end
 
-    end
-  end
+    end --for j
+  end  -- for i
 
 end
 
-function CollisionManager:checkCollisionForMovement( currentPosition, movementVector, objectCollider )
+function CollisionManager:checkCollisions()
+
+  --// TODO more efficient collision check
+
+  for i = 1, #self.layers do
+    self:checkollisionForLayer( self.layers[i] )
+  end
+end
+
+function CollisionManager:checkCollisionForMovement( currentPosition, movementVector, objectCollider, objectLayer )
   local movedPosition = Vec( currentPosition.x + movementVector.x,  currentPosition.y + movementVector.y)
 
   local futureCollider = objectCollider:clone()
@@ -50,20 +76,20 @@ function CollisionManager:checkCollisionForMovement( currentPosition, movementVe
 
   local collIndex = 1
 
-  local checkedAll = self.collidersCount == 0 -- if no colliders, no check
+  local checkedAll = self.layers[objectLayer].collcount == 0 -- if no colliders, no check
 
   while not checkedAll do
 
-    if ( futureCollider:getOwner() ~= self.colliders[collIndex]:getOwner() ) then
+    if ( futureCollider:getOwner() ~= self.layers[objectLayer].colliders[collIndex]:getOwner() ) then
 
-      collided = collision.check( futureCollider, self.colliders[collIndex] )
+      collided = collision.check( futureCollider, self.layers[objectLayer].colliders[collIndex] )
 
       if ( collided ) then
         --//notifies collision to objects
-        self.colliders[collIndex]:collisionEnter( objectCollider )
-        objectCollider:collisionEnter( self.colliders[collIndex] )
+        self.layers[objectLayer].colliders[collIndex]:collisionEnter( objectCollider )
+        objectCollider:collisionEnter( self.layers[objectLayer].colliders[collIndex] )
 
-        if ( self.colliders[collIndex]:isSolid() ) then
+        if ( self.layers[objectLayer].colliders[collIndex]:isSolid() ) then
           movementVector:set( 0, 0 ) --//TODO change to check the collision and keep moving?
         end
 
@@ -86,12 +112,11 @@ function CollisionManager:checkCollisionForMovement( currentPosition, movementVe
 
     collIndex = collIndex + 1
 
-    checkedAll = collIndex > self.collidersCount
+    checkedAll = collIndex > self.layers[objectLayer].collcount
   end
 
   return movementVector
 end
-
 
 function CollisionManager:orientedCollisionCheck( coll1, coll2, movementVector )
   -- checks whether a collided object can keep moving on in one direction

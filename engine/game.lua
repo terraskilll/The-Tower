@@ -10,6 +10,8 @@ require("..engine.resourcemanager")
 require("..engine.objectmanager")
 require("..engine.animationmanager")
 require("..engine.mapmanager")
+require("..engine.savegame.savegame")
+require("..engine.savegame.savemanager")
 
 local config = {
   gameScreenWidth = 1280,
@@ -23,6 +25,10 @@ function Game:Game()
 
   self.screens = {}
 
+  self.savegame = nil
+
+  self.gameobjects = {}
+
 end
 
 function Game:update(dt)
@@ -32,11 +38,19 @@ function Game:update(dt)
   self.drawManager:update( dt ) --//TODO check is gets slow
 end
 
+function Game:updateRegisteredObjects( dt )
+  local c = #self.gameobjects
+
+  for i = 1, c do
+    self.gameobjects[i]:update( dt )
+  end
+end
+
 function Game:draw()
   self.currentScreen:draw()
 
   if ( glob.devMode.showFPS ) then
-    love.graphics.print( "Current FPS: ".. tostring( love.timer.getFPS() ), 10, 10 )
+    love.graphics.print( "Current FPS: " .. tostring( love.timer.getFPS() ), 10, 10 )
   end
 
 end
@@ -68,44 +82,16 @@ function Game:onKeyRelease( key, scancode, isrepeat )
 	return false
 end
 
-function Game:configure()
-  self:loadConfiguration()
+function Game:register( gameobject )
+  table.insert( self.gameobjects, gameobject )
+end
 
-  -- window configuration
-  if (config.setFullScreen == nil) then
-    config.setFullScreen = false
-  end
+function Game:unregister( )
+  --//TODO
+end
 
-  local ww, wh = config.gameScreenWidth, config.gameScreenHeight
-
-  love.window.setMode( ww, wh, config.gameIsFullScreen )
-
-  self.resourceManager = ResourceManager( self )
-
-  self.objectManager = ObjectManager( self )
-  self.objectManager:load()
-
-  self.animationManager = AnimationManager( self )
-  self.animationManager:load()
-
-  self.mapManager = MapManager( self )
-  self.mapManager:loadList()
-
-  self.player = Player( "PLAYER", 0, 0 )
-
-  self.camera = Camera()
-  self.camera:setScale( ww / 1280, wh / 720 )
-
-  self.drawManager = DrawManager( self.camera )
-  self.drawManager:setScale( ww / 1280, wh / 720 )
-
-  self.collisionManager = CollisionManager()
-
-  Input.overallListener = Game
-  Input.camera = self.camera
-
-  local font = love.graphics.newFont( "res/font/ubuntu.ttf", 12 )
-  love.graphics.setFont( font )
+function Game:destroy(  )
+  --//TODO
 end
 
 function Game:getPlayer()
@@ -140,6 +126,27 @@ function Game:getMapManager()
   return self.mapManager
 end
 
+function Game:getSaveManager()
+  return self.saveManager
+end
+
+function Game:getSaveGame()
+  return self.savegame
+end
+
+function Game:createEmptySave()
+  local gamedata = loadFile( "__gameplay" )
+
+  self.savegame = SaveGame( "Save " .. tostring( self.saveManager:getSaveCount() + 1 ) )
+
+  self.savegame:setMapName( gamedata.startmap )
+  self.savegame:setAreaName( gamedata.startarea )
+  self.savegame:setSpawnName( gamedata.startspawn )
+  self.savegame:save()
+
+  self.saveManager:addSave( self.savegame:getName(), self.savegame )
+end
+
 function Game:setCurrentScreen( screenName )
   local nextScreen = self.screens[screenName]
 
@@ -168,6 +175,48 @@ function Game:addScreen( screenName, screen )
     self.screens[screenName] = screen
   end
 
+end
+
+function Game:configure()
+  self:loadConfiguration()
+
+  -- window configuration
+  if (config.setFullScreen == nil) then
+    config.setFullScreen = false
+  end
+
+  local ww, wh = config.gameScreenWidth, config.gameScreenHeight
+
+  love.window.setMode( ww, wh, config.gameIsFullScreen )
+
+  self.resourceManager = ResourceManager( self )
+
+  self.objectManager = ObjectManager( self )
+  self.objectManager:load()
+
+  self.animationManager = AnimationManager( self )
+  self.animationManager:load()
+
+  self.mapManager = MapManager( self )
+  self.mapManager:loadList()
+
+  self.saveManager = SaveManager( self )
+
+  self.player = Player( "PLAYER", "PLAYER", 0, 0 )
+
+  self.camera = Camera()
+  self.camera:setScale( ww / 1280, wh / 720 )
+
+  self.drawManager = DrawManager( self.camera )
+  self.drawManager:setScale( ww / 1280, wh / 720 )
+
+  self.collisionManager = CollisionManager()
+
+  Input.overallListener = Game
+  Input.camera = self.camera
+
+  local font = love.graphics.newFont( "res/font/ubuntu.ttf", 12 )
+  love.graphics.setFont( font )
 end
 
 function Game:changeResolution( resolutionWidth, resolutionHeight, setFullScreen )

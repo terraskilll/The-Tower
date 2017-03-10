@@ -67,7 +67,7 @@ function Map:getAreas()
   return self.areas
 end
 
-function Map:getAreaByName ( areaName )
+function Map:getAreaByName( areaName )
   return self.areas[areaName]
 end
 
@@ -101,16 +101,41 @@ function Map:removeAreaByName( areaName )
 end
 
 function Map:addLayer( layerName, layerIndex )
-  table.insert( self.layers, { name = layerName, index = layerIndex })
+  table.insert( self.layers, { name = layerName, index = layerIndex, collision = true } )
 
   table.sort( self.layers , function ( l1, l2 ) return l1.index < l2.index end )
+end
+
+function Map:enableCollisionForLayer( layerIndex, trueToEnable )
+
+  for i=1, #self.layers do
+
+    if ( layerIndex == self.layers[i].index ) then
+      self.layers[i].collision = trueToEnable
+      return
+    end
+
+  end
+end
+
+function Map:getCollisionEnabledForLayer( layerIndex )
+
+  for i=1, #self.layers do
+
+    if ( layerIndex == self.layers[i].index ) then
+      return self.layers[i].collision
+    end
+
+  end
+
+  return false
 end
 
 function Map:getLayers()
   return self.layers
 end
 
-function Map:getLayerByName ( areaName )
+function Map:getLayerByName ( layerName )
   --return self.areas[areaName]
   --//TODO
 end
@@ -120,7 +145,7 @@ function Map:getLayerCount()
 end
 
 function Map:addMovingObject( objectToAdd )
-  self.movingObjects[objectToAdd:getName()] = objectToAdd
+  self.movingObjects[objectToAdd:getInstanceName()] = objectToAdd
 end
 
 function Map:getMovingObjects()

@@ -130,13 +130,13 @@ function NavMesh:recomputeLines()
   -- each time a point is created this is called
 
   -- create a line between the points
-  if ( #self.points >= 2 ) then
+  if ( #self.points >= 1 ) then
 
     self.lines = {}
 
     self.lineCount = 0
 
-    for i = 1, #self.points - 2 do
+    for i = 1, #self.points - 1 do
 
       local line = {
         self.points[i][1],
@@ -152,10 +152,10 @@ function NavMesh:recomputeLines()
     end
 
     line = {
-      self.points[#self.points - 1],
-      self.points[#self.points],
-      self.points[1],
-      self.points[2]
+      self.points[#self.points][1],
+      self.points[#self.points][2],
+      self.points[1][1],
+      self.points[1][2]
     }
 
     table.insert(self.lines, line)
@@ -212,9 +212,9 @@ function NavMesh:isMobile()
   return self.mobile
 end
 
-function NavMesh:getCollisionCheckedPosition ( currentPosition, movementVector, objectCollider, collisionManager )
+function NavMesh:getCollisionCheckedPosition( currentPosition, movementVector, objectCollider, collisionManager, objectLayer )
 
-  movementVector = collisionManager:checkCollisionForMovement( currentPosition, movementVector, objectCollider )
+  movementVector = collisionManager:checkCollisionForMovement( currentPosition, movementVector, objectCollider, objectLayer )
 
   return movementVector
 end

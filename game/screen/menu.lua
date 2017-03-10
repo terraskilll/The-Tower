@@ -25,12 +25,12 @@ function MenuScreen:MenuScreen( theGame )
 
   self.mainMenu = UIGroup()
 
-  local startButton = Button(0, 0, "INICIAR", ib_uibutton1, 0.375)
+  local startButton = Button(0, 0, "NOVO JOGO", ib_uibutton1, 0.375)
   startButton:setAnchor(4, 15, 185)
   startButton.onButtonClick = self.startButtonClick
 
   local continueButton = Button(0, 0, "CONTINUAR", ib_uibutton1, 0.375)
-  continueButton:setEnabled(false)
+  continueButton:setEnabled( self.game:getSaveManager():getSaveCount() > 0 )
   continueButton:setAnchor(4, 15, 130)
 
   local optionsButton = Button(0, 0, "OPÇÕES", ib_uibutton1, 0.375)
@@ -137,7 +137,9 @@ function MenuScreen:joystickPressed(joystick, button)
    self.currentmenu:joystickPressed( joystick, button, self )
 end
 
-function MenuScreen:startButtonClick(sender)
+function MenuScreen:startButtonClick( sender )
+
+  local emptysave = sender.game:createEmptySave()
 
   sender.game:setCurrentScreen("PlayScreen")
 

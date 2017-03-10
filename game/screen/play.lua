@@ -1,26 +1,26 @@
 require("..engine.lclass")
 
 require("..engine.input")
-require("..engine.ui/uigroup")
-require("..engine.ui/button/button")
-require("..engine.screen/screen")
-require("..engine.gameobject/gameobject")
-require("..engine.gameobject/staticimage")
-require("..engine.gameobject/simpleobject")
-require("..engine.gameobject/movingobject")
-require("..engine.light/light")
-require("..engine.map/map")
-require("..engine.map/area")
-require("..engine.map/spawnpoint")
-require("..engine.collision/collision")
-require("..engine.navigation/navmesh")
-require("..engine.navigation/navmap")
+require("..engine.ui.uigroup")
+require("..engine.ui.button.button")
+require("..engine.screen.screen")
+require("..engine.gameobject.gameobject")
+require("..engine.gameobject.staticimage")
+require("..engine.gameobject.simpleobject")
+require("..engine.gameobject.movingobject")
+require("..engine.light.light")
+require("..engine.map.map")
+require("..engine.map.area")
+require("..engine.map.spawnpoint")
+require("..engine.collision.collision")
+require("..engine.navigation.navmesh")
+require("..engine.navigation.navmap")
 
-require("../resources")
+require("..resources")
 
 require("../game/actors/spider/spider")
 
-local Vec = require("..engine.math/vector")
+local Vec = require("..engine.math.vector")
 
 local sepiaShader = love.graphics.newShader("engine/shaders/sepia.glsl")
 
@@ -32,8 +32,6 @@ function PlayScreen:PlayScreen( game )
 
   self.enemies = {}
 
-  self.tree   = nil
-
   self.camera = game:getCamera()
   self.camera:setTarget( self.game:getPlayer() )
   self.currentMap = nil
@@ -44,7 +42,45 @@ function PlayScreen:PlayScreen( game )
 end
 
 function PlayScreen:onEnter()
-  self:createTestMap()
+  --// TODO make map loading generic ( a separate function )
+
+  local savegame = self.game:getSaveGame()
+
+  self.currentMap = self.game:getMapManager():loadMap( nil, savegame:getMapName() )
+
+  local area = self.currentMap:getAreaByName( savegame:getAreaName() )
+
+  local spawn = area:getSpawnPointByName( savegame:getSpawnName() )
+
+  self.game:getPlayer():setMap( self.currentMap, area, spawn )
+
+  local lls = self.currentMap:getLayers()
+
+  for i = 1, #lls do
+    self.game:getDrawManager():addLayer( lls[i].name )
+    self.game:getCollisionManager():addLayer( lls[i].index, lls[i].name, lls[i].collision == 1 )
+  end
+
+  --//TODO add enemies to drawmanager
+
+  self.game:getDrawManager():addObject( self.game:getPlayer(), spawn:getLayer() )
+  self.game:getDrawManager():getObjectsFromMap( self.currentMap )
+
+  self.game:getCollisionManager():addCollider( self.game:getPlayer():getCollider() )
+
+  --//TODO move to collisionmanager ?
+  local areas = self.currentMap:getAreas()
+
+  for _,aa in pairs( areas ) do
+    local objects = aa:getObjects()
+
+    for _,oo in pairs( objects ) do
+      self.game:getCollisionManager():addCollider( oo:getCollider(), oo:getLayer() )
+      self.game:register( oo )
+    end
+
+  end
+
 end
 
 function PlayScreen:onExit()
@@ -104,6 +140,7 @@ function PlayScreen:joystickPressed(joystick, button)
 end
 
 function PlayScreen:changeMap( newMap, newArea, newSpawnPoint )
+  --//TODO refactor
   self.currentMap = newMap
   self.game:getPlayer():setMap( newMap, newArea, newSpawnPoint )
 end
@@ -151,15 +188,18 @@ end
 function PlayScreen:updateInGame( dt )
   self.game:getPlayer():update( dt, self.game )
 
+  ---//TODO use updateRegisteredObjects
   for i=1, #self.enemies do
     self.enemies[i]:update( dt, self.game )
   end
 
+  self.game:updateRegisteredObjects( dt )
+
+  self.game:getCollisionManager():checkCollisions()
+
   self.camera:update( dt )
 
   self.currentMap:update( dt )
-
-  self.game:getCollisionManager():checkCollisions()
 
 end
 

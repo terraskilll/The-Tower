@@ -5,13 +5,13 @@ an actor is a interactive gameobject object (player, npc, enemy)
 ]]
 require("..engine.lclass")
 
-require("..engine.navigation/navagent")
-require("..engine.collision/boxcollider")
-require("..engine.collision/circlecollider")
-require("..engine.render/boundingbox")
-require("..engine.navigation/navbox")
+require("..engine.navigation.navagent")
+require("..engine.collision.boxcollider")
+require("..engine.collision.circlecollider")
+require("..engine.render.boundingbox")
+require("..engine.navigation.navbox")
 
-local Vec = require("..engine.math/vector")
+local Vec = require("..engine.math.vector")
 
 class "Actor" ("GameObject")
 
@@ -34,17 +34,19 @@ function Actor:getKind()
   return "Actor"
 end
 
-function Actor:setMap( newMap, newArea, spawnPoint )
-  self.map   = newMap
-  self.area  = newArea
+function Actor:setMap( mapToSet, areaToSet, spawnPointToSet )
+  self.map   = mapToSet
+  self.area  = areaToSet
 
   if ( self.navagent ) then
-    self.navagent:setArea( newArea )
+    self.navagent:setMap( mapToSet )
     self.navagent:setNavMesh( self.area:getNavMesh() )
   end
 
-  if ( spawnPoint ) then
-    local pos = spawnPoint:getPosition()
+  if ( spawnPointToSet ) then
+    local pos = spawnPointToSet:getPosition()
+
+    self:setLayer( spawnPointToSet:getLayer() )
 
     self:setPosition( pos.x, pos.y )
   end
