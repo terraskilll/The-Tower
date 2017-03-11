@@ -40,7 +40,7 @@ function SimpleObject:SimpleObject( objectName, instName, positionX, positionY, 
   self.boundingbox = nil
   self.navbox      = nil
 
-  self.onCollisionEnter = nil
+  self.scriptname = nil
 end
 
 function SimpleObject:getKind()

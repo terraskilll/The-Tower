@@ -6,6 +6,10 @@ require("../game/thetower")
 
 local game
 
+function getGame()
+	return game
+end
+
 function love.load()
 	game = TheTower()
 end

@@ -17,9 +17,8 @@ local modfun = math.fmod
 local floorfun = math.floor
 
 local options = {
-  "F1 - Add Resource",
-  "F2 - Edit Resource",
-  "F3 - Remove Resource",
+  "F1 - Add Script",
+  "F3 - Remove Script",
   "",
   "F9 - Save List",
   "F11 - Back",
@@ -28,11 +27,11 @@ local options = {
   "Pg Down - Next Page"
 }
 
-class "ResourceList"
+class "ScriptList"
 
-local allResources = {}
+local allscripts = {}
 
-function ResourceList:ResourceList( ownerEditor, thegame )
+function ScriptList:ScriptList( ownerEditor, thegame )
   self.game      = thegame
   self.editor    = ownerEditor
 
@@ -42,36 +41,35 @@ function ResourceList:ResourceList( ownerEditor, thegame )
   self.listEnd   = 1
 
   self.mode      = 0
-  self.inputMode = 0
   self.textInput = nil
 
   self.tempData  = nil
 end
 
-function ResourceList:addResource( resourceName, resourceType, resourcePath )
-  table.insert(allResources, { resourceName, resourceType, resourcePath } )
+function ScriptList:addScript( scriptname, scriptfile )
+  table.insert(allscripts, { scriptname, scriptfile } )
 end
 
-function ResourceList:save()
-  self.game:getResourceManager():save( allResources )
+function ScriptList:save()
+  self.game:getScriptManager():save( allscripts )
 end
 
-function ResourceList:load()
-  allResources = self.game:getResourceManager():load()
+function ScriptList:load()
+  allscripts = self.game:getScriptManager():load()
 end
 
-function ResourceList:onEnter()
-  print("Entered ResourceList")
+function ScriptList:onEnter()
+  print("Entered ScriptList")
 
   self:load()
   self:refreshList()
 end
 
-function ResourceList:onExit()
+function ScriptList:onExit()
 
 end
 
-function ResourceList:draw()
+function ScriptList:draw()
   if ( self.textInput ) then
 
     self.textInput:draw()
@@ -81,36 +79,34 @@ function ResourceList:draw()
       love.graphics.print( options[i], 16, (i * 16) + 40 )
     end
 
-    self:drawResourceList()
+    self:drawScriptList()
   end
 
 end
 
-function ResourceList:drawResourceList()
+function ScriptList:drawScriptList()
 
   love.graphics.setColor( 0, 255, 100, 255 )
   love.graphics.print( "Name", 200, 56 )
-  love.graphics.print( "Type", 400, 56 )
-  love.graphics.print( "Path", 600, 56 )
+  love.graphics.print( "File", 500, 56 )
   love.graphics.setColor( glob.defaultColor )
 
   love.graphics.setColor( 255, 255, 255, 80 )
   love.graphics.rectangle( "fill", 190, (self.selIndex * 16) + 56, 1000, 18 )
   love.graphics.setColor( glob.defaultColor )
 
-  if ( #allResources == 0) then
+  if ( #allscripts == 0 ) then
     return
   end
 
   for i = self.listStart, self.listEnd do
-    love.graphics.print( allResources[i][1], 200, ( (i - self.listStart + 1) * 16) + 56 )
-    love.graphics.print( allResources[i][2], 400, ( (i - self.listStart + 1) * 16) + 56 )
-    love.graphics.print( allResources[i][3], 600, ( (i - self.listStart + 1) * 16) + 56 )
+    love.graphics.print( allscripts[i][1], 200, ( (i - self.listStart + 1) * 16) + 56 )
+    love.graphics.print( allscripts[i][2], 500, ( (i - self.listStart + 1) * 16) + 56 )
   end
 
 end
 
-function ResourceList:update( dt )
+function ScriptList:update( dt )
 
   if ( self.mode == 1 or self.mode == 2 ) then
     self:updateAddEdit(dt)
@@ -118,18 +114,16 @@ function ResourceList:update( dt )
 
 end
 
-function ResourceList:onKeyPress( key, scancode, isrepeat )
+function ScriptList:onKeyPress( key, scancode, isrepeat )
   if ( self.mode == 1 or self.mode == 2 ) then
     self.textInput:keypressed( key )
     return
   end
 
   if ( key == "f1" ) then
-    self:addMode()
-  end
-
-  if ( key == "f2" ) then
-    self:editMode()
+    self.tempData  = {}
+    self.mode      = 1
+    self.textInput = TextInput("Script Name:")
   end
 
   if ( key == "f3" ) then
@@ -171,71 +165,39 @@ function ResourceList:onKeyPress( key, scancode, isrepeat )
   end
 end
 
-function ResourceList:addMode()
-  self.tempData  = {}
-  self.mode      = 1
-  self.inputMode = 1
-  self.textInput = TextInput("Resource Name:")
-end
-
-function ResourceList:editMode()
-  self.tempData  = {}
-  self.mode      = 2
-  self.inputMode = 1
-  self.textInput = TextInput( "Resource Name:", allResources[self.selIndex][1] )
-end
-
-function ResourceList:removeSelected()
+function ScriptList:removeSelected()
   local delIndex = self.selIndex + ( self.pageIndex - 1 ) * 40
 
-  table.remove( allResources, delIndex )
+  table.remove( allscripts, delIndex )
 
   self:refreshList()
 end
 
-function ResourceList:doTextInput ( t )
-  if ( self.textInput ~= nil ) then
+function ScriptList:doTextInput ( t )
+  if ( self.textInput ) then
     self.textInput:input( t )
   end
 end
 
-function ResourceList:updateAddEdit( dt )
+function ScriptList:updateAddEdit( dt )
   if ( self.textInput:isFinished() ) then
-    self.inputMode = self.inputMode + 1
 
-    if ( self.inputMode == 2 ) then
-      self.tempData[1] = self.textInput:getText()
-
-      if ( self.mode == 1 ) then
-        self.textInput = TextInput("Resource Type (image or audio):")
-      else
-        self.textInput = TextInput("Resource Type (image or audio):", allResources[self.selIndex][2])
-      end
-
-    end
-
-    if ( self.inputMode == 3 ) then
+    if ( self.mode == 2 ) then
       self.tempData[2] = self.textInput:getText()
-
-      if ( self.mode == 1 ) then
-        self.textInput = TextInput("Path to Resource (relative):")
-      else
-        self.textInput = TextInput("Path to Resource (relative):", allResources[self.selIndex][3])
-      end
-
+      self.mode = 3
     end
 
-    if ( self.inputMode == 4 ) then -- have everything
-      self.tempData[3] = self.textInput:getText()
+    if ( self.mode == 1 ) then
+      self.tempData[1] = self.textInput:getText()
+      self.textInput = TextInput( "File name:" )
+      self.mode = 2
+    end
 
-      if ( self.mode == 1 ) then
-        table.insert( allResources, self.tempData )
-      else
-        allResources[self.selIndex] = self.tempData
-      end
+    if ( self.mode == 3 ) then
+
+      self:addScript( self.tempData[1], self.tempData[2] )
 
       self.tempData  = nil
-      self.inputMode = 0
       self.mode      = 0
       self.textInput = nil
 
@@ -245,7 +207,7 @@ function ResourceList:updateAddEdit( dt )
   end
 end
 
-function ResourceList:refreshList()
+function ScriptList:refreshList()
   --//TODO go to same page ?
   self.selIndex  = 1
   self.pageIndex = 1
@@ -254,12 +216,12 @@ function ResourceList:refreshList()
 
   self.listEnd = self.listStart + 40
 
-  if ( self.listEnd > #allResources ) then
-    self.listEnd   = #allResources
+  if ( self.listEnd > #allscripts ) then
+    self.listEnd   = #allscripts
   end
 end
 
-function ResourceList:selectPrevious( steps )
+function ScriptList:selectPrevious( steps )
   steps = steps or 1
 
   self.selIndex = self.selIndex - steps
@@ -269,7 +231,7 @@ function ResourceList:selectPrevious( steps )
   end
 end
 
-function ResourceList:selectNext( steps )
+function ScriptList:selectNext( steps )
   steps = steps or 1
 
   self.selIndex = self.selIndex + steps
@@ -284,7 +246,7 @@ function ResourceList:selectNext( steps )
   end
 end
 
-function ResourceList:listUp()
+function ScriptList:listUp()
   self.pageIndex = self.pageIndex - 1
 
   if (self.pageIndex == 0) then
@@ -295,23 +257,23 @@ function ResourceList:listUp()
 
   self.listEnd = self.listStart + 40 - 1
 
-  if ( self.listEnd > #allResources ) then
-    self.listEnd   = #allResources
+  if ( self.listEnd > #allscripts ) then
+    self.listEnd   = #allscripts
   end
 end
 
-function ResourceList:listDown()
+function ScriptList:listDown()
   self.pageIndex = self.pageIndex + 1
 
-  if ( self.pageIndex > modfun( #allResources, 40 ) ) then
-    self.pageIndex = modfun( #allResources, 40 )
+  if ( self.pageIndex > modfun( #allscripts, 40 ) ) then
+    self.pageIndex = modfun( #allscripts, 40 )
   end
 
   self.listStart = (self.pageIndex - 1) * 40 + 1
 
   self.listEnd = self.listStart + 40 - 1
 
-  if ( self.listEnd > #allResources ) then
-    self.listEnd   = #allResources
+  if ( self.listEnd > #allscripts ) then
+    self.listEnd   = #allscripts
   end
 end

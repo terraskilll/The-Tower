@@ -90,7 +90,7 @@ function CircleCollider:collisionEnter( otherCollider )
     return
   end
 
-  if ( self.owner.onCollisionEnter ~= nil ) then
+  if ( self.owner.onCollisionEnter ) then
     self.owner:onCollisionEnter( otherCollider )
   end
 

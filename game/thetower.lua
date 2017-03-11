@@ -24,6 +24,8 @@ function TheTower:TheTower()
 
   self.gameobjects = {}
 
+  self.deletedObjects = {}
+
   self:configure()
 
   self:addScreen( "EditorScreen", Editor( self ) )

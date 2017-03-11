@@ -102,6 +102,12 @@ function MapManager:loadMap( mapName, mapFileName )
           object:getCollider():setSolid( objects[i].solidcollider == 1 )
         end
 
+        if ( ( objects[i].script ~= nil ) and ( objects[i].script ~= "" ) ) then
+          local scname, scpath = self.game:getScriptManager():getScriptByName( objects[i].script, true )
+          object:setScript( scname, scpath )
+          object:loadScript()
+        end
+
         area:addObject( object )
       end
     end
@@ -173,7 +179,8 @@ function MapManager:saveMap( mapName, mapFileName, map )
           instname = oo:getInstanceName(),
           posx     = px,
           posy     = py,
-          layer    = oo:getLayer()
+          layer    = oo:getLayer(),
+          script   = oo:getScript()
       }
 
       local colld = oo:getCollider()

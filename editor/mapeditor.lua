@@ -6,21 +6,21 @@ the engine map editor
 
 require("..engine.lclass")
 require("..engine.input")
-require("..engine.ui/uigroup")
-require("..engine.ui/button/button")
-require("..engine.screen/screen")
-require("..engine.gameobject/gameobject")
-require("..engine.gameobject/staticimage")
-require("..engine.gameobject/simpleobject")
-require("..engine.gameobject/movingobject")
-require("..engine.light/light")
-require("..engine.map/map")
-require("..engine.map/area")
-require("..engine.map/spawnpoint")
-require("..engine.collision/collision")
-require("..engine.navigation/navmesh")
-require("..engine.navigation/navmap")
-require("..engine.utl/funcs")
+require("..engine.ui.uigroup")
+require("..engine.ui.button.button")
+require("..engine.screen.screen")
+require("..engine.gameobject.gameobject")
+require("..engine.gameobject.staticimage")
+require("..engine.gameobject.simpleobject")
+require("..engine.gameobject.movingobject")
+require("..engine.light.light")
+require("..engine.map.map")
+require("..engine.map.area")
+require("..engine.map.spawnpoint")
+require("..engine.collision.collision")
+require("..engine.navigation.navmesh")
+require("..engine.navigation.navmap")
+require("..engine.utl.funcs")
 
 local Vec = require("..engine.math.vector")
 
@@ -47,6 +47,7 @@ local mapOptions = {
   "F5 - Load Object From Library",
   "Ctrl + D - Duplicate",
   "Ctrl + N - Rename",
+  "Ctrl + J - Set Script",
   "DEL - Remove Object",
   "Alt + PgUp - Layer Up",
   "Alt + PgDown - Layer Down",
@@ -914,6 +915,12 @@ function MapEditor:keypressMiscelaneous( key )
     self:lockLayer( self.currentLayer )
   end
 
+  if ( ( key == "j" ) and ( Input:isKeyDown( "lctrl" ) ) ) then
+    self.textInput        = TextInput( "Script Name:" )
+    self.updatefunction   = self.updateSetScript
+    self.keypressfunction = self.keypressSetScript
+  end
+
   if ( ( key == "n" ) and ( Input:isKeyDown( "lctrl" ) ) ) then
     if ( self.selectedCount > 0 ) then
       local index = 0
@@ -1175,6 +1182,37 @@ function MapEditor:keypressRenameObject( key )
   self.textInput:keypressed( key )
 end
 
+--- SET SCRIPT -----------------------------------------------------------------
+
+function MapEditor:setScriptForSelectedObjects( scriptname )
+
+  for i = 1, #self.allobjects do
+    if ( self.allobjects[i].selected ) then
+      self.allobjects[i].object:setScript( scriptname, "" )
+    end
+  end
+
+end
+
+function MapEditor:updateSetScript( dt )
+  if ( self.textInput:isFinished() ) then
+
+    local scriptname = self.textInput:getText()
+
+    self:setScriptForSelectedObjects( scriptname )
+
+    self.textInput = nil
+
+    self.updatefunction   = self.updateEditMap
+    self.keypressfunction = self.keypressEditMap
+
+  end
+end
+
+function MapEditor:keypressSetScript( key )
+  self.textInput:keypressed( key )
+end
+
 --- CREATE SPAWN POINT ---------------------------------------------------------
 
 function MapEditor:createSpawnPoint( )
@@ -1401,16 +1439,26 @@ function MapEditor:drawHelp()
     "F3 - Edit NavMesh",
     "",
     "F5 - Load Object From Library",
+    "Ctrl + A - Select All",
     "Ctrl + D - Duplicate",
     "Ctrl + N - Rename",
+    "Ctrl + J - Set Script",
     "DEL - Remove Object",
+    "Alt + PgDown - Change To Layer Below",
+    "Alt + PgUp - Change To Layer Above",
     "",
+    "Ctrl + P - Create Spawn Point"
+  }
+
+  column3 = {
+    "Alt + L - Add Layer",
+    "Ctrl + L - Change Active Layer",
+    "Ctrl + I - Enable/Disable Collision for Layer",
+    "Ctrl + I - Change Layer Visibility",
+    "Ctrl + K - Lock/Unlock Layer",
+    "Shift + H - Hide/Show Layer",
     "Alt + PgUp - Object Layer Up",
     "Alt + PgDown - Object Layer Down",
-    "Ctrl + L - Change Active Layer",
-    "Ctrl + K - Lock Layer",
-    "Ctrl + H - Hide Layer",
-    "Alt + L - Add Layer"
   }
 
   for i = 1, #column1 do
@@ -1419,6 +1467,10 @@ function MapEditor:drawHelp()
 
   for i = 1, #column2 do
     love.graphics.print( column2[i], 300, (i * 16) )
+  end
+
+  for i = 1, #column3 do
+    love.graphics.print( column3[i], 600, (i * 16) )
   end
 
 end

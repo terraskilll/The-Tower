@@ -20,7 +20,7 @@ function ResourceManager:ResourceManager( thegame )
 end
 
 function ResourceManager:load()
-  allResources, err = loadFile("__resourcelist")
+  allResources, err = loadFile( "__resourcelist" )
 
   if (allResources == nil) then
     allResources = {}

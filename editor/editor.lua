@@ -12,6 +12,7 @@ require("..editor.maplist")
 require("..editor.mapeditor")
 require("..editor.animationlist")
 require("..editor.animationeditor")
+require("..editor.scriptlist")
 require("..editor.gameplayeditor")
 
 local options = {
@@ -20,6 +21,7 @@ local options = {
   "F3 - Edit Maps",
   "F4 - Edit Animations",
   "",
+  "F7 - Edit Script List",
   "F8 - Edit Game Play Config"
 }
 
@@ -155,6 +157,11 @@ function Editor:checkKey( key, scancode, isrepeat )
 
   if ( key == "f4" ) then
     self.currentEditor = AnimationList( self, self.game )
+    self.currentEditor:onEnter()
+  end
+
+  if ( key == "f7" ) then
+    self.currentEditor = ScriptList( self, self.game )
     self.currentEditor:onEnter()
   end
 

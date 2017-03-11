@@ -7,11 +7,12 @@ require("..engine.camera.camera")
 require("..engine.render.drawmanager")
 require("..engine.collision.collisionmanager")
 require("..engine.resourcemanager")
-require("..engine.objectmanager")
-require("..engine.animationmanager")
-require("..engine.mapmanager")
+require("..engine.gameobject.objectmanager")
+require("..engine.animation.animationmanager")
+require("..engine.map.mapmanager")
 require("..engine.savegame.savegame")
 require("..engine.savegame.savemanager")
+require("..engine.script.scriptmanager")
 
 local config = {
   gameScreenWidth = 1280,
@@ -29,13 +30,17 @@ function Game:Game()
 
   self.gameobjects = {}
 
+  self.deletedObjects = {}
+
 end
 
 function Game:update(dt)
   Input:update(dt)
 
 	self.currentScreen:update( dt )
-  self.drawManager:update( dt ) --//TODO check is gets slow
+  self.drawManager:update( dt ) --//TODO check is gets slow, skiplist is pending
+
+  self:postUpdate( dt )
 end
 
 function Game:updateRegisteredObjects( dt )
@@ -86,12 +91,17 @@ function Game:register( gameobject )
   table.insert( self.gameobjects, gameobject )
 end
 
-function Game:unregister( )
+function Game:unregister( gameobject )
   --//TODO
 end
 
-function Game:destroy(  )
+function Game:destroy( gameobject )
   --//TODO
+  table.insert( self.deletedObjects , gameobject )
+end
+
+function Game:postUpdate( dt )
+  --//TODO releases destroyed objects
 end
 
 function Game:getPlayer()
@@ -128,6 +138,10 @@ end
 
 function Game:getSaveManager()
   return self.saveManager
+end
+
+function Game:getScriptManager()
+  return self.scriptManager
 end
 
 function Game:getSaveGame()
@@ -202,7 +216,10 @@ function Game:configure()
 
   self.saveManager = SaveManager( self )
 
-  self.player = Player( "PLAYER", "PLAYER", 0, 0 )
+  self.scriptManager = ScriptManager( self )
+  self.scriptManager:load()
+
+  self.collisionManager = CollisionManager()
 
   self.camera = Camera()
   self.camera:setScale( ww / 1280, wh / 720 )
@@ -210,7 +227,7 @@ function Game:configure()
   self.drawManager = DrawManager( self.camera )
   self.drawManager:setScale( ww / 1280, wh / 720 )
 
-  self.collisionManager = CollisionManager()
+  self.player = Player( "PLAYER", "PLAYER", 0, 0 )
 
   Input.overallListener = Game
   Input.camera = self.camera
@@ -220,11 +237,11 @@ function Game:configure()
 end
 
 function Game:changeResolution( resolutionWidth, resolutionHeight, setFullScreen )
-  if (setFullScreen == nil) then
+  if ( setFullScreen == nil ) then
     setFullScreen = false
   end
 
-  love.window.setMode( resolutionWidth, resolutionHeight, {fullscreen = setFullScreen} )
+  love.window.setMode( resolutionWidth, resolutionHeight, { fullscreen = setFullScreen } )
 
   self.camera:setScale( resolutionWidth / 1280, resolutionHeight / 720 )
   self.drawManager:setScale( resolutionWidth / 1280, resolutionHeight / 720 )
@@ -235,11 +252,11 @@ function Game:changeResolution( resolutionWidth, resolutionHeight, setFullScreen
 end
 
 function Game:saveConfiguration()
-  saveFile("__config", config)
+  saveFile( "__config", config )
 end
 
 function Game:loadConfiguration()
-  config, err = loadFile("__config")
+  config, err = loadFile( "__config" )
 end
 
 function Game:Message( str )

@@ -19,6 +19,13 @@ function GameObject:GameObject( instName, positionX, positionY )
 
   self.width  = 0
   self.height = 0
+
+  self.scriptname = nil
+  self.scriptpath = nil
+end
+
+function GameObject:getKind()
+  return "GameObject"
 end
 
 function GameObject:getName()
@@ -53,10 +60,6 @@ function GameObject:setLayer( layerToSet )
   self.layer = layerToSet
 end
 
-function GameObject:getKind()
-  return "GameObject"
-end
-
 function GameObject:getPositionXY()
   return self.position.x, self.position.y
 end
@@ -71,6 +74,24 @@ end
 
 function GameObject:setPosition( positionToSet )
   self.position:set( positionToSet.x, positionToSet.y )
+end
+
+function GameObject:setScript( scriptName, scriptPath )
+  self.scriptname = scriptName
+  self.scriptpath = scriptPath
+end
+
+function GameObject:getScript()
+  return self.scriptname, self.scriptpath
+end
+
+function GameObject:loadScript()
+
+  if ( self.scriptpath ) then
+    local script = require( self.scriptpath )
+    scriptsetup( self )
+  end
+
 end
 
 function GameObject:update( dt )
