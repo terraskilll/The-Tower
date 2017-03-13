@@ -1,5 +1,5 @@
-require ("..engine.materials/material")
-require ("..engine.light/light")
+require ("..engine.materials.material")
+require ("..engine.light.light")
 
 NormalMapMaterial = {}
 

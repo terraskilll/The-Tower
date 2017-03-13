@@ -18,7 +18,7 @@ require("..engine.navigation.navmap")
 
 require("..resources")
 
-require("../game/actors/spider/spider")
+require("..game.actors.spider.spider")
 
 local Vec = require("..engine.math.vector")
 
@@ -30,64 +30,46 @@ function PlayScreen:PlayScreen( game )
   self.game   = game
   self.paused = false
 
+  self.menu = nil
+
   self.enemies = {}
 
-  self.camera = game:getCamera()
-  self.camera:setTarget( self.game:getPlayer() )
-  self.currentMap = nil
+  self.map = nil
 
   self.navmaps = {}
 
-  self:createPauseMenu()
+  self:createMenu()
 end
 
 function PlayScreen:onEnter()
-  --// TODO make map loading generic ( a separate function )
-
   local savegame = self.game:getSaveGame()
 
-  self.currentMap = self.game:getMapManager():loadMap( nil, savegame:getMapName() )
+  self.map = self.game:loadMapFoSaveGame( savegame )
 
-  local area = self.currentMap:getAreaByName( savegame:getAreaName() )
+  self.game:getCamera():setTarget( self.game:getPlayer() )
 
-  local spawn = area:getSpawnPointByName( savegame:getSpawnName() )
+  self.paused = false
 
-  self.game:getPlayer():setMap( self.currentMap, area, spawn )
+  self.pauseMenu:setVisible( false )
 
-  local lls = self.currentMap:getLayers()
-
-  for i = 1, #lls do
-    self.game:getDrawManager():addLayer( lls[i].name )
-    self.game:getCollisionManager():addLayer( lls[i].index, lls[i].name, lls[i].collision == 1 )
-  end
-
-  --//TODO add enemies to drawmanager
-
-  self.game:getDrawManager():addObject( self.game:getPlayer(), spawn:getLayer() )
-  self.game:getDrawManager():getObjectsFromMap( self.currentMap )
-
-  self.game:getCollisionManager():addCollider( self.game:getPlayer():getCollider() )
-
-  --//TODO move to collisionmanager ?
-  local areas = self.currentMap:getAreas()
-
-  for _,aa in pairs( areas ) do
-    local objects = aa:getObjects()
-
-    for _,oo in pairs( objects ) do
-      self.game:getCollisionManager():addCollider( oo:getCollider(), oo:getLayer() )
-      self.game:register( oo )
-    end
-
-  end
-
+  self.menu = self.pauseMenu
 end
 
 function PlayScreen:onExit()
+  self.paused  = false
 
+  self.game:unloadMap()
+
+  self.game:getCamera():setTarget( nil )
+
+  self.game:getDrawManager():clear()
+
+  self.game:getCollisionManager():clear()
+
+  self.game:unregisterAll()
 end
 
-function PlayScreen:update(dt)
+function PlayScreen:update( dt )
 
   if ( self.paused ) then
     self:updatePaused( dt )
@@ -102,7 +84,7 @@ function PlayScreen:draw()
     love.graphics.setShader( sepiaShader )
   end
 
-  self.camera:set()
+  self.game:getCamera():set()
 
   self.game:getDrawManager():draw()
 
@@ -112,20 +94,32 @@ function PlayScreen:draw()
 
   love.graphics.setShader()
 
-  self.camera:unset()
+  self.game:getCamera():unset()
 
-  self.pauseMenu:draw()
+  self.game:getMessageBox():draw()
+
+  self.menu:draw()
 end
 
-function PlayScreen:onKeyPress(key, scancode, isrepeat)
+function PlayScreen:onKeyPress( key, scancode, isrepeat )
+  if ( key == "d") then
+    self.game:getMessageBox():show("A Simple message")
+  end
+
+  if ( key == "'") then --//TODO invert with escape
+    self:checkPause()
+  end
+
+  if ( self.paused ) and  ( key == "return" or key == "kpenter" or key == "left" or key == "right") then
+    self.menu:keyPressed( key, self )
+  end
+end
+
+function PlayScreen:onKeyRelease( key, scancode, isrepeat )
 
 end
 
-function PlayScreen:onKeyRelease(key, scancode, isrepeat)
-
-end
-
-function PlayScreen:joystickPressed(joystick, button)
+function PlayScreen:joystickPressed( joystick, button )
 
   if ( button == 8 ) then
     self:checkPause()
@@ -140,41 +134,50 @@ function PlayScreen:joystickPressed(joystick, button)
 end
 
 function PlayScreen:changeMap( newMap, newArea, newSpawnPoint )
-  --//TODO refactor
-  self.currentMap = newMap
+
+  self.game:changeMap( newMap, newArea, newSpawnPoint )
+
   self.game:getPlayer():setMap( newMap, newArea, newSpawnPoint )
 end
 
-function PlayScreen:createPauseMenu()
+function PlayScreen:createMenu()
   self.pauseMenu = UIGroup()
 
   local continueButton = Button( 0, 0, "CONTINUAR", ib_uibutton1, 0.375 )
-  continueButton:setAnchor( 4, 15, 130 )
+  continueButton:setAnchor( 4, 15, 185 )
+  continueButton.onButtonClick = self.continueButtonClick
+
+  local saveButton = Button( 0, 0, "SALVAR", ib_uibutton1, 0.375 )
+  saveButton:setAnchor( 4, 15, 130 )
+  saveButton.onButtonClick = self.saveButtonClick
 
   local exitButton = Button( 0, 0, "SAIR", ib_uibutton1, 0.375 )
   exitButton:setAnchor( 4, 15, 75 )
   exitButton.onButtonClick = self.exitButtonClick
 
   self.pauseMenu:addButton( continueButton )
+  self.pauseMenu:addButton( saveButton )
   self.pauseMenu:addButton( exitButton )
 
-  self.pauseMenu:setVisible( self.paused )
+  self.pauseMenu:setVisible( false )
+
 end
 
 function PlayScreen:checkPause()
   if ( self.paused ) then
     self.paused = false
   else
+    self.menu = self.pauseMenu
     self.paused = true
-    self.pauseMenu:joystickPressed(joystick, button)
-    self.pauseMenu:selectFirst()
+    self.menu:joystickPressed( joystick, button )
+    self.menu:selectFirst()
   end
 
-  self.pauseMenu:setVisible(self.paused)
+  self.menu:setVisible( self.paused )
 end
 
 function PlayScreen:handleInPauseMenu( joystick, button )
-  self.pauseMenu:joystickPressed( joystick, button, self )
+  self.menu:joystickPressed( joystick, button, self )
 end
 
 function PlayScreen:handleInGame( joystick, button, sender )
@@ -182,14 +185,14 @@ function PlayScreen:handleInGame( joystick, button, sender )
 end
 
 function PlayScreen:updatePaused( dt )
-  self.pauseMenu:update(dt)
+  self.menu:update( dt )
 end
 
 function PlayScreen:updateInGame( dt )
   self.game:getPlayer():update( dt, self.game )
 
   ---//TODO use updateRegisteredObjects
-  for i=1, #self.enemies do
+  for i = 1, #self.enemies do
     self.enemies[i]:update( dt, self.game )
   end
 
@@ -197,17 +200,34 @@ function PlayScreen:updateInGame( dt )
 
   self.game:getCollisionManager():checkCollisions()
 
-  self.camera:update( dt )
+  self.game:getCamera():update( dt )
 
-  self.currentMap:update( dt )
+  self.game:updateMap( dt )
+
+  self.game:getMessageBox():update( dt )
 
 end
+
+--- BUTTON HANDLING ------------------------------------------------------------
 
 function PlayScreen:exitButtonClick( sender )
 
+  --//TODO quit better? ask on quit?
   sender.game:setCurrentScreen( "MenuScreen" )
 
 end
+
+function PlayScreen:continueButtonClick( sender )
+  sender.paused = false
+  sender.menu = sender.pauseMenu
+  sender.menu:setVisible( false )
+end
+
+function PlayScreen:saveButtonClick( sender )
+  sender.game:saveGame()
+end
+
+--------------------------------------------------------------------------------
 
 function PlayScreen:createTestMap()
   --//TODO remove

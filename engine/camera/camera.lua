@@ -34,6 +34,11 @@ end
 
 function Camera:setTarget( newTarget )
 
+  if ( newTarget == nil ) then
+    self.target = nil
+    return
+  end
+
   if ( not newTarget.getPosition ) then
     print("Target has no getPosition method")
     return
@@ -44,8 +49,8 @@ end
 
 function Camera:set()
   love.graphics.push()
-  love.graphics.scale(1.0 / self.scaleX, 1.0 / self.scaleY)
-  love.graphics.translate(-self.positionX, -self.positionY)
+  love.graphics.scale( 1.0 * self.scaleX, 1.0 * self.scaleY )
+  love.graphics.translate( -self.positionX, - self.positionY )
 end
 
 function Camera:unset()
@@ -93,8 +98,6 @@ function Camera:getVisibleArea( startXOffset, startYOffset, endXOffset, endYOffs
   endYOffset   = endYOffset or 0
 
   local screenWidth, screenHeight = love.graphics.getDimensions()
-
-  --print (endYOffset * self.scaleY)
 
   return
     ( self.positionX + startXOffset * self.scaleX ),

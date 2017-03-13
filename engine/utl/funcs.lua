@@ -1,9 +1,13 @@
 
-local Vec = require("..engine.math/vector")
+local Vec = require("..engine.math.vector")
 
 local sinfun = math.sin
 local cosfun = math.cos
 local atan2fun = math.atan2
+
+lerp = function( min, max, value )
+	return ( 1 - value ) * min + value * max
+end
 
 normalizeVec = function( v1, v2 )
 	local mag = sqrt( v1 * v1 + v2 * v2 )

@@ -15,7 +15,7 @@ require("..engine.lclass")
 require("..engine.globalconf")
 require("..engine.utl/funcs")
 
-local Vec = require("..engine.math/vector")
+local Vec = require("..engine.math.vector")
 
 local linesIntersect = linesIntersectFunc
 

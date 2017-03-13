@@ -1,8 +1,9 @@
 
 require("..engine.globalconf")
 require("..engine.input")
+require("..engine.utl.funcs")
 
-require("../game/thetower")
+require("..game.thetower")
 
 local game
 

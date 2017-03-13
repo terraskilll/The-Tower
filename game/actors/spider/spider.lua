@@ -6,7 +6,7 @@ require("..engine.collision/boxcollider")
 require("..engine.collision/circlecollider")
 require("..engine.ai/fov")
 
-local Vec = require("..engine.math/vector")
+local Vec = require("..engine.math.vector")
 
 class "Spider" ("Actor")
 

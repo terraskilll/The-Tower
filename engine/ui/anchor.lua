@@ -24,6 +24,7 @@ anchored aligmnent position
 
 --//TODO : testar "enums" com table
 --//TODO : considerar posição/offset da camera no alinhamento
+--//TODO : revisar coordenadas para outros pontos
 
 https://forums.coronalabs.com/topic/1792-does-lua-support-enums/
 
@@ -46,7 +47,7 @@ function getAnchoredPosition(anchor, positionX, positionY, offsetX, offsetY, ele
   if ( anchor == 0 ) then -- center
 
       finalPositionX = (screenWidth / 2) - halfElementW + offsetX + positionX
-      finalPositionY = (sh / 2) - halfElementH + offsetY + positionY
+      finalPositionY = (screenHeight / 2) - halfElementH + offsetY + positionY
 
     elseif ( anchor == 1 ) then -- east
 

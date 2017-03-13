@@ -1,18 +1,19 @@
 require("..engine.lclass")
 
+require("..editor.editor")
+
 require("..engine.input")
-require("../editor/editor")
-require("..engine.ui/uigroup")
-require("..engine.ui/button/button")
-require("..engine.ui/selector/selector")
-require("..engine.screen/screen")
-require("..engine.light/light")
-require("..engine.gameobject/gameobject")
-require("..engine.gameobject/staticimage")
+require("..engine.ui.uigroup")
+require("..engine.ui.button.button")
+require("..engine.ui.selector.selector")
+require("..engine.screen.screen")
+require("..engine.light.light")
+require("..engine.gameobject.gameobject")
+require("..engine.gameobject.staticimage")
 
-require("../resources")
+require("..resources")
 
-require("../game/screen/play")
+require("..game.screen.play")
 
 class "MenuScreen" ("Screen")
 
@@ -30,8 +31,9 @@ function MenuScreen:MenuScreen( theGame )
   startButton.onButtonClick = self.startButtonClick
 
   local continueButton = Button(0, 0, "CONTINUAR", ib_uibutton1, 0.375)
-  continueButton:setEnabled( self.game:getSaveManager():getSaveCount() > 0 )
+  continueButton:setEnabled( self.game:getSaveManager():usedSlots() > 0 )
   continueButton:setAnchor(4, 15, 130)
+  continueButton.onButtonClick = self.continueButtonClick
 
   local optionsButton = Button(0, 0, "OPÇÕES", ib_uibutton1, 0.375)
   optionsButton:setAnchor(4, 15, 75)
@@ -50,44 +52,71 @@ function MenuScreen:MenuScreen( theGame )
 
   self.configMenu = UIGroup()
 
-  self.resolutionChange = Selector(0, 0, "RESOLUÇÃO", ib_uibutton1, 0.375)
-  self.resolutionChange:setAnchor(4, 15, 240)
+  self.resolutionChange = Selector( 0, 0, "RESOLUÇÃO", ib_uibutton1, 0.375 )
+  self.resolutionChange:setAnchor( 4, 15, 240 )
 
-  self.resolutionChange:addOption("1024 x 768", {1024, 768})
-  self.resolutionChange:addOption("1280 x 720", {1280, 720})
-  self.resolutionChange:addOption("1600 x 900", {1600, 900})
-  self.resolutionChange:addOption("1440 x 960", {1440, 960})
-  self.resolutionChange:addOption("1920 x 1080", {1920, 1080})
+  self.resolutionChange:addOption( "1024 x 768", {1024, 768} )
+  self.resolutionChange:addOption( "1280 x 720", {1280, 720} )
+  self.resolutionChange:addOption( "1600 x 900", {1600, 900} )
+  self.resolutionChange:addOption( "1440 x 960", {1440, 960} )
+  self.resolutionChange:addOption( "1920 x 1080", {1920, 1080} )
 
   self.resolutionChange:setDefaultOptionIndex(2)
   self.resolutionChange.onSelectorChange  = self.selectorOnChange
 
-  self.fullscreenMode = Selector(0, 0, "TELA CHEIA", ib_uibutton1, 0.375)
-  self.fullscreenMode:setAnchor(4, 15, 185)
-  self.fullscreenMode:addOption("SIM", true)
-  self.fullscreenMode:addOption("NÃO", false)
+  self.fullscreenMode = Selector( 0, 0, "TELA CHEIA", ib_uibutton1, 0.375 )
+  self.fullscreenMode:setAnchor( 4, 15, 185 )
+  self.fullscreenMode:addOption( "SIM", true )
+  self.fullscreenMode:addOption( "NÃO", false )
 
-  self.fullscreenMode:setDefaultOptionIndex(2)
+  self.fullscreenMode:setDefaultOptionIndex( 2 )
   self.fullscreenMode.onSelectorChange  = self.selectorOnChange
 
-  self.applyOptionsButton = Button(0, 0, "APLICAR", ib_uibutton1, 0.375)
-  self.applyOptionsButton:setEnabled(false)
-  self.applyOptionsButton:setAnchor(4, 15, 130)
+  self.applyOptionsButton = Button( 0, 0, "APLICAR", ib_uibutton1, 0.375 )
+  self.applyOptionsButton:setEnabled( false )
+  self.applyOptionsButton:setAnchor( 4, 15, 130 )
   self.applyOptionsButton.onButtonClick = self.applyOptionsButtonClick
 
-  self.creditsButton = Button(0, 0, "CRÉDITOS", ib_uibutton1, 0.375)
-  self.creditsButton:setAnchor(4, 15, 75)
+  self.creditsButton = Button( 0, 0, "CRÉDITOS", ib_uibutton1, 0.375 )
+  self.creditsButton:setAnchor( 4, 15, 75)
   self.creditsButton.onButtonClick = self.creditsButtonClick
 
-  self.exitOptionsButton = Button(0, 0, "VOLTAR", ib_uibutton1, 0.375)
-  self.exitOptionsButton:setAnchor(4, 15, 20)
+  self.exitOptionsButton = Button( 0, 0, "VOLTAR", ib_uibutton1, 0.375 )
+  self.exitOptionsButton:setAnchor( 4, 15, 20 )
   self.exitOptionsButton.onButtonClick = self.exitOptionsButtonClick
 
-  self.configMenu:addButton(self.resolutionChange)
-  self.configMenu:addButton(self.fullscreenMode)
-  self.configMenu:addButton(self.applyOptionsButton)
-  self.configMenu:addButton(self.creditsButton)
-  self.configMenu:addButton(self.exitOptionsButton)
+  self.configMenu:addButton( self.resolutionChange )
+  self.configMenu:addButton( self.fullscreenMode )
+  self.configMenu:addButton( self.applyOptionsButton )
+  self.configMenu:addButton( self.creditsButton )
+  self.configMenu:addButton( self.exitOptionsButton )
+
+  ---- select slot menu
+
+  self.selectSlotMenu = UIGroup()
+
+  self.slot1Button = Button( 0, 0, "SLOT 1", ib_uibutton1, 0.375 )
+  self.slot1Button:setAnchor( 4, 15, 240 )
+  self.slot1Button.onButtonClick = self.slot1ButtonClick
+
+  self.slot2Button = Button( 0, 0, "SLOT 2", ib_uibutton1, 0.375 )
+  self.slot2Button:setAnchor( 4, 15, 185 )
+  self.slot2Button.onButtonClick = self.slot2ButtonClick
+
+  self.slot3Button = Button( 0, 0, "SLOT 3", ib_uibutton1, 0.375 )
+  self.slot3Button:setAnchor( 4, 15, 130 )
+  self.slot3Button.onButtonClick = self.slot3ButtonClick
+
+  local exitSelectSlotButton = Button( 0, 0, "VOLTAR", ib_uibutton1, 0.375 )
+  exitSelectSlotButton:setAnchor( 4, 15, 20 )
+  exitSelectSlotButton.onButtonClick = self.exitSelectSlotButtonClick
+
+  self.selectSlotMenu:addButton( self.slot1Button )
+  self.selectSlotMenu:addButton( self.slot2Button )
+  self.selectSlotMenu:addButton( self.slot3Button )
+  self.selectSlotMenu:addButton( exitSelectSlotButton )
+
+  self.selectSlotMenu:setVisible( false )
 
   self.currentmenu = self.mainMenu
 end
@@ -138,11 +167,33 @@ function MenuScreen:joystickPressed(joystick, button)
 end
 
 function MenuScreen:startButtonClick( sender )
+  sender.currentmenu:setVisible( false )
 
-  local emptysave = sender.game:createEmptySave()
+  --//TODO check overwrite ("this will erase current progress. Are you sure?")
 
-  sender.game:setCurrentScreen("PlayScreen")
+  sender.slot1Button:setEnabled( true )
+  sender.slot2Button:setEnabled( true )
+  sender.slot3Button:setEnabled( true )
 
+  sender.game:setNewGame( true )
+
+  sender.currentmenu = sender.selectSlotMenu
+  sender.currentmenu:selectFirst()
+  sender.currentmenu:setVisible( true )
+end
+
+function MenuScreen:continueButtonClick( sender )
+  sender.currentmenu:setVisible( false )
+
+  sender.slot1Button:setEnabled( sender.game:getSaveManager():getSaveSlot( 1 ):isUsed() )
+  sender.slot2Button:setEnabled( sender.game:getSaveManager():getSaveSlot( 2 ):isUsed() )
+  sender.slot3Button:setEnabled( sender.game:getSaveManager():getSaveSlot( 3 ):isUsed() )
+
+  sender.game:setNewGame( false )
+
+  sender.currentmenu = sender.selectSlotMenu
+  sender.currentmenu:selectFirst()
+  sender.currentmenu:setVisible( true )
 end
 
 function MenuScreen:exitButtonClick( sender )
@@ -171,6 +222,56 @@ end
 
 function MenuScreen:selectorOnChange( sender )
   sender.applyOptionsButton:setEnabled( true )
+end
+
+function MenuScreen:exitSelectSlotButtonClick( sender )
+  sender.currentmenu:setVisible( false )
+
+  sender.currentmenu = sender.mainMenu
+  sender.currentmenu:selectFirst()
+  sender.currentmenu:setVisible( true )
+end
+
+function MenuScreen:slot1ButtonClick( sender )
+  sender.currentmenu:setVisible( false )
+  sender.currentmenu = sender.mainMenu
+  sender.currentmenu:selectFirst()
+  sender.currentmenu:setVisible( true )
+
+  if ( sender.game:isNewGame() ) then
+    sender.game:getSaveManager():setSaveToSlot( sender.game:getSaveManager():createEmptySave(), 1 )
+  end
+
+  sender.game:selectSaveSlot( 1 )
+  sender.game:setCurrentScreen( "PlayScreen" )
+end
+
+function MenuScreen:slot2ButtonClick( sender )
+  sender.currentmenu:setVisible( false )
+  sender.currentmenu = sender.mainMenu
+  sender.currentmenu:selectFirst()
+  sender.currentmenu:setVisible( true )
+
+  if ( sender.game:isNewGame() ) then
+    sender.game:getSaveManager():setSaveToSlot( sender.game:getSaveManager():createEmptySave(), 2 )
+  end
+
+  sender.game:selectSaveSlot( 2 )
+  sender.game:setCurrentScreen( "PlayScreen" )
+end
+
+function MenuScreen:slot3ButtonClick( sender )
+  sender.currentmenu:setVisible( false )
+  sender.currentmenu = sender.mainMenu
+  sender.currentmenu:selectFirst()
+  sender.currentmenu:setVisible( true )
+
+  if ( sender.game:isNewGame() ) then
+    sender.game:getSaveManager():setSaveToSlot( sender.game:getSaveManager():createEmptySave(), 3 )
+  end
+
+  sender.game:selectSaveSlot( 3 )
+  sender.game:setCurrentScreen( "PlayScreen" )
 end
 
 function MenuScreen:onMousePress( x, y, button, scaleX, scaleY, istouch )

@@ -6,7 +6,7 @@ require("..engine.lclass")
 
 require("..engine.utl/funcs")
 
-local Vec = require("..engine.math/vector")
+local Vec = require("..engine.math.vector")
 
 local atan2fun = math.atan2
 local degfun   = math.deg

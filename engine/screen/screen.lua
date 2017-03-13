@@ -4,7 +4,6 @@
 
 require ("..engine.lclass")
 
-require("../resources")
 require("..engine.input")
 
 class "Screen"

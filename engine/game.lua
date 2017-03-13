@@ -13,6 +13,7 @@ require("..engine.map.mapmanager")
 require("..engine.savegame.savegame")
 require("..engine.savegame.savemanager")
 require("..engine.script.scriptmanager")
+require("..engine.ui.messagebox.messagebox")
 
 local config = {
   gameScreenWidth = 1280,
@@ -23,24 +24,22 @@ local config = {
 class "Game"
 
 function Game:Game()
-
-  self.screens = {}
-
-  self.savegame = nil
-
-  self.gameobjects = {}
-
-  self.deletedObjects = {}
-
+ -- Empty?
 end
 
-function Game:update(dt)
+function Game:update( dt )
+  self.deltaTime = dt
+
   Input:update(dt)
 
 	self.currentScreen:update( dt )
   self.drawManager:update( dt ) --//TODO check is gets slow, skiplist is pending
 
   self:postUpdate( dt )
+end
+
+function Game:getDeltaTime()
+  return self.deltaTime
 end
 
 function Game:updateRegisteredObjects( dt )
@@ -95,17 +94,36 @@ function Game:unregister( gameobject )
   --//TODO
 end
 
+function Game:unregisterAll()
+  --//TODO add more checks?
+
+  for i = 1, #self.gameobjects do
+    self.gameobjects[i]:unloadScript()
+  end
+
+  self.gameobjects = {}
+end
+
 function Game:destroy( gameobject )
   --//TODO
   table.insert( self.deletedObjects , gameobject )
 end
 
 function Game:postUpdate( dt )
-  --//TODO releases destroyed objects
+
+  --//TODO releases destroyed objects on deletedObjects
+  if ( #self.deletedObjects > 0 ) then
+
+  end
+
 end
 
 function Game:getPlayer()
   return self.player
+end
+
+function Game:getCurrentMap()
+  return self.currentMap
 end
 
 function Game:getCamera()
@@ -144,21 +162,120 @@ function Game:getScriptManager()
   return self.scriptManager
 end
 
-function Game:getSaveGame()
-  return self.savegame
+function Game:getMessageBox()
+  return self.messagebox
 end
 
 function Game:createEmptySave()
-  local gamedata = loadFile( "__gameplay" )
+  return self:getSaveManager():createEmptySave()
+end
 
-  self.savegame = SaveGame( "Save " .. tostring( self.saveManager:getSaveCount() + 1 ) )
+function Game:setNewGame( trueToNewGame )
+  self.newgame = trueToNewGame
+end
 
-  self.savegame:setMapName( gamedata.startmap )
-  self.savegame:setAreaName( gamedata.startarea )
-  self.savegame:setSpawnName( gamedata.startspawn )
-  self.savegame:save()
+function Game:isNewGame()
+  return self.newgame
+end
 
-  self.saveManager:addSave( self.savegame:getName(), self.savegame )
+function Game:saveGame()
+  self:getSaveManager():setSaveToSlot( self.savegame, self.saveslot )
+  self:getSaveManager():saveGame( self.saveslot )
+end
+
+function Game:selectSaveSlot( slotNumber )
+  self.saveslot = slotNumber
+  self:setSaveGame( self:getSaveManager():getSaveSlot( slotNumber ) )
+end
+
+function Game:setSaveGame( savegame )
+  self.savegame = savegame
+end
+
+function Game:getSaveGame( savegame )
+  return self.savegame
+end
+
+function Game:loadMap( mapname, mapfilename )
+  local map = self:getMapManager():loadMap( mapname, mapfilename )
+
+  local lls = map:getLayers()
+
+  for i = 1, #lls do
+    self:getDrawManager():addLayer( lls[i].name )
+    self:getCollisionManager():addLayer( lls[i].index, lls[i].name, lls[i].collision == 1 )
+  end
+
+  --//TODO add enemies to drawmanager
+
+  self:getDrawManager():getObjectsFromMap( map )
+
+  self:getCollisionManager():addCollider( self:getPlayer():getCollider() )
+
+  --//TODO move to collisionmanager ?
+  local areas = map:getAreas()
+
+  for _,aa in pairs( areas ) do
+    local objects = aa:getObjects()
+
+    for _,oo in pairs( objects ) do
+      self:getCollisionManager():addCollider( oo:getCollider(), oo:getLayer() )
+      self:register( oo )
+    end
+
+  end
+
+  return map
+end
+
+function Game:changeMap( newMapName, newAreaName, newSpawnName )
+
+  self:unloadMap()
+  self:getCamera():setTarget( nil )
+  self:getDrawManager():clear()
+  self:getCollisionManager():clear()
+  self:unregisterAll()
+
+  self.map = self:loadMap( nil, newMapName )
+
+  local area = self.map:getAreaByIndex( 1 )
+  local spawn = area:getSpawnPointByIndex( 1 )
+
+  if ( newAreaName ) then
+    area = self.map:getAreaByName( newAreaName )
+
+    if ( newSpawnName ) then
+      spawn = area:getSpawnPointByName( newSpawnName )
+    else
+      spawn = area:getSpawnPointByIndex( 1 )
+    end
+
+  end
+
+  self:getCamera():setTarget( self:getPlayer() )
+
+  self:getPlayer():setMap( self.map, area, spawn )
+  self:getDrawManager():addObject( self:getPlayer(), spawn:getLayer() )
+end
+
+function Game:loadMapFoSaveGame( savegame )
+  self.map = self:loadMap( nil, savegame:getMapName() )
+
+  local area = self.map:getAreaByName( savegame:getAreaName() )
+
+  local spawn = area:getSpawnPointByName( savegame:getSpawnName() )
+
+  self:getPlayer():setMap( self.map, area, spawn )
+
+  self:getDrawManager():addObject( self:getPlayer(), spawn:getLayer() )
+end
+
+function Game:updateMap( dt )
+  self.map:update( dt )
+end
+
+function Game:unloadMap()
+  self.map = nil
 end
 
 function Game:setCurrentScreen( screenName )
@@ -192,6 +309,20 @@ function Game:addScreen( screenName, screen )
 end
 
 function Game:configure()
+  self.screens = {}
+
+  self.gameobjects = {}
+
+  self.deletedObjects = {}
+
+  self.currentMap = nil
+
+  self.savegame = nil
+
+  self.saveslot = 0
+
+  self.newgame = true
+
   self:loadConfiguration()
 
   -- window configuration
@@ -215,6 +346,7 @@ function Game:configure()
   self.mapManager:loadList()
 
   self.saveManager = SaveManager( self )
+  self.saveManager:load()
 
   self.scriptManager = ScriptManager( self )
   self.scriptManager:load()
@@ -222,10 +354,14 @@ function Game:configure()
   self.collisionManager = CollisionManager()
 
   self.camera = Camera()
-  self.camera:setScale( ww / 1280, wh / 720 )
+  self.camera:setScale( ww / 1280, wh / 720 ) -- old version
+  --self.camera:setScale( 1280 / ww, 720 / wh ) -- new test
 
   self.drawManager = DrawManager( self.camera )
   self.drawManager:setScale( ww / 1280, wh / 720 )
+  --self.drawManager:setScale( 1280 / ww, 720 / wh ) -- new test
+
+  self.messagebox = MessageBox()
 
   self.player = Player( "PLAYER", "PLAYER", 0, 0 )
 

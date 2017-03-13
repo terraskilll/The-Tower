@@ -10,5 +10,5 @@ end
 
 localCollisionEnter = function ( otherCollider )
   print( "Im a Warp! I will send you somewhere!" )
-  getGame():Message("What!")
+  getGame():changeMap( "corridor", "mainarea", "corridorpath")
 end

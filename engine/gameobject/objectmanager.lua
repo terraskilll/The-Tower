@@ -1,8 +1,8 @@
 require("..engine.lclass")
 require("..engine.io.io")
-require("../engine.gameobject.simpleobject")
-require("../engine.animation.animation")
-require("../engine.animation.frame")
+require("..engine.gameobject.simpleobject")
+require("..engine.animation.animation")
+require("..engine.animation.frame")
 
 local basePath = love.filesystem.getSourceBaseDirectory() .. "/__data/"
 

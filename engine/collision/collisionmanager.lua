@@ -1,6 +1,6 @@
 require("..engine.lclass")
 
-local Vec = require("..engine.math/vector")
+local Vec = require("..engine.math.vector")
 
 class "CollisionManager"
 
@@ -30,6 +30,10 @@ function CollisionManager:addCollider( objectCollider, layer )
 
   table.insert( self.layers[layer].colliders, objectCollider )
   self.layers[layer].collcount = self.layers[layer].collcount + 1
+end
+
+function CollisionManager:clear()
+  self.layers = {}
 end
 
 function CollisionManager:checkollisionForLayer( layer )
@@ -86,12 +90,12 @@ function CollisionManager:checkCollisionForMovement( currentPosition, movementVe
 
       if ( collided ) then
         --//notifies collision to objects
-        self.layers[objectLayer].colliders[collIndex]:collisionEnter( objectCollider )
-        objectCollider:collisionEnter( self.layers[objectLayer].colliders[collIndex] )
-
         if ( self.layers[objectLayer].colliders[collIndex]:isSolid() ) then
           movementVector:set( 0, 0 ) --//TODO change to check the collision and keep moving?
         end
+
+        self.layers[objectLayer].colliders[collIndex]:collisionEnter( objectCollider )
+        objectCollider:collisionEnter( self.layers[objectLayer].colliders[collIndex] )
 
         --[[ --TODO FIX: code below is not working properly, so we set vector to 0 for now
         movementVector = self:orientedCollisionCheck( objectCollider, self.staticColliders[collIndex], movementVector )

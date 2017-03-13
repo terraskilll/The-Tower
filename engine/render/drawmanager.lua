@@ -66,7 +66,7 @@ function DrawManager:DrawManager( gameCamera )
   self.navCount   = 0
   self.navmeshes  = {}
 
-  self.clipping = true
+  self.drawLayerFunction = self.drawLayerNormal
 end
 
 function DrawManager:addLayer( layerName )
@@ -103,6 +103,8 @@ function DrawManager:clear()
   self.spawnCount  = 0
   self.navCount    = 0
 
+  self.layers = {}
+
   self.areas         = {}
   self.spawnPoints   = {}
   self.navmeshes     = {}
@@ -136,7 +138,7 @@ function DrawManager:toogleLayerVisible( layerIndex )
 
   self.layers[layerIndex].visible = self.layers[layerIndex].visible
 
-  print( "Layer " .. layerIndex ..  "visibility changed to " .. tostring( self.layers[layerIndex].visible ) )
+  print( "Layer " .. layerIndex ..  " visibility changed to " .. tostring( self.layers[layerIndex].visible ) )
 end
 
 function DrawManager:swapLayers( layerIndex1, layerIndex2 )
@@ -194,6 +196,29 @@ function DrawManager:addAllSpawns( spawnsToAdd )
 
 end
 
+function DrawManager:removeSpawnPoint( instanceName, layerIndex )
+  local index = 0
+
+  local spawn = nil
+
+  for i = 1, #self.spawns do
+
+    if ( self.spawns[i]:getInstanceName() == instanceName ) then
+      index = i
+    end
+
+  end
+
+  if ( index > 0 ) then
+    spawn = self.spawns[index]
+    table.remove( self.spawns, index )
+  end
+
+  self.spawnCount = #self.spawns
+
+  return spawn
+end
+
 function DrawManager:addArea( areaToAdd ) --//TODO remove ?
   table.insert( self.areas, areaToAdd )
   self.areaCount = #self.areas
@@ -236,6 +261,14 @@ function DrawManager:addNavMesh( navmeshToAdd )
   self.navCount = #self.navmeshes
 end
 
+function DrawManager:enableVisibiltyTest( trueToEnable )
+  if ( trueToEnable ) then
+    self.drawLayerFunction = self.drawLayerNormal
+  else
+    self.drawLayerFunction = self.drawLayerFull
+  end
+end
+
 function DrawManager:draw()
 
   if ( glob.devMode.lightsActive ) then
@@ -245,7 +278,7 @@ function DrawManager:draw()
   for i = 1, #self.layers do
 
     if ( self.layers[i].visible ) then
-      self:drawLayer( self.layers[i] )
+      self:drawLayerFunction( self.layers[i] )
     end
 
   end
@@ -262,7 +295,15 @@ function DrawManager:draw()
 
 end
 
-function DrawManager:drawLayer( layerToDraw )
+function DrawManager:drawLayerFull( layerToDraw )
+
+  for i = 1, #layerToDraw.objects do
+    layerToDraw.objects[i]:draw()
+  end
+
+end
+
+function DrawManager:drawLayerNormal( layerToDraw )
 
   for i = 1, #layerToDraw.objects do
 
@@ -278,11 +319,7 @@ function DrawManager:isInsideScreen( object )
   local camX, camY, camW, camH = self.camera:getVisibleArea(-300, -300, 400, 400) -- arbitrary values?
   local objX, objY, objW, objH = object:getBoundingBox():getBounds()
 
-  if ( self.clipping == false ) then
-    return true
-  end
-
-  --//TODO fix isInside when changed resolution
+  --//TODO fix isInside when resolution is changed
 
   --if ( object:getInstanceName() == "onetree") then
   --  objX = objX * self.scaleX

@@ -9,7 +9,7 @@ TODO add shaders
 
 require ("..engine.lclass")
 
-local Vec = require("..engine.math/vector")
+local Vec = require("..engine.math.vector")
 
 class "SimpleObject" ("GameObject")
 
@@ -41,6 +41,8 @@ function SimpleObject:SimpleObject( objectName, instName, positionX, positionY, 
   self.navbox      = nil
 
   self.scriptname = nil
+
+  self.scriptupdate = nil
 end
 
 function SimpleObject:getKind()
@@ -51,6 +53,10 @@ function SimpleObject:update( dt )
   --//TODO call update in game for SimpleObjects
   if ( self.animation ) then
     self.animation:update( dt )
+  end
+
+  if ( self.scriptupdate ) then
+    self:scriptupdate( dt )
   end
 
 end

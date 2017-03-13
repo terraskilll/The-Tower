@@ -126,11 +126,13 @@ function MapManager:loadMap( mapName, mapFileName )
     --- NAVMESH ---
     local navmeshdata = areas[i].navmeshdata
 
-    local navmesh = NavMesh()
-    navmesh:addAllPoints( areas[i].navmeshdata.points )
-    navmesh:setMobile( areas[i].mobile == 1 )
+    if ( navmeshdata ) then
+      local navmesh = NavMesh()
+      navmesh:addAllPoints( areas[i].navmeshdata.points )
+      navmesh:setMobile( areas[i].mobile == 1 )
 
-    area:setNavMesh( navmesh )
+      area:setNavMesh( navmesh )
+    end
 
     --- FINALLY ---
     map:addArea( area )
@@ -213,14 +215,21 @@ function MapManager:saveMap( mapName, mapFileName, map )
     end
 
     --- NAVMESH ---
-    local navmeshdata = {
-      points = aa:getNavMesh():getPoints()
-    }
+    local navmeshdata = nil
 
-    if ( aa:getNavMesh():isMobile() == true ) then -- savetable does not support boolean :(
-      navmeshdata.mobile = 1
-    else
-      navmeshdata.mobile = 0
+    local nm = aa:getNavMesh()
+
+    if ( nm ) then
+      navmeshdata = {
+        points = nm:getPoints()
+      }
+
+      if ( nm:isMobile() == true ) then -- savetable does not support boolean :(
+        navmeshdata.mobile = 1
+      else
+        navmeshdata.mobile = 0
+      end
+
     end
 
     --- HERE WE GO ---

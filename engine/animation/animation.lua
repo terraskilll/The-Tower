@@ -4,8 +4,8 @@
 
 ]]
 
-require("../engine.lclass")
-require("../engine.animation.frame")
+require("..engine.lclass")
+require("..engine.animation.frame")
 
 class "Animation"
 

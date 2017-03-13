@@ -7,7 +7,7 @@ a spawn point in a map->area->floor that can be  refered by name
 
 require("..engine.lclass")
 
-local Vec = require("../engine.math.vector")
+local Vec = require("..engine.math.vector")
 
 class "SpawnPoint" ("GameObject")
 

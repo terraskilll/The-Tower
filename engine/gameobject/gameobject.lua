@@ -3,7 +3,7 @@
 -------------------------------------------------------------------------------
 require ("..engine.lclass")
 
-local Vec = require("..engine.math/vector")
+local Vec = require("..engine.math.vector")
 
 class "GameObject"
 
@@ -20,8 +20,9 @@ function GameObject:GameObject( instName, positionX, positionY )
   self.width  = 0
   self.height = 0
 
-  self.scriptname = nil
-  self.scriptpath = nil
+  self.scriptname   = nil
+  self.scriptpath   = nil
+  self.scriptloaded = false
 end
 
 function GameObject:getKind()
@@ -77,8 +78,15 @@ function GameObject:setPosition( positionToSet )
 end
 
 function GameObject:setScript( scriptName, scriptPath )
-  self.scriptname = scriptName
-  self.scriptpath = scriptPath
+
+  if ( scriptName == nil or scriptName == "" ) then
+    self.scriptname = nil
+    self.scriptpath = nil
+  else
+    self.scriptname = scriptName
+    self.scriptpath = scriptPath
+  end
+
 end
 
 function GameObject:getScript()
@@ -87,11 +95,20 @@ end
 
 function GameObject:loadScript()
 
+  --//TODO test loadScript
   if ( self.scriptpath ) then
     local script = require( self.scriptpath )
     scriptsetup( self )
+
+    self.scriptloaded = true
   end
 
+end
+
+function GameObject:unloadScript()
+  if ( self.scriptloaded ) then
+    package.loaded[self.scriptpath] = nil
+  end
 end
 
 function GameObject:update( dt )

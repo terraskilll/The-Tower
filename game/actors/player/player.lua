@@ -9,7 +9,7 @@ require("..engine.navigation/navbox")
 require("../game/actors/player/states/iddlestate")
 require("../game/actors/player/states/walkingstate")
 
-local Vec = require("..engine.math/vector")
+local Vec = require("..engine.math.vector")
 
 class "Player" ( "Actor" )
 
@@ -46,13 +46,13 @@ function Player:draw()
   --self.fsm:getCurrent():getAnimation():draw(self:getPositionXY())
 
   local x, y = self:getPositionXY()
-  love.graphics.circle( "line", x, y, 20, 4 )
-  love.graphics.circle( "line", x, y, 2 )
+  --love.graphics.circle( "line", x, y, 20, 4 )
+  --love.graphics.circle( "line", x, y, 2 )
 
   love.graphics.draw(i__me, x, y, 0, 0.75, 0.75, 32, 32)
 
   self.collider:draw()
-  --self.navagent:draw()
+  self.navagent:draw()
   self.boundingbox:draw()
 end
 

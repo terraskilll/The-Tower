@@ -12,7 +12,7 @@ require("..engine.input")
 require("..engine.io.io")
 require("..engine.utl/funcs")
 
-local Vec = require("../engine.math.vector")
+local Vec = require("..engine.math.vector")
 
 local absfun = math.abs
 local minfun = math.min

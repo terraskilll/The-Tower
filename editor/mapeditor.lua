@@ -328,7 +328,7 @@ function MapEditor:selectOnClick( cx, cy )
 
       if pointInRect(
           cx + ox, cy + oy,
-          self.allobjects[i].selbox[1] + ox, self.allobjects[i].selbox[2] + oy,
+          self.allobjects[i].selbox[1], self.allobjects[i].selbox[2],
           self.allobjects[i].selbox[3], self.allobjects[i].selbox[4] ) then
 
           table.insert( sl, self.allobjects[i] )
@@ -568,6 +568,7 @@ function MapEditor:removeObject( objectindex, layerindex )
     self.area:removeSpawnPoint( obj:getInstanceName() )
 
     self.game:getDrawManager():removeObject( obj:getInstanceName(), self.allobjects[objectindex].layer )
+    self.game:getDrawManager():removeSpawnPoint( obj:getInstanceName(), self.allobjects[objectindex].layer )
 
     table.remove( self.allobjects, objectindex )
   end
@@ -1220,7 +1221,9 @@ function MapEditor:createSpawnPoint( )
 
     local px, py = Input.mousePosition()
 
-    local spawn = SpawnPoint( spawnname, px, py )
+    local cx, cy = self.game:getCamera():getPositionXY()
+
+    local spawn = SpawnPoint( spawnname, px + cx, py + cy )
 
     spawn:setLayer( self.currentLayer )
 

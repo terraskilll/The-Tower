@@ -9,7 +9,7 @@ require("..engine.globalconf")
 require("..engine.lclass")
 require("..engine.ui/anchor")
 
-local Vec = require("..engine.math/vector")
+local Vec = require("..engine.math.vector")
 
 --local selectorShader = love.graphics.newShader("engine/shaders/ui.glsl")
 

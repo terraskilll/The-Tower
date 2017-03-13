@@ -2,7 +2,7 @@
 
 An adventure game in Lua/Love2D, drawing inspiration from titles like 2D Zelda (A Link to the Past, Links Awakening) and Bastion, with a built-in engine and game editor
 
-It's my final project in a Game Programming Course at [PUC-PR] (http://www.pucpr.br/) in Brazil.
+It's my final project in a Game Programming Course at [PUCPR] (http://www.pucpr.br/) in Brazil.
 
 ## Some of the features we want to implement in this project are:
 

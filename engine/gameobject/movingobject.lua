@@ -7,7 +7,7 @@ require("..engine.lclass")
 
 require("..engine.collision/boxcollider")
 
-local Vec = require("..engine.math/vector")
+local Vec = require("..engine.math.vector")
 
 local absfun = math.abs
 

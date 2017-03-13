@@ -18,7 +18,7 @@ require("..engine.globalconf")
 local Grid = require ("..engine.navigation/jumper.grid")
 local Pathfinder = require ("..engine.navigation/jumper.pathfinder")
 
-local Vec = require("..engine.math/vector")
+local Vec = require("..engine.math.vector")
 
 class "NavAgent"
 

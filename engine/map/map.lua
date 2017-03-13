@@ -74,7 +74,7 @@ end
 function Map:getAreaByIndex ( areaIndex )
   local i = 1
 
-  for _,area in pairs(self.areas) do
+  for _,area in pairs( self.areas ) do
     if ( i == areaIndex ) then
       return area
     end

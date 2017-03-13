@@ -80,6 +80,12 @@ function Area:getSpawnPoints()
   return self.spawns
 end
 
+function Area:getSpawnPointByIndex( index )
+  if ( self.spawns[index] ) then
+    return self.spawns[index]
+  end
+end
+
 function Area:getSpawnPointByName( spawnName )
 
   for i = 1, #self.spawns do
