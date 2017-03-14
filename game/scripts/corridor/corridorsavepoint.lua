@@ -10,8 +10,8 @@ scriptsetup = function( object )
   gameobject.onCollisionEnter = localCollisionEnter
 end
 
-localCollisionEnter = function ( otherCollider )
-  print(otherCollider:getKind())
+localCollisionEnter = function ( caller, otherCollider )
+
   if ( not saved ) then
     getGame():getSaveGame():setMapName( "corridor" )
     getGame():getSaveGame():setAreaName( "mainarea" )

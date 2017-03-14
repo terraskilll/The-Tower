@@ -216,10 +216,6 @@ function SimpleObject:changePosition( movementVector )
 
 end
 
---function SimpleObject:onCollisionEnter( otherCollider )
-  -- nothing
---end
-
 function SimpleObject:clone( objectName, newInstanceName )
 
   local qd = nil

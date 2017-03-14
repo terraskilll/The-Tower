@@ -6,9 +6,9 @@ scriptsetup = function( object )
   eachsecond = 0
 end
 
- localupdate = function( dt )
+ localupdate = function( caller, dt )
 
-  eachsecond = eachsecond + getGame():getDeltaTime()
+  eachsecond = eachsecond + dt
 
   if ( eachsecond > 1 ) then
     print("EACH SECOND I TALK!")

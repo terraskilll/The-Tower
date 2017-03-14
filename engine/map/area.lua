@@ -66,6 +66,7 @@ function Area:removeObject( instanceName )
 
   if ( index > 0 ) then
     table.remove( self.objects, index )
+
     return true
   end
 

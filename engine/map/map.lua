@@ -111,6 +111,14 @@ function Map:removeAreaByName( areaName )
 
 end
 
+function Map:removeObjectByName( objectName )
+
+  for __, aa in pairs( self.areas ) do
+    aa:removeObject( objectName )
+  end
+
+end
+
 function Map:addLayer( layerName, layerIndex )
   table.insert( self.layers, { name = layerName, index = layerIndex, collision = true } )
 

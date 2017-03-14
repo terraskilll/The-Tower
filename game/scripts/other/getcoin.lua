@@ -7,17 +7,20 @@ local gameobject = nil
 scriptsetup = function( object )
   gameobject = object
 
-  gameobject.onCollisionEnter = onCollisionEnter
+  gameobject.onCollisionEnter = collisionEnter
 end
 
-onCollisionEnter = function ( other, infoindex )
+collisionEnter = function ( caller, otherCollider )
 
-  --print( "Object Kind: " .. gameobject:getCollider():getKind() )
-  --print( "Other Kind: " .. other:getOwner():getInstanceName() )
+  if ( otherCollider:getOwner():getInstanceName() == "PLAYER" ) then
+    local name = caller:getInstanceName()
 
-  print( info )
+    local objectHit = getGame():queryObjectByName( name )
 
-  local info = getGame():getCollisionManager():getCollisionInfo( infoindex )
+    if  ( objectHit ) then
+      getGame():destroy( objectHit )
+    end
+  end
 
   -- if ( otherCollider:getOwner():getTag() == "PLAYER" ) then
   --   print( "Collided with coin" )

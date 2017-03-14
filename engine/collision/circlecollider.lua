@@ -83,7 +83,7 @@ function CircleCollider:getRadius()
   return self.radius * self.scale
 end
 
-function CircleCollider:collisionEnter( otherCollider, infoindex )
+function CircleCollider:collisionEnter( otherCollider )
 
   if ( self:getOwner() == nil )  then
     print(self.name .. " has no owner")
@@ -91,7 +91,7 @@ function CircleCollider:collisionEnter( otherCollider, infoindex )
   end
 
   if ( self.owner.onCollisionEnter ) then
-    self.owner:onCollisionEnter( otherCollider, infoindex )
+    self.owner:onCollisionEnter( otherCollider )
   end
 
 end

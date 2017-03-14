@@ -51,6 +51,18 @@ function Game:updateRegisteredObjects( dt )
   end
 end
 
+function Game:queryObjectByName( instanceName )
+  local c = #self.gameobjects
+
+  for i = 1, c do
+    if ( self.gameobjects[i]:getInstanceName() == instanceName ) then
+      return self.gameobjects[i]
+    end
+  end
+
+  return nil
+end
+
 function Game:draw()
   self.currentScreen:draw()
 
@@ -112,10 +124,26 @@ end
 
 function Game:postUpdate( dt )
 
-  --//TODO releases destroyed objects on deletedObjects
-  if ( #self.deletedObjects > 0 ) then
+  --//TODO add more checks, test better
 
+  if ( #self.deletedObjects == 0 ) then
+    return
   end
+
+  count = 0
+
+  -- releasing destroyed objects on deletedObjects
+
+  for i = 1, #self.deletedObjects do
+
+    self:getDrawManager():removeObject( self.deletedObjects[i]:getInstanceName(), self.deletedObjects[i]:getLayer() )
+    self:getCollisionManager():removeCollider( self.deletedObjects[i]:getCollider(), self.deletedObjects[i]:getLayer() )
+    self.map:removeObjectByName( self.deletedObjects[i]:getInstanceName() )
+
+    count = count + 1
+  end
+
+  self.deletedObjects = {}
 
 end
 
