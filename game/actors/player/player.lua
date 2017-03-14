@@ -1,13 +1,13 @@
 require("..engine.input")
-require("..engine.fsm/fsm")
-require("..engine.navigation/navagent")
-require("..engine.collision/boxcollider")
-require("..engine.collision/circlecollider")
-require("..engine.render/boundingbox")
-require("..engine.navigation/navbox")
+require("..engine.fsm.fsm")
+require("..engine.navigation.navagent")
+require("..engine.collision.boxcollider")
+require("..engine.collision.circlecollider")
+require("..engine.render.boundingbox")
+require("..engine.navigation.navbox")
 
-require("../game/actors/player/states/iddlestate")
-require("../game/actors/player/states/walkingstate")
+require("..game.actors.player.states.iddlestate")
+require("..game.actors.player.states.walkingstate")
 
 local Vec = require("..engine.math.vector")
 
@@ -80,6 +80,10 @@ function Player:getCollider()
   return self.collider
 end
 
+function Player:getKind()
+  return "PLAYER"
+end
+
 function Player:configure()
   self.fsm = FSM()
 
@@ -111,4 +115,5 @@ end
 
 function Player:onCollisionEnter( otherCollider )
   --print( "Player Collided with " .. otherCollider:getOwner():getInstanceName() )
+  --print( otherCollider:getOwner():getInstanceName() )
 end

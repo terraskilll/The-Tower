@@ -11,6 +11,7 @@ scriptsetup = function( object )
 end
 
 localCollisionEnter = function ( otherCollider )
+  print(otherCollider:getKind())
   if ( not saved ) then
     getGame():getSaveGame():setMapName( "corridor" )
     getGame():getSaveGame():setAreaName( "mainarea" )

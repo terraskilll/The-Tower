@@ -84,19 +84,22 @@ function BoxCollider:getBounds()
     self.height * self.scale
 end
 
-function BoxCollider:collisionEnter( otherCollider )
-
+function BoxCollider:collisionEnter( otherCollider, infoindex )
   if ( self:getOwner() == nil )  then
     print(self.name .. " has no owner")
     return
   end
 
-  if ( self.owner.onCollisionEnter ~= nil ) then
-    self.owner:onCollisionEnter( otherCollider )
+  --print( otherCollider:getOwner():getInstanceName() )
+
+  if ( self.owner.onCollisionEnter ) then
+    self.owner:onCollisionEnter( otherCollider, infoindex )
   end
 
 end
 
 function BoxCollider:clone()
-  return BoxCollider( self.positionX, self.positionY, self.width, self.height, self.offsetX, self.offsetY, self.scale )
+  local colld = BoxCollider( self.positionX, self.positionY, self.width, self.height, self.offsetX, self.offsetY, self.scale )
+  colld:setSolid( self:isSolid() )
+  return colld
 end

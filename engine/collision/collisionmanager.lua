@@ -16,7 +16,21 @@ function CollisionManager:addLayer( layerIndex, layerName, collisionEnabled )
     collcount = 0
   }
 
+  self.collisionInfo = {}
+
   self.layers[layerIndex] = layer
+end
+
+function CollisionManager:addCollisionInfo( infoindex, collider1, collider2 )
+  self.collisionInfo[infoindex] = { collider1 = collider1, collider2 = collider2 }
+end
+
+function CollisionManager:getCollisionInfo( infoindex )
+  return self.collisionInfo[infoindex]
+end
+
+function CollisionManager:clearCollisionInfo( infoindex )
+  self.collisionInfo[infoindex] = nil
 end
 
 function CollisionManager:enableLayer( layerIndex, trueToEnable )
@@ -36,7 +50,7 @@ function CollisionManager:clear()
   self.layers = {}
 end
 
-function CollisionManager:checkollisionForLayer( layer )
+function CollisionManager:checkCollisionForLayer( layer )
   if ( not layer.enabled ) then
     return
   end
@@ -65,7 +79,7 @@ function CollisionManager:checkCollisions()
   --// TODO more efficient collision check
 
   for i = 1, #self.layers do
-    self:checkollisionForLayer( self.layers[i] )
+    self:checkCollisionForLayer( self.layers[i] )
   end
 end
 
@@ -94,8 +108,15 @@ function CollisionManager:checkCollisionForMovement( currentPosition, movementVe
           movementVector:set( 0, 0 ) --//TODO change to check the collision and keep moving?
         end
 
-        self.layers[objectLayer].colliders[collIndex]:collisionEnter( objectCollider )
-        objectCollider:collisionEnter( self.layers[objectLayer].colliders[collIndex] )
+        local info =
+            objectCollider:getOwner():getInstanceName() ..
+            self.layers[objectLayer].colliders[collIndex]:getOwner():getInstanceName()
+
+        self:addCollisionInfo( info, objectCollider, self.layers[objectLayer].colliders[collIndex] )
+        self:addCollisionInfo( info, objectCollider, self.layers[objectLayer].colliders[collIndex] )
+
+        objectCollider:collisionEnter( self.layers[objectLayer].colliders[collIndex], info )
+        self.layers[objectLayer].colliders[collIndex]:collisionEnter( objectCollider, info )
 
         --[[ --TODO FIX: code below is not working properly, so we set vector to 0 for now
         movementVector = self:orientedCollisionCheck( objectCollider, self.staticColliders[collIndex], movementVector )

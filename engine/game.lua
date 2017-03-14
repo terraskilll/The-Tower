@@ -4,9 +4,10 @@ require("..engine.input")
 require("..engine.io.io")
 require("..engine.globalconf")
 require("..engine.camera.camera")
+require("..engine.resourcemanager")
+require("..engine.audio.audiomanager")
 require("..engine.render.drawmanager")
 require("..engine.collision.collisionmanager")
-require("..engine.resourcemanager")
 require("..engine.gameobject.objectmanager")
 require("..engine.animation.animationmanager")
 require("..engine.map.mapmanager")
@@ -118,16 +119,12 @@ function Game:postUpdate( dt )
 
 end
 
-function Game:getPlayer()
-  return self.player
+function Game:getResourceManager()
+  return self.resourceManager
 end
 
-function Game:getCurrentMap()
-  return self.currentMap
-end
-
-function Game:getCamera()
-  return  self.camera
+function Game:getAudioManager()
+  return self.audioManager
 end
 
 function Game:getDrawManager()
@@ -136,10 +133,6 @@ end
 
 function Game:getCollisionManager()
   return self.collisionManager
-end
-
-function Game:getResourceManager()
-  return self.resourceManager
 end
 
 function Game:getObjectManager()
@@ -160,6 +153,18 @@ end
 
 function Game:getScriptManager()
   return self.scriptManager
+end
+
+function Game:getCamera()
+  return  self.camera
+end
+
+function Game:getPlayer()
+  return self.player
+end
+
+function Game:getCurrentMap()
+  return self.currentMap
 end
 
 function Game:getMessageBox()
@@ -223,6 +228,18 @@ function Game:loadMap( mapname, mapfilename )
       self:register( oo )
     end
 
+  end
+
+  local musicdata = map:getBackgroundMusicData()
+
+  if ( musicdata.name ) then
+    local resname, restype, respath = self:getResourceManager():getResourceByName( musicdata.name )
+    local music = self:getResourceManager():loadAudio( respath )
+
+    self:getAudioManager():addMusic( musicdata.name, music, tonumber( musicdata.volume ) )
+    self:getAudioManager():playMusic( musicdata.name )
+
+     --//TODO where to start audio?
   end
 
   return map
@@ -335,6 +352,8 @@ function Game:configure()
   love.window.setMode( ww, wh, config.gameIsFullScreen )
 
   self.resourceManager = ResourceManager( self )
+
+  self.audioManager = AudioManager( self )
 
   self.objectManager = ObjectManager( self )
   self.objectManager:load()

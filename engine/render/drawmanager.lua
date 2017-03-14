@@ -175,6 +175,10 @@ end
 
 function DrawManager:swapObjectLayer( objectName, currentLayer, newLayer )
 
+  -- if ( newLayer > #self.layers ) then
+  --   return
+  -- end
+
   local object = self:removeObject( objectName, currentLayer )
 
   if ( object ) then

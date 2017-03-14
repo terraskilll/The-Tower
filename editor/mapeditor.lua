@@ -32,7 +32,9 @@ local generalOptions = {
   "/ - Help/Command List",
   "Numpad '+/-' - Change Inc Modifier",
   "F9 - Save",
-  "F11 - Back"
+  "F11 - Back",
+  "",
+  "Alt + M - Set Music"
 }
 
 local mapOptions = {
@@ -47,6 +49,7 @@ local mapOptions = {
   "F5 - Load Object From Library",
   "Ctrl + D - Duplicate",
   "Ctrl + N - Rename",
+  "Ctrl + B - Change Solid Collider",
   "Ctrl + J - Set Script",
   "DEL - Remove Object",
   "Alt + PgUp - Layer Up",
@@ -61,10 +64,6 @@ local editNavMeshOptions = {
   "Left Click: Add Point",
   "Right Click: Remove Point",
   "Drag Left - Move Point"
-}
-
-local spawnPtOptions = {
-
 }
 
 local enemyOptions = {
@@ -121,7 +120,11 @@ function MapEditor:MapEditor( mapListOwner, mapIndex, mapName, mapFile, thegame 
 
   self.dragthreshold = { x = 0, y = 0 }
 
+  self.musicdata = {}
+
   self.mousewasdragged = false
+
+  self.game:getDrawManager():clear()
 
   self:loadMap( mapName, mapFile )
 end
@@ -295,7 +298,7 @@ function MapEditor:selectAll( trueToSelect, layerindex )
 
   for i = 1, #self.allobjects do
 
-    if ( self.allobjects[i].layer == layerindex) then
+    if ( self.allobjects[i].layer == layerindex ) then
 
       self.allobjects[i].selected = trueToSelect
 
@@ -459,6 +462,10 @@ function MapEditor:doTextInput ( t )
 end
 
 function MapEditor:saveMap()
+  if ( self.musicdata.resname ) then
+    self.map:setBackgroundMusicResource( self.musicdata.resname, self.musicdata.volume )
+  end
+
   self.game:getMapManager():saveMap( self.mapname, self.filename, self.map )
 end
 
@@ -609,6 +616,24 @@ function MapEditor:duplicateSelectedObjects( layerindex )
 
 end
 
+function MapEditor:changeSolidCollider()
+  local oc = #self.allobjects
+
+  for i = 1, oc do
+
+    if ( self.allobjects[i].selected ) then
+
+      local coll = self.allobjects[i].object:getCollider()
+
+      if ( coll ) then
+        coll:setSolid( not coll:isSolid() )
+      end
+
+    end
+
+  end
+end
+
 function MapEditor:moveSelected( dx, dy, forceApply )
 
   if ( forceApply == nil ) then
@@ -671,6 +696,7 @@ function MapEditor:moveSelected( dx, dy, forceApply )
 end
 
 function MapEditor:moveObjectsToLayer( layerindex, incLayer )
+
   if ( #self.layers < 2 ) then
     return
   end
@@ -686,13 +712,18 @@ function MapEditor:moveObjectsToLayer( layerindex, incLayer )
   for i = 1, #self.allobjects do
 
     if ( self.allobjects[i].selected ) then
-      self.game:getDrawManager():swapObjectLayer(
-          self.allobjects[i].object:getInstanceName(),
-          self.allobjects[i].layer,
-          self.allobjects[i].layer + incLayer )
+      if ( self.allobjects[i].layer + incLayer > 0 and self.allobjects[i].layer + incLayer <= #self.layers ) then
+        self.game:getDrawManager():swapObjectLayer(
+            self.allobjects[i].object:getInstanceName(),
+            self.allobjects[i].layer,
+            self.allobjects[i].layer + incLayer )
 
-      self.allobjects[i].layer = self.allobjects[i].layer + incLayer
-      self.allobjects[i]:setLayer( self.allobjects[i].layer )
+        self.allobjects[i].layer = self.allobjects[i].layer + incLayer
+        self.allobjects[i].object:setLayer( self.allobjects[i].layer )
+
+        self.allobjects[i].selected = false
+        self.selectedCount = self.selectedCount - 1
+      end
     end
 
   end
@@ -908,8 +939,8 @@ function MapEditor:keypressMiscelaneous( key )
     self.showHelp = not self.showHelp
   end
 
-  if ( key == ";" ) then
-    self.game:getCamera():setScale( 10 , 10 )
+  if ( key == ";" ) then --//TODO fix zoom
+    self.game:getCamera():setScale( 0.1 , 0.1 )
   end
 
   if ( ( key == "k" ) and ( Input:isKeyDown( "lctrl" ) ) ) then
@@ -961,6 +992,18 @@ function MapEditor:keypressMiscelaneous( key )
     self.textInput        = TextInput( "Layer Name:" )
     self.updatefunction   = self.updateCreateLayer
     self.keypressfunction = self.keypressCreateLayer
+  end
+
+  if ( (key == "m")  and ( Input:isKeyDown( "lalt" ) ) ) then
+    self.textInput        = TextInput( "Music Resource Name:" )
+    self.updatefunction   = self.updateSetMusic
+    self.keypressfunction = self.keypressSetMusic
+  end
+
+  if ( (key == "m")  and ( Input:isKeyDown( "lalt" ) ) and ( Input:isKeyDown( "lshift" ) ) ) then
+    self.textInput        = TextInput( "Music Volume:" )
+    self.updatefunction   = self.updateSetMusicVolume
+    self.keypressfunction = self.keypressSetMusicVolume
   end
 
   if ( (key == "p")  and ( Input:isKeyDown( "lctrl" ) ) ) then
@@ -1041,6 +1084,10 @@ function MapEditor:keypressForObjects( key )
     self:duplicateSelectedObjects( self.currentLayer )
   end
 
+  if ( (key == "b")  and ( Input:isKeyDown( "lctrl" ) ) ) then
+    self:changeSolidCollider( self.currentLayer )
+  end
+
   if ( ( key == "pagedown" )  and ( Input:isKeyDown( "lalt" ) )  ) then
     self:moveObjectsToLayer( self.currentLayer, -1 )
   end
@@ -1073,6 +1120,11 @@ function MapEditor:updateSelectFromLibrary( dt )
     local cx, cy = self.game:getCamera():getPositionXY()
 
     local lx, ly = px + cx, py + cy
+
+    if ( self.incModifier > 1 ) then
+      lx = floorfun( lx / self.incModifier ) * self.incModifier
+      ly = floorfun( ly / self.incModifier ) * self.incModifier
+    end
 
     local instancename =  self.map:getNextGeneratedName()
 
@@ -1295,7 +1347,10 @@ function MapEditor:drawGrid()
 
   love.graphics.setColor( 0, 255, 0, 40 )
 
-  for i = -10000, 10000, self.incModifier do
+  local hi = floorfun ( 10000 / self.incModifier ) * self.incModifier
+  local lo = - hi
+
+  for i = lo, hi, self.incModifier do
     love.graphics.line( i, -10000, i, 10000 )
     love.graphics.line( -10000, i, 10000, i )
   end
@@ -1407,6 +1462,59 @@ function MapEditor:mouseMovedNavMesh( x, y, dx, dy )
 
 end
 
+--- SET MUSIC ------------------------------------------------------------------
+
+function MapEditor:updateSetMusic( dt )
+  if ( self.textInput:isFinished() ) then
+
+    local str = self.textInput:getText()
+
+    local resname, restype, respath = self.game:getResourceManager():getResourceByName( str )
+
+    if ( restype == "audio" ) then
+      if ( resname ) then
+        self.musicdata.resname = resname
+        self.musicdata.volume  = 1
+      end
+    else
+      self:setLastMessage("Resource is not Audio")
+    end
+
+    self.textInput = nil
+
+    self.updatefunction   = self.updateEditMap
+    self.keypressfunction = self.keypressEditMap
+
+  end
+end
+
+function MapEditor:keypressSetMusic( key )
+  self.textInput:keypressed( key )
+end
+
+--- SET MUSIC VOLUME -----------------------------------------------------------
+
+function MapEditor:updateSetMusicVolume( dt )
+  if ( self.textInput:isFinished() ) then
+
+    local str = self.textInput:getText()
+
+    if ( self.musicdata.resname ) then
+      self.musicdata.volume  = tonumber( str )
+    end
+
+    self.textInput = nil
+
+    self.updatefunction   = self.updateEditMap
+    self.keypressfunction = self.keypressEditMap
+
+  end
+end
+
+function MapEditor:keypressSetMusicVolume( key )
+  self.textInput:keypressed( key )
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -1431,6 +1539,8 @@ function MapEditor:drawHelp()
     "F9 - Save",
     "F11 - Back",
     "",
+    "Alt + M - Set Music",
+    "",
     "F12 - Developer Options Shortcuts"
   }
 
@@ -1445,6 +1555,7 @@ function MapEditor:drawHelp()
     "Ctrl + A - Select All",
     "Ctrl + D - Duplicate",
     "Ctrl + N - Rename",
+    "Ctrl + B - Change Solid Collider",
     "Ctrl + J - Set Script",
     "DEL - Remove Object",
     "Alt + PgDown - Change To Layer Below",

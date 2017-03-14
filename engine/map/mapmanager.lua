@@ -62,9 +62,15 @@ function MapManager:loadMap( mapName, mapFileName )
 
   map:setNameIndex( mapdata.nameindex )
 
-  local layers  = mapdata.layers
-  local library = mapdata.library
-  local areas   = mapdata.areas
+  local musicdata = mapdata.musicdata
+  local layers    = mapdata.layers
+  local library   = mapdata.library
+  local areas     = mapdata.areas
+
+  --- MUSIC ---
+  if ( musicdata ) then
+    map:setBackgroundMusicResource( musicdata.name, musicdata.volume )
+  end
 
   --- LAYERS ---
   for i = 1, #layers do
@@ -238,6 +244,7 @@ function MapManager:saveMap( mapName, mapFileName, map )
 
   local mapdata = {
     nameindex = map:getNameIndex(),
+    musicdata = map:getBackgroundMusicData(),
     layers    = layers,
     library   = library,
     areas     = areas

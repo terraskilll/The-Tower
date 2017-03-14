@@ -216,9 +216,9 @@ function SimpleObject:changePosition( movementVector )
 
 end
 
-function SimpleObject:onCollisionEnter( otherCollider )
+--function SimpleObject:onCollisionEnter( otherCollider )
   -- nothing
-end
+--end
 
 function SimpleObject:clone( objectName, newInstanceName )
 

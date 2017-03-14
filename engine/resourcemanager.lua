@@ -59,6 +59,10 @@ function ResourceManager:loadImage( filePath )
   return love.graphics.newImage( filePath )
 end
 
-function ResourceManager:loadSound( filepath )
-
+function ResourceManager:loadAudio( filepath, loadToMemory )
+  if ( loadToMemory ) then
+    return love.audio.newSource( filepath, static )
+  else
+    return love.audio.newSource( filepath )
+  end
 end

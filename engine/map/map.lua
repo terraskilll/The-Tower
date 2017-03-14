@@ -26,6 +26,8 @@ function Map:Map( mapName, mapFile )
   self.objectLibrary = {}
 
   self.movingObjects = {}
+
+  self.musicResource = {}
 end
 
 function Map:getName()
@@ -56,6 +58,15 @@ function Map:getNextGeneratedName()
   self.nameindex = self.nameindex + 1
 
   return "obj" .. self.nameindex
+end
+
+function Map:setBackgroundMusicResource( musicResource, volume )
+  self.musicResource.name   = musicResource
+  self.musicResource.volume = volume
+end
+
+function Map:getBackgroundMusicData()
+  return self.musicResource
 end
 
 function Map:addArea( area )
