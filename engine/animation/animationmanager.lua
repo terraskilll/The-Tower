@@ -20,7 +20,7 @@ function AnimationManager:AnimationManager( thegame )
 end
 
 function AnimationManager:load()
-  allanimations, err = loadFile("__animationlist")
+  allanimations, err = loadFile( "__animationlist" )
 
   if ( allanimations == nil ) then
     allanimations = {}
@@ -34,7 +34,7 @@ function AnimationManager:save( animations )
     allanimations = animations
   end
 
-  saveFile("__animationlist", allanimations)
+  saveFile( "__animationlist", allanimations )
 end
 
 function AnimationManager:getAnimationByIndex( animationindex )
@@ -43,6 +43,16 @@ end
 
 function AnimationManager:check( animationname )
   return self:getAnimationByName( animationname ) ~= nil
+end
+
+function AnimationManager:renameAnimation( oldname, newname )
+  --//TODO test simpler methods, like os.rename, check removed
+
+  local anim = self:loadAnimation( oldname )
+
+  self:saveAnimation( newname, anim )
+
+  local removed = love.filesystem.remove( basePath .. "__animations/" .. oldname )
 end
 
 function AnimationManager:getAnimationByName( animationname )
@@ -83,15 +93,11 @@ function AnimationManager:loadAnimData( animationFilename )
   local animData, err = loadFile( "__animations/" .. animationFilename )
 
   if ( animData ) then
-
     return animData
-
   else
-
     print("Load error for " .. animationFilename)
 
     return nil
-
   end
 
 end
@@ -113,7 +119,7 @@ function AnimationManager:loadAnimation( animationFilename )
 
   animation:setImage( image, resname )
 
-  for i=1, #animdata.frames do
+  for i = 1, #animdata.frames do
     animation:createFrame(
       animdata.frames[i].duration,
       animdata.frames[i].quadx,

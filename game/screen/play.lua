@@ -67,6 +67,8 @@ function PlayScreen:onExit()
   self.game:getCollisionManager():clear()
 
   self.game:unregisterAll()
+
+  self.game:getAudioManager():stopMusic()
 end
 
 function PlayScreen:update( dt )

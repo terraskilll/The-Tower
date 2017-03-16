@@ -8,7 +8,7 @@ scriptsetup = function( object )
   gameobject.onCollisionEnter = localCollisionEnter
 end
 
-local localCollisionEnter = function ( caller, otherCollider )
+localCollisionEnter = function ( caller, otherCollider )
   print( "Hello! Im a windmill!" )
 
   local animation = gameobject:getAnimation()

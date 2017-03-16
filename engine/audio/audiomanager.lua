@@ -44,6 +44,14 @@ function AudioManager:playMusic( musicName )
   love.audio.play( self.musics[musicName].audio )
 end
 
+function AudioManager:stopMusic( musicName )
+  if ( musicName ) then
+    love.audio.stop( musicName )
+  else
+    love.audio.stop()
+  end
+end
+
 ---- AUDIO SFX -----------------------------------------------------------------
 
 function AudioManager:addSound( soundName, audioToAdd, volume )

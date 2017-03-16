@@ -12,6 +12,7 @@ require("..editor.maplist")
 require("..editor.mapeditor")
 require("..editor.animationlist")
 require("..editor.animationeditor")
+require("..editor.autoanimator")
 require("..editor.scriptlist")
 require("..editor.gameplayeditor")
 

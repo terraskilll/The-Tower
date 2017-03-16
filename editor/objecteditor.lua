@@ -104,6 +104,11 @@ function ObjectEditor:draw()
 
   love.graphics.print( "Inc Modifier: " .. self.incModifier, 16, 300 )
 
+  love.graphics.print( "Editing Object: " .. self.name, 320, 10 )
+
+  love.graphics.setColor( 225, 100, 255, 255 )
+  love.graphics.print( self.name, 415, 10 )
+
   love.graphics.setColor( 150, 150, 255, 100 )
 
   love.graphics.line( 299, 0, 299, 2000 )
@@ -156,9 +161,7 @@ function ObjectEditor:drawObject()
 end
 
 function ObjectEditor:update(dt)
-
   self:updatefunction( dt )
-
 end
 
 function ObjectEditor:updategeneral(dt)

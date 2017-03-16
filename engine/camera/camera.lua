@@ -17,7 +17,7 @@ end
 
 function Camera:update( dt )
 
-  if ( self.target ~=  nil ) then
+  if ( self.target ) then
 
     local targetPosition = self.target:getPosition()
     local screenWidth, screenHeight = love.graphics.getDimensions()

@@ -68,6 +68,8 @@ function SaveManager:setSaveToSlot( savegame, slotNumber )
 
   savegame:setUsed( true )
 
+  savegame:setName( "SLOT " .. slotNumber )
+
   if ( slotNumber == 1 ) then
     self.slot1 = savegame
   elseif ( slotNumber == 2 ) then

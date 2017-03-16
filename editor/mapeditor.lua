@@ -598,7 +598,11 @@ function MapEditor:duplicateSelectedObjects( layerindex )
 
       local dp = self.allobjects[i].object:clone( self.allobjects[i].object:getName(), instancename )
 
-      dp:changePosition( Vec( 40, 40) )
+      if ( self.incModifier > 4 ) then
+        dp:changePosition( Vec( self.incModifier, self.incModifier ) )
+      else
+        dp:changePosition( Vec( 40, 40 ) )
+      end
 
       dp:setLayer( self.currentLayer )
 
@@ -1122,8 +1126,8 @@ function MapEditor:updateSelectFromLibrary( dt )
     local lx, ly = px + cx, py + cy
 
     if ( self.incModifier > 1 ) then
-      lx = floorfun( lx / self.incModifier ) * self.incModifier
-      ly = floorfun( ly / self.incModifier ) * self.incModifier
+      lx = floorfun( lx / self.incModifier ) * self.incModifier - self.incModifier
+      ly = floorfun( ly / self.incModifier ) * self.incModifier - self.incModifier
     end
 
     local instancename =  self.map:getNextGeneratedName()
@@ -1137,13 +1141,17 @@ function MapEditor:updateSelectFromLibrary( dt )
     else
       tolibrary = self.game:getObjectManager():loadObject( objectname, instancename, lx, ly )
 
-      self.map:addToLibrary( objectname, tolibrary )
+      if ( tolibrary ) then
+        self.map:addToLibrary( objectname, tolibrary )
 
-      instancename =  self.map:getNextGeneratedName()
+        instancename =  self.map:getNextGeneratedName()
 
-      object = tolibrary:clone( objectname, instancename )
+        object = tolibrary:clone( objectname, instancename )
 
-      object:setLayer( self.currentLayer )
+        object:setLayer( self.currentLayer )
+      else
+        self:setLastMessage( "Object not found: " .. objectname )
+      end
     end
 
     if ( object ) then

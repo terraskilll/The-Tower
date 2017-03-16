@@ -24,6 +24,9 @@ function MenuScreen:MenuScreen( theGame )
 
   self.inMainMenu = true
 
+  self.screenmusicname = "mainmenumusic"
+  self.music = nil
+
   self.mainMenu = UIGroup()
 
   local startButton = Button(0, 0, "NOVO JOGO", ib_uibutton1, 0.375)
@@ -122,11 +125,24 @@ function MenuScreen:MenuScreen( theGame )
 end
 
 function MenuScreen:onEnter()
+  local resname, restype, respath = self.game:getResourceManager():getResourceByName( self.screenmusicname )
+
+  if ( respath ) then
+    local music = self.game:getResourceManager():loadAudio( respath )
+
+    self.game:getAudioManager():addMusic( resname, music, tonumber( 0.3 ) )
+    self.game:getAudioManager():playMusic( resname )
+
+    self.music = music
+  end
+
   self.game:getCamera():setPosition(0, 0)
 end
 
 function MenuScreen:onExit()
-
+  if ( self.music ) then
+    self.game:getAudioManager():stopMusic( self.music )
+  end
 end
 
 function MenuScreen:onKeyPress(key, scancode, isrepeat)

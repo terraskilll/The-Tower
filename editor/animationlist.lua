@@ -3,7 +3,7 @@
 require("..engine.lclass")
 require("..engine.io.io")
 
-require("../editor/textinput")
+require("..editor.textinput")
 
 local allanimations = {}
 
@@ -14,8 +14,10 @@ local options = {
   "F1 - New Animation",
   "F2 - Edit Name",
   "F3 - Remove Animation",
-  "",
   "F4 - Edit Animation",
+  "",
+  "F6 - Auto Animator",
+  "",
   "F9 - Save",
   "F11 - Back",
   "",
@@ -38,13 +40,23 @@ function AnimationList:AnimationList( ownerEditor, thegame )
   self.inputMode = 0
   self.textInput = nil
 
+  self.renamed = {}
+
   self.animationEditor = nil
 
   self.tempData  = nil
+
+  self.autonames = {}
 end
 
 function AnimationList:save()
+  for i=1, #self.renamed do
+    self.game:getAnimationManager():renameAnimation( self.renamed[i].old, self.renamed[i].new )
+  end
+
   self.game:getAnimationManager():save( allanimations )
+
+  self.renamed = {}
 end
 
 function AnimationList:load()
@@ -57,7 +69,7 @@ function AnimationList:load()
 end
 
 function AnimationList:onEnter()
-  print("Entered AnimationList")
+  print( "Entered AnimationList" )
 
   self:load()
   self:refreshList()
@@ -67,9 +79,14 @@ function AnimationList:onExit()
 
 end
 
-function AnimationList:update(dt)
+function AnimationList:update( dt )
   if ( self.mode == 1 or self.mode == 2 ) then
     self:updateAddEdit( dt )
+    return
+  end
+
+  if ( self.mode == 5 ) then
+    self:updateAutoAnimation( dt )
     return
   end
 
@@ -89,7 +106,7 @@ function AnimationList:draw()
       self.animationEditor:draw()
   else
     for i = 1, #options do
-      love.graphics.print(options[i], 16, (i * 16) + 40)
+      love.graphics.print( options[i], 16, ( i * 16 ) + 40 )
     end
 
     self:drawAnimationList()
@@ -99,39 +116,44 @@ end
 
 function AnimationList:drawAnimationList()
 
-  love.graphics.setColor(0, 255, 100, 255)
-  love.graphics.print("Name", 200, 56)
-  --love.graphics.print("Engine Version", 500, 56)
-  love.graphics.setColor(glob.defaultColor)
+  love.graphics.setColor( 0, 255, 100, 255 )
+  love.graphics.print( "Name", 200, 56 )
+  love.graphics.setColor( glob.defaultColor )
 
-  if ( #allanimations == 0) then
+  if ( #allanimations == 0 ) then
     return
   end
 
-  love.graphics.setColor(255, 255, 255, 80)
-  love.graphics.rectangle("fill", 190, (self.selIndex * 16) + 56, 1000, 18)
-  love.graphics.setColor(glob.defaultColor)
+  love.graphics.setColor( 255, 255, 255, 80 )
+  love.graphics.rectangle( "fill", 190, ( self.selIndex * 16 ) + 56, 1000, 18 )
+  love.graphics.setColor( glob.defaultColor )
 
   for i = self.listStart, self.listEnd do
-    love.graphics.print(allanimations[i][1], 200, ( (i - self.listStart + 1) * 16) + 56)
-    --love.graphics.print(allanimations[i][2], 500, ( (i - self.listStart + 1) * 16) + 56)
+    love.graphics.print( allanimations[i][1], 200, ( ( i - self.listStart + 1 ) * 16 ) + 56 )
   end
 
 end
 
-function AnimationList:updateAddEdit(dt)
+function AnimationList:addToList( name, mode )
+  mode = mode or 1
+
+  self.tempData[1] = name
+
+  if ( mode == 1 ) then
+    table.insert( allanimations, self.tempData )
+  else
+    table.insert( self.renamed, { old = allanimations[self.selIndex][1], new = self.tempData[1] } )
+    allanimations[self.selIndex] = self.tempData
+  end
+
+end
+
+function AnimationList:updateAddEdit( dt )
   if ( self.textInput:isFinished() ) then
     self.inputMode = self.inputMode + 1
 
-    self.tempData[1] = self.textInput:getText()
-
     if ( self.inputMode == 2 ) then -- have everything
-
-      if ( self.mode == 1 ) then
-        table.insert( allanimations, self.tempData )
-      else
-        allanimations[self.selIndex] = self.tempData
-      end
+      self:addToList( self.textInput:getText(), self.mode )
 
       self.tempData  = nil
       self.inputMode = 0
@@ -143,6 +165,11 @@ function AnimationList:updateAddEdit(dt)
 
   end
 end
+
+function AnimationList:setAutoNames( autonameslist )
+  self.autonames = autonameslist
+end
+
 
 function AnimationList:onKeyPress( key, scancode, isrepeat )
   if ( self.mode == 1 or self.mode == 2 ) then
@@ -169,6 +196,10 @@ function AnimationList:onKeyPress( key, scancode, isrepeat )
 
   if ( key == "f4" ) then
     self:editSelected()
+  end
+
+  if ( key == "f6" ) then
+    self:openAutoAnimator()
   end
 
   if ( key == "pageup" ) then
@@ -282,6 +313,14 @@ function AnimationList:editSelected()
   self.animationEditor:onEnter()
 end
 
+function AnimationList:openAutoAnimator()
+  self.mode = 8
+
+  self.animationEditor = AutoAnimator( self, self.game )
+
+  self.animationEditor:onEnter()
+end
+
 function AnimationList:backFromEdit()
   self.animationEditor = nil
 end
@@ -320,7 +359,7 @@ function AnimationList:selectNext( steps )
     self.selIndex = 40
   end
 
-  if ( self.listEnd < self.selIndex) then
+  if ( self.listEnd < self.selIndex ) then
      self.selIndex = self.listEnd
   end
 end
@@ -328,7 +367,7 @@ end
 function AnimationList:listUp()
   self.pageIndex = self.pageIndex - 1
 
-  if (self.pageIndex == 0) then
+  if ( self.pageIndex == 0 ) then
     self.pageIndex = 1
   end
 
@@ -336,7 +375,7 @@ function AnimationList:listUp()
 
   self.listEnd = self.listStart + 40 - 1
 
-  if (self.listEnd > #allanimations) then
+  if ( self.listEnd > #allanimations ) then
     self.listEnd = #allanimations
   end
 end
@@ -344,15 +383,15 @@ end
 function AnimationList:listDown()
   self.pageIndex = self.pageIndex + 1
 
-  if (self.pageIndex > modfun(#allanimations, 40)) then
-    self.pageIndex = modfun(#allanimations, 40)
+  if ( self.pageIndex > modfun( #allanimations, 40 ) ) then
+    self.pageIndex = modfun( #allanimations, 40 )
   end
 
-  self.listStart = (self.pageIndex - 1) * 40 + 1
+  self.listStart = ( self.pageIndex - 1 ) * 40 + 1
 
   self.listEnd = self.listStart + 40
 
-  if (self.listEnd > #allanimations) then
+  if ( self.listEnd > #allanimations ) then
     self.listEnd = #allanimations
   end
 

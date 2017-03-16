@@ -16,6 +16,8 @@ require("..engine.savegame.savemanager")
 require("..engine.script.scriptmanager")
 require("..engine.ui.messagebox.messagebox")
 
+local Vec = require("..engine.math.vector")
+
 local config = {
   gameScreenWidth = 1280,
   gameScreenHeight = 720,
@@ -31,12 +33,14 @@ end
 function Game:update( dt )
   self.deltaTime = dt
 
+  self:beforeUpdate( dt )
+
   Input:update(dt)
 
 	self.currentScreen:update( dt )
   self.drawManager:update( dt ) --//TODO check is gets slow, skiplist is pending
 
-  self:postUpdate( dt )
+  self:afterUpdate( dt )
 end
 
 function Game:getDeltaTime()
@@ -118,11 +122,73 @@ function Game:unregisterAll()
 end
 
 function Game:destroy( gameobject )
-  --//TODO
   table.insert( self.deletedObjects , gameobject )
 end
 
-function Game:postUpdate( dt )
+function Game:addObject( objectname, areaname, positionx, positiony, layer )
+  table.insert( self.addedObjects, { name = objectname, areaname = areaname, positionx = positionx, positiony = positiony, layer = layer } )
+end
+
+function Game:createAndAddObject( objectname, areaname, positionx, positiony, layer )
+  local area = self.map:getAreaByName( areaname )
+
+  local instancename =  self.map:getNextGeneratedName()
+
+  local fromLibrary = self.map:getObjectFromLibrary ( objectname )
+
+  local object = nil
+
+  if ( fromLibrary ) then
+    object = fromLibrary:clone( objectname, instancename )
+  else
+    tolibrary = self:getObjectManager():loadObject( objectname, instancename, lx, ly )
+
+    if ( tolibrary ) then
+      self.map:addToLibrary( objectname, tolibrary )
+
+      instancename =  self.map:getNextGeneratedName()
+
+      object = tolibrary:clone( objectname, instancename )
+    else
+      self:setLastMessage( "Object not found: " .. objectname )
+    end
+  end
+
+  if ( object ) then
+    object:setLayer( layer )
+
+    object:setPosition( Vec( positionx, positiony ) )
+
+    area:addObject( object )
+
+    self:getDrawManager():addObject( object, layer )
+
+    self:addObject( object, true )
+
+    --//TODO set script if exists
+  end
+end
+
+function Game:addQueuedObjects()
+  for i = 1, #self.addedObjects do
+    self:createAndAddObject(
+        self.addedObjects[i].name,
+        self.addedObjects[i].areaname,
+        self.addedObjects[i].positionx,
+        self.addedObjects[i].positiony,
+        self.addedObjects[i].layer )
+  end
+
+  self.addedObjects = {}
+end
+
+function Game:beforeUpdate( dt )
+
+  self:addQueuedObjects()
+
+end
+
+function Game:afterUpdate( dt )
 
   --//TODO add more checks, test better
 
@@ -358,6 +424,7 @@ function Game:configure()
 
   self.gameobjects = {}
 
+  self.addedObjects   = {}
   self.deletedObjects = {}
 
   self.currentMap = nil

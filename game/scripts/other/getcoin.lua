@@ -18,7 +18,13 @@ collisionEnter = function ( caller, otherCollider )
     local objectHit = getGame():queryObjectByName( name )
 
     if  ( objectHit ) then
+      local posx, posy = objectHit:getPositionXY()
+
+      local layer = objectHit:getLayer()
+
       getGame():destroy( objectHit )
+
+      getGame():addObject( "coin", "mainarea", posx + 40, posy, layer )
     end
   end
 
