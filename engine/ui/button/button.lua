@@ -8,6 +8,7 @@ must be used with a buttongroup for menu management (focus and click)
 require("..engine.lclass")
 
 require("..engine.globalconf")
+require("..engine.colors")
 require("..engine.ui.anchor")
 
 local Vec = require("..engine.math.vector")
@@ -36,6 +37,8 @@ function Button:update(dt)
 end
 
 function Button:draw()
+  love.graphics.setColor( colors.WHITE )
+
   buttonShader:send( "uIsSelected", self.selected )
   buttonShader:send( "uIsEnabled", self.enabled )
 
@@ -61,7 +64,7 @@ function Button:drawText()
   end
 
   love.graphics.setColor( 255, 255, 255, a )
-  love.graphics.print(self.text, x + 96 * self.scale, y + 5 * self.scale )
+  love.graphics.print( self.text, x + 96 * self.scale, y + 5 * self.scale )
   love.graphics.setColor( 255, 255, 255, 255 )
 
   love.graphics.setNewFont( glob.defaultFontSize )

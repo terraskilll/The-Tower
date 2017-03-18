@@ -11,6 +11,8 @@ require("..game.actors.player.states.walkingstate")
 
 local Vec = require("..engine.math.vector")
 
+local i__me =  loadImage("res/_me.png") --//TODO temporary
+
 class "Player" ( "Actor" )
 
 function Player:Player( playerName, instName, positionX, positionY )

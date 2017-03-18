@@ -2,6 +2,7 @@
 
 require("..engine.lclass")
 require("..engine.globalconf")
+require("..engine.colors")
 
 class "BoundingBox"
 
@@ -24,7 +25,7 @@ function BoundingBox:draw()
     love.graphics.rectangle( "fill",
         self.positionX + self.offsetX, self.positionY + self.offsetY,
         self.width * self.scale, self.height * self.scale )
-    love.graphics.setColor(glob.defaultColor )
+    love.graphics.setColor(colors.WHITE )
 
   end
 end

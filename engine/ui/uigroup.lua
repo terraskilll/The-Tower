@@ -10,24 +10,32 @@ function UIGroup:UIGroup()
   self.items         = {}
   self.loopCount     = 0
   self.visible       = true
+
+  self.traversalmode = 1 -- horizontal
 end
 
-function UIGroup:update(dt)
+function UIGroup:update( dt )
   local keyVec = Input:getAxis()
 
-  if (keyVec.y == 0) then
+  local travvalue = keyVec.y
+
+  if ( self.traversalmode == 2 ) then
+    travvalue = keyVec.x
+  end
+
+  if ( travvalue == 0 ) then
     self.altDelay = 0.16
   else
     self.altDelay = self.altDelay + dt
 
     if ( self.altDelay >= 0.16 ) then
 
-      if ( keyVec.y == -1 ) then
+      if ( travvalue == -1 ) then
         self:selectPrevious()
         self.altDelay = 0
       end
 
-      if ( keyVec.y == 1 ) then
+      if ( travvalue == 1 ) then
         self:selectNext()
         self.altDelay = 0
       end
@@ -35,20 +43,30 @@ function UIGroup:update(dt)
     end
   end
 
-  self:updateComponents(dt)
+  self:updateComponents( dt )
 end
 
-function UIGroup:updateComponents(dt)
-  for _,comp in ipairs(self.items) do
+function UIGroup:setTraversalMode( traversalmode )
+  traversalmode = traversalmode or 1
+
+  if ( traversalmode < 1 or traversalmode > 2 ) then
+    traversalmode = 1
+  end
+
+  self.traversalmode = traversalmode
+end
+
+function UIGroup:updateComponents( dt )
+  for _,comp in ipairs( self.items ) do
     comp:update(dt)
   end
 end
 
-function UIGroup:keyPressed(key, sender)
+function UIGroup:keyPressed( key, sender )
 
   if ( key == "return" or key == "kpenter" ) then
     if ( self.items[self.selectedIndex].onClick ) then
-      self.items[self.selectedIndex]:onClick(sender)
+      self.items[self.selectedIndex]:onClick( sender )
     end
   end
 
@@ -60,16 +78,15 @@ function UIGroup:keyPressed(key, sender)
 
 end
 
-function UIGroup:addButton(button)
-  table.insert(self.items, button)
+function UIGroup:addButton( button )
+  table.insert( self.items, button )
 
-  if (#self.items == 1) then
+  if ( #self.items == 1 ) then
     self:selectFirst()
   end
-
 end
 
-function UIGroup:setVisible(isVisible)
+function UIGroup:setVisible( isVisible )
   self.visible = isVisible
 end
 
@@ -79,7 +96,7 @@ function UIGroup:selectFirst()
   self:desselectAll()
 
   if ( self.items[self.selectedIndex]:isEnabled() ) then
-    self.items[self.selectedIndex]:setSelected(true)
+    self.items[self.selectedIndex]:setSelected( true )
     self.loopCount = 0
   else
     self:checkLoop(1)
@@ -89,7 +106,7 @@ end
 function UIGroup:selectNext()
   self.selectedIndex = self.selectedIndex + 1
 
-  if (self.selectedIndex > #self.items) then
+  if ( self.selectedIndex > #self.items ) then
     self.selectedIndex = 1
   end
 
@@ -130,7 +147,7 @@ function UIGroup:checkLoop( whereToGo )
     -- there is enabled buttons
     if ( self.loopCount < #self.items ) then
 
-      if (whereToGo == 1) then
+      if ( whereToGo == 1 ) then
         self:selectNext()
       else
         self:selectPrevious()

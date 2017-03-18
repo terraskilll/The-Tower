@@ -74,7 +74,7 @@ function GamePlayEditor:draw()
   love.graphics.print( "First Map : ", 200, 50 )
   love.graphics.print( "First Area : ", 200, 70 )
   love.graphics.print( "First Spawn Point :", 200, 90 )
-  love.graphics.setColor( glob.defaultColor )
+  love.graphics.setColor( colors.WHITE )
 
   love.graphics.print( self.gamedata.startmap, 350, 50 )
   love.graphics.print( self.gamedata.startarea, 350, 70 )

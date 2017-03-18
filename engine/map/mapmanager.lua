@@ -67,6 +67,15 @@ function MapManager:loadMap( mapName, mapFileName )
   local library   = mapdata.library
   local areas     = mapdata.areas
 
+  --- SCRIPT ---
+  if ( mapdata.scriptname ) then
+    local scname, scpath = self.game:getScriptManager():getScriptByName( mapdata.scriptname, true )
+
+    if ( scpath ) then
+      map:setScript( scname, scpath )
+    end
+  end
+
   --- MUSIC ---
   if ( musicdata ) then
     map:setBackgroundMusicResource( musicdata.name, musicdata.volume )
@@ -243,11 +252,12 @@ function MapManager:saveMap( mapName, mapFileName, map )
   end
 
   local mapdata = {
-    nameindex = map:getNameIndex(),
-    musicdata = map:getBackgroundMusicData(),
-    layers    = layers,
-    library   = library,
-    areas     = areas
+    nameindex  = map:getNameIndex(),
+    musicdata  = map:getBackgroundMusicData(),
+    scriptname = map:getScript(),
+    layers     = layers,
+    library    = library,
+    areas      = areas
   }
 
   table.insert( mapdata, libr )

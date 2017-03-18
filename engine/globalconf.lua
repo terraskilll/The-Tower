@@ -1,8 +1,8 @@
 
 glob = {
-  engineVersion   = 150, --//TODO note: change this at each commit
+  engineVersion   = 160, --//TODO note: change this at each commit
   defaultFontSize = 12,
-  defaultColor    = {255,255,255,255},
+  whiteColor      = { 255, 255, 255, 255 },
 
   --//TODO revisit default configurations
   devMode = {

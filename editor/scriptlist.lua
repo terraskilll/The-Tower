@@ -89,11 +89,11 @@ function ScriptList:drawScriptList()
   love.graphics.setColor( 0, 255, 100, 255 )
   love.graphics.print( "Name", 200, 56 )
   love.graphics.print( "File", 500, 56 )
-  love.graphics.setColor( glob.defaultColor )
+  love.graphics.setColor( colors.WHITE )
 
   love.graphics.setColor( 255, 255, 255, 80 )
   love.graphics.rectangle( "fill", 190, (self.selIndex * 16) + 56, 1000, 18 )
-  love.graphics.setColor( glob.defaultColor )
+  love.graphics.setColor( colors.WHITE )
 
   if ( #allscripts == 0 ) then
     return

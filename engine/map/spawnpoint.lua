@@ -42,6 +42,6 @@ function SpawnPoint:draw()
     love.graphics.line( self.position.x - 10, self.position.y, self.position.x, self.position.y - 10)
     love.graphics.line( self.position.x + 10, self.position.y, self.position.x, self.position.y - 10)
 
-    love.graphics.setColor(glob.defaultColor)
+    love.graphics.setColor(colors.WHITE)
   end
 end

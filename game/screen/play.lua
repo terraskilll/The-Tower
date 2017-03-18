@@ -2,6 +2,7 @@ require("..engine.lclass")
 
 require("..engine.input")
 require("..engine.ui.uigroup")
+require("..engine.ui.uires")
 require("..engine.ui.button.button")
 require("..engine.screen.screen")
 require("..engine.gameobject.gameobject")
@@ -145,15 +146,15 @@ end
 function PlayScreen:createMenu()
   self.pauseMenu = UIGroup()
 
-  local continueButton = Button( 0, 0, "CONTINUAR", ib_uibutton1, 0.375 )
+  local continueButton = Button( 0, 0, "CONTINUAR", ib_red1, 0.375 )
   continueButton:setAnchor( 4, 15, 185 )
   continueButton.onButtonClick = self.continueButtonClick
 
-  local saveButton = Button( 0, 0, "SALVAR", ib_uibutton1, 0.375 )
+  local saveButton = Button( 0, 0, "SALVAR", ib_red1, 0.375 )
   saveButton:setAnchor( 4, 15, 130 )
   saveButton.onButtonClick = self.saveButtonClick
 
-  local exitButton = Button( 0, 0, "SAIR", ib_uibutton1, 0.375 )
+  local exitButton = Button( 0, 0, "SAIR", ib_red1, 0.375 )
   exitButton:setAnchor( 4, 15, 75 )
   exitButton.onButtonClick = self.exitButtonClick
 

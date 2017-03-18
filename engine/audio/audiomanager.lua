@@ -61,10 +61,14 @@ function AudioManager:addSound( soundName, audioToAdd, volume )
     volume = 1
   end
 
-  self.sounds[soundName] = { audio = audioToAdd, volume = volume }
+  if ( self.sounds[soundName] ) then
+    self.sounds[soundName].volume = volume
+  else
+    self.sounds[soundName] = { audio = audioToAdd, volume = volume }
+  end
 end
 
-function AudioManager:changeMusicVolume( soundName, newVolume )
+function AudioManager:changeSoundVolume( soundName, newVolume )
   newVolume = newVolume or self.sfxVolume
 
   if ( newVolume > 1 ) then
@@ -75,6 +79,7 @@ function AudioManager:changeMusicVolume( soundName, newVolume )
 end
 
 function AudioManager:playSound( soundName, volume )
-  self.sounds[soundName].audio:setVolume( self.sounds[soundName].volume )
+  volume = volume or self.sounds[soundName].volume
+  self.sounds[soundName].audio:setVolume( volume )
   love.audio.play( self.sounds[soundName].audio )
 end

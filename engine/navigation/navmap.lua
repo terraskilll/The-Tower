@@ -16,6 +16,7 @@ WISHLIST: use threads for parallel A star search
 require("..engine.lclass")
 
 require("..engine.globalconf")
+require("..engine.colors")
 
 local Vec = require("..engine.math.vector")
 

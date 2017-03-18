@@ -15,10 +15,10 @@ function ObjectSelector:ObjectSelector( )
   self.listEnd   = 1
 
   self.menu = UIGroup()
-  local addButton = Button( 0, 0, "+", ib_uibutton2, 0.4 )
+  local addButton = Button( 0, 0, "+", ib_green2, 0.4 )
   addButton:setAnchor( 4, 2, 2 )
 
-  local delButton = Button( 0, 0, "-", ib_uibutton2, 0.4 )
+  local delButton = Button( 0, 0, "-", ib_green2, 0.4 )
   delButton:setAnchor( 4, 100, 2 )
   --exitButton.onButtonClick = self.exitButtonClick
 
@@ -39,7 +39,7 @@ function ObjectSelector:draw()
 
   love.graphics.rectangle( "fill", 0, 0, 200, 720 )
 
-  love.graphics.setColor( glob.defaultColor )
+  love.graphics.setColor( colors.WHITE )
 
   self.menu:draw()
 

@@ -139,7 +139,7 @@ function AnimationEditor:drawEditing()
 
   self.game:getCamera():unset()
 
-  love.graphics.setColor( glob.defaultColor )
+  love.graphics.setColor( colors.WHITE )
 
   for i = 1, #generalOptions do
     love.graphics.print( generalOptions[i], 1000, (i * 16) )

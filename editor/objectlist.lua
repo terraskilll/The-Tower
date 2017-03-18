@@ -102,7 +102,7 @@ function ObjectList:drawObjectList()
 
   love.graphics.setColor(0, 255, 100, 255)
   love.graphics.print("Name", 200, 56)
-  love.graphics.setColor(glob.defaultColor)
+  love.graphics.setColor(colors.WHITE)
 
   if ( #allObjects == 0) then
     return
@@ -110,7 +110,7 @@ function ObjectList:drawObjectList()
 
   love.graphics.setColor(255, 255, 255, 80)
   love.graphics.rectangle("fill", 190, (self.selIndex * 16) + 56, 1000, 18)
-  love.graphics.setColor(glob.defaultColor)
+  love.graphics.setColor(colors.WHITE)
 
   for i = self.listStart, self.listEnd do
     love.graphics.print(allObjects[i][1], 200, ( (i - self.listStart + 1) * 16) + 56)

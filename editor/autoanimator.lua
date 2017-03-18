@@ -160,7 +160,7 @@ function AutoAnimator:drawEditing()
   -- anim data ---
   love.graphics.setColor( 100, 255, 100 )
   love.graphics.print( " * * Parameters * * ", 10, 640 )
-  love.graphics.setColor( glob.defaultColor )
+  love.graphics.setColor( colors.WHITE )
   love.graphics.print( "Base Name: " .. self.animdata.basename, 10, 660 )
   love.graphics.print( "Anim. Count: " .. self.animdata.animcount, 10, 690 )
 

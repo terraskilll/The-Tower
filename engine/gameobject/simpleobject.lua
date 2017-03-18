@@ -40,7 +40,9 @@ function SimpleObject:SimpleObject( objectName, instName, positionX, positionY, 
   self.boundingbox = nil
   self.navbox      = nil
 
-  self.scriptname = nil
+  self.scriptname   = nil
+  self.scriptpath   = nil
+  self.scriptloaded = false
 
   self.scriptupdate = nil
 end

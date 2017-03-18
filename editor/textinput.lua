@@ -15,7 +15,7 @@ function TextInput:draw()
 
   love.graphics.setColor(0, 255, 100, 255)
   love.graphics.print(self.caption, 20, 20)
-  love.graphics.setColor(glob.defaultColor)
+  love.graphics.setColor(colors.WHITE)
 
   love.graphics.print(self.text, 20, 40)
 end

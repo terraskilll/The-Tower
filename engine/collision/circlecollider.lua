@@ -1,6 +1,7 @@
 require("..engine.lclass")
 
 require("..engine.globalconf")
+require("..engine.colors")
 
 class "CircleCollider"
 
@@ -55,7 +56,7 @@ function CircleCollider:draw()
       self.positionY + self.offsetY * self.scale,
       self.radius * self.scale)
 
-    love.graphics.setColor( glob.defaultColor )
+    love.graphics.setColor( colors.WHITE )
   end
 end
 

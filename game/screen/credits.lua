@@ -14,7 +14,7 @@ function CreditsScreen:CreditsScreen( theGame )
 
   self.menu = UIGroup()
 
-  local exitButton = Button(0, 0, "SAIR", ib_uibutton1, 0.375)
+  local exitButton = Button(0, 0, "SAIR", ib_red1, 0.375)
   exitButton:setAnchor(4, 15, 20)
   exitButton.onButtonClick = self.exitButtonClick
 

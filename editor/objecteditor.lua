@@ -114,7 +114,7 @@ function ObjectEditor:draw()
   love.graphics.line( 299, 0, 299, 2000 )
   love.graphics.line( 299, 99, 2000, 99 )
 
-  love.graphics.setColor( glob.defaultColor )
+  love.graphics.setColor( colors.WHITE )
 
   self:drawObject()
 end
@@ -135,7 +135,7 @@ function ObjectEditor:drawObject()
 
       love.graphics.setColor( 255, 100, 100, 200 )
       love.graphics.rectangle( "line", x, y, w, h )
-      love.graphics.setColor( glob.defaultColor )
+      love.graphics.setColor( colors.WHITE )
     else
       love.graphics.draw( self.image, 0, 0, 0, self.object.scale, self.object.scale )
     end

@@ -13,7 +13,8 @@ owner to another (a player walking into another area, for example)
 
 require("..engine.lclass")
 require("..engine.globalconf")
-require("..engine.utl/funcs")
+require("..engine.utl.funcs")
+require("..engine.colors")
 
 local Vec = require("..engine.math.vector")
 
@@ -59,7 +60,7 @@ function NavMesh:draw()
     love.graphics.line( self.bounds[3], self.bounds[2], self.bounds[3], self.bounds[4] )
     love.graphics.line( self.bounds[1], self.bounds[4], self.bounds[3], self.bounds[4] )
 
-    love.graphics.setColor( glob.defaultColor )
+    love.graphics.setColor( colors.WHITE )
   end
 end
 

@@ -12,7 +12,8 @@ function SaveGame:SaveGame( savename )
   self.description = nil
   self.used        = false
 
-  self.items = {}
+  self.items     = {}
+  self.eventkeys = {}
 end
 
 function SaveGame:getName()
@@ -63,12 +64,72 @@ function SaveGame:isUsed()
   return self.used
 end
 
+----- ITEM STORAGING -----
+
 function SaveGame:addItem( itemname, ammount )
   table.insert( self.items, { name = itemname, ammount = ammount } )
 end
 
+function SaveGame:getItem( itemname )
+  local index = 0
+
+  for i = 1, #self.items do
+    if ( self.items[i].name == itemname ) then
+      index = i
+    end
+  end
+
+  if ( index > 0 ) then
+    return index, self.items[index].name, self.items[index].ammount
+  else
+    return 0, nil, nil
+  end
+end
+
+function SaveGame:removeItem( itemname )
+  local index = self:getItem( itemname )
+
+  if ( index > 0 ) then
+    table.remove( self.items, index )
+  end
+end
+
 function SaveGame:clearItems()
   self.items = {}
+end
+
+----- EVENT KEYS FOR MAPS AND SO ON -----
+
+function SaveGame:addEventKey( eventname, keyvalue )
+  table.insert( self.eventkeys, { eventname = eventname, keyvalue = keyvalue } )
+end
+
+function SaveGame:getEventKey( eventname )
+  local index = 0
+
+  for i = 1, #self.eventkeys do
+    if ( self.eventkeys[i].eventname == eventname ) then
+      index = i
+    end
+  end
+
+  if ( index > 0 ) then
+    return index, self.eventkeys[index].eventname, self.eventkeys[index].keyvalue
+  else
+    return 0, nil, nil
+  end
+end
+
+function SaveGame:removeEventKey( eventname )
+  local index = self:getEventKey( eventname )
+
+  if ( index > 0 ) then
+    table.remove( self.eventkeys, index )
+  end
+end
+
+function SaveGame:clearEventKeys()
+  self.eventkeys = {}
 end
 
 --------------------------------------------------------------------------------
@@ -78,7 +139,8 @@ function SaveGame:save()
     areaname    = self.areaname,
     spawnname   = self.spawnname,
     description = self.description,
-    items       = self.items
+    items       = self.items,
+    eventkeys   = self.eventkeys
   }
 
   if ( self.used ) then
@@ -100,6 +162,7 @@ function SaveGame:load()
     self.description = data.description
     self.used        = data.used == 1
     self.items       = data.items
+    self.eventkeys   = data.eventkeys
 
     return true
   else
@@ -108,6 +171,8 @@ function SaveGame:load()
     self.spawnname   = nil
     self.description = nil
     self.used        = false
+    self.items       = {}
+    self.eventkeys   = {}
 
     return false
   end

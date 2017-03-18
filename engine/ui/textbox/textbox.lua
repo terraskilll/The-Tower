@@ -6,8 +6,9 @@ simple textbox class for ui
 ------------------------------------------------------------------------------]]--
 
 require("..engine.globalconf")
+require("..engine.colors")
 require("..engine.lclass")
-require("..engine.ui/anchor")
+require("..engine.ui.anchor")
 
 local Vec = require("..engine.math.vector")
 

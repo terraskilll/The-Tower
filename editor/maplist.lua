@@ -17,6 +17,8 @@ local options = {
   "",
   "F4 - Edit Map",
   "",
+  "Ctrl + J - Set Map Script",
+  "",
   "F9 - Save List",
   "F11 - Back",
   "",
@@ -46,7 +48,6 @@ end
 
 function MapList:save()
   self.game:getMapManager():saveList( allmaps )
-
 end
 
 function MapList:load()
@@ -65,7 +66,7 @@ function MapList:onExit()
 end
 
 function MapList:update(dt)
-  if ( self.mode == 1 or self.mode == 2 ) then
+  if ( self.mode == 1 or self.mode == 2 or self.mode == 7 ) then
     self:updateAddEdit( dt )
     return
   end
@@ -100,7 +101,7 @@ function MapList:drawMapList()
   love.graphics.print( "Name", 200, 56 )
   love.graphics.print( "File", 500, 56 )
   love.graphics.print( "Engine Version", 800, 56 )
-  love.graphics.setColor( glob.defaultColor )
+  love.graphics.setColor( colors.WHITE )
 
   if ( #allmaps == 0) then
     return
@@ -108,7 +109,7 @@ function MapList:drawMapList()
 
   love.graphics.setColor( 255, 255, 255, 80 )
   love.graphics.rectangle( "fill", 190, ( self.selIndex * 16 ) + 56, 1000, 18 )
-  love.graphics.setColor( glob.defaultColor )
+  love.graphics.setColor( colors.WHITE )
 
   for i = self.listStart, self.listEnd do
     love.graphics.print( allmaps[i][1], 200, ( ( i - self.listStart + 1 ) * 16) + 56 )
@@ -121,34 +122,64 @@ end
 function MapList:updateAddEdit(dt)
   if ( self.textInput:isFinished() ) then
 
-    self.tempData[self.inputMode] = self.textInput:getText()
-
-    self.inputMode = self.inputMode + 1
-
-    self.textInput = TextInput( "File Name: " )
-
-    if ( self.inputMode == 3 ) then -- have everything
-      self.tempData[3] = glob.engineVersion
-
-      if ( self.mode == 1 ) then
-        table.insert( allmaps, self.tempData )
-      else
-        allmaps[self.selIndex] = self.tempData
-      end
-
-      self.tempData  = nil
-      self.inputMode = 0
-      self.mode      = 0
-      self.textInput = nil
-
-      self:refreshList()
+    if ( self.mode == 7 ) then
+      self:setScript( self.textInput:getText() )
+    else
+      self:setMapData( self.textInput:getText() )
     end
 
   end
 end
 
+function MapList:setScript( scriptname )
+  local scname, scpath = self.game:getScriptManager():getScriptByName( scriptname, true )
+
+  if ( scpath ) then
+    local map = self.game:getMapManager():loadMap( allmaps[self.selIndex][1], allmaps[self.selIndex][2] )
+
+    if ( map ) then
+      map:setScript( scname, scpath )
+      self.game:getMapManager():saveMap( allmaps[self.selIndex][1], allmaps[self.selIndex][2], map )
+    end
+  else
+    print("Script not found")
+  end
+
+  self.tempData  = nil
+  self.inputMode = 0
+  self.mode      = 0
+  self.textInput = nil
+
+  self:refreshList()
+end
+
+function MapList:setMapData( str )
+  self.tempData[self.inputMode] = str
+
+  self.inputMode = self.inputMode + 1
+
+  self.textInput = TextInput( "File Name: " )
+
+  if ( self.inputMode == 3 ) then -- have everything
+    self.tempData[3] = glob.engineVersion
+
+    if ( self.mode == 1 ) then
+      table.insert( allmaps, self.tempData )
+    else
+      allmaps[self.selIndex] = self.tempData
+    end
+
+    self.tempData  = nil
+    self.inputMode = 0
+    self.mode      = 0
+    self.textInput = nil
+
+    self:refreshList()
+  end
+end
+
 function MapList:onKeyPress( key, scancode, isrepeat )
-  if ( self.mode == 1 or self.mode == 2 ) then
+  if ( self.mode == 1 or self.mode == 2 or self.mode == 7 ) then
     self.textInput:keypressed( key )
     return
   end
@@ -172,6 +203,10 @@ function MapList:onKeyPress( key, scancode, isrepeat )
 
   if ( key == "f4" ) then
     self:editSelected()
+  end
+
+  if ( ( key == "j" ) and ( Input:isKeyDown("lctrl") ) ) then
+    self:setScriptMode()
   end
 
   if ( key == "pageup" ) then
@@ -273,6 +308,13 @@ function MapList:editMode()
   self.mode      = 2
   self.inputMode = 1
   self.textInput = TextInput( "Map Name:", allmaps[self.selIndex][1] )
+end
+
+function MapList:setScriptMode()
+  self.tempData  = {}
+  self.mode      = 7
+  self.inputMode = 1
+  self.textInput = TextInput( "Script Name:" )
 end
 
 function MapList:editSelected()

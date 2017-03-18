@@ -6,6 +6,7 @@ must be used with a buttongroup for menu management (focus and click)
 
 ------------------------------------------------------------------------------]]--
 require("..engine.globalconf")
+require("..engine.colors")
 require("..engine.lclass")
 require("..engine.ui.anchor")
 

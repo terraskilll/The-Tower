@@ -183,7 +183,7 @@ function MapEditor:draw()
 
   self.game:getCamera():unset()
 
-  love.graphics.setColor( glob.defaultColor )
+  love.graphics.setColor( colors.WHITE )
 
   for i = 1, #generalOptions do
     love.graphics.print( generalOptions[i], 1050, (i * 16) )
@@ -1363,7 +1363,7 @@ function MapEditor:drawGrid()
     love.graphics.line( -10000, i, 10000, i )
   end
 
-  love.graphics.setColor( glob.defaultColor )
+  love.graphics.setColor( colors.WHITE )
 end
 
 function MapEditor:updateNavMesh( dt )
@@ -1534,7 +1534,7 @@ end
 function MapEditor:drawLastMessage()
   love.graphics.setColor( 225, 175, 255, 255 )
   love.graphics.print( "# # " .. self.lastMessage .. " # #", 10, 700 )
-  love.graphics.setColor( glob.defaultColor )
+  love.graphics.setColor( colors.WHITE )
 end
 
 function MapEditor:drawHelp()

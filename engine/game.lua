@@ -3,6 +3,7 @@ require("..engine.lclass")
 require("..engine.input")
 require("..engine.io.io")
 require("..engine.globalconf")
+require("..engine.colors")
 require("..engine.camera.camera")
 require("..engine.resourcemanager")
 require("..engine.audio.audiomanager")
@@ -13,6 +14,7 @@ require("..engine.animation.animationmanager")
 require("..engine.map.mapmanager")
 require("..engine.savegame.savegame")
 require("..engine.savegame.savemanager")
+require("..engine.inventory.inventory")
 require("..engine.script.scriptmanager")
 require("..engine.ui.messagebox.messagebox")
 
@@ -249,6 +251,10 @@ function Game:getScriptManager()
   return self.scriptManager
 end
 
+function Game:getInventory()
+  return self.inventory
+end
+
 function Game:getCamera()
   return  self.camera
 end
@@ -367,9 +373,13 @@ function Game:changeMap( newMapName, newAreaName, newSpawnName )
 
   self:getPlayer():setMap( self.map, area, spawn )
   self:getDrawManager():addObject( self:getPlayer(), spawn:getLayer() )
+
+  self.map:onEnter()
 end
 
 function Game:loadMapFoSaveGame( savegame )
+  --//TODO use changemap function
+
   self.map = self:loadMap( nil, savegame:getMapName() )
 
   local area = self.map:getAreaByName( savegame:getAreaName() )
@@ -379,6 +389,8 @@ function Game:loadMapFoSaveGame( savegame )
   self:getPlayer():setMap( self.map, area, spawn )
 
   self:getDrawManager():addObject( self:getPlayer(), spawn:getLayer() )
+
+  self.map:onEnter()
 end
 
 function Game:updateMap( dt )
@@ -386,6 +398,8 @@ function Game:updateMap( dt )
 end
 
 function Game:unloadMap()
+  self.map:unloadScript()
+
   self.map = nil
 end
 
@@ -466,6 +480,9 @@ function Game:configure()
   self.scriptManager:load()
 
   self.collisionManager = CollisionManager()
+
+  self.inventory = Inventory()
+  self.inventory:reset()
 
   self.camera = Camera()
   self.camera:setScale( ww / 1280, wh / 720 ) -- old version

@@ -28,6 +28,10 @@ function Map:Map( mapName, mapFile )
   self.movingObjects = {}
 
   self.musicResource = {}
+
+  self.scriptname   = nil
+  self.scriptpath   = nil
+  self.scriptloaded = false
 end
 
 function Map:getName()
@@ -36,6 +40,14 @@ end
 
 function Map:getFileName()
   return self.file
+end
+
+function Map:onEnter()
+  self:loadScript()
+
+  if ( self.mapOnEnter ) then
+    self:mapOnEnter()
+  end
 end
 
 function Map:update( dt )
@@ -232,4 +244,36 @@ function Map:checkChangedNavMesh( objectPosition, objectMovement )
   end
 
   return nav
+end
+
+function Map:setScript( scriptName, scriptPath )
+
+  if ( scriptName == nil or scriptName == "" ) then
+    self.scriptname = nil
+    self.scriptpath = nil
+  else
+    self.scriptname = scriptName
+    self.scriptpath = scriptPath
+  end
+
+end
+
+function Map:getScript()
+  return self.scriptname, self.scriptpath
+end
+
+function Map:loadScript()
+  if ( self.scriptpath ) then
+    local script = require( self.scriptpath )
+    scriptsetup( self )
+
+    self.scriptloaded = true
+  end
+
+end
+
+function Map:unloadScript()
+  if ( self.scriptloaded ) then
+    package.loaded[self.scriptpath] = nil
+  end
 end

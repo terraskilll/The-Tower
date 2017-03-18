@@ -18,21 +18,10 @@ i_char = love.graphics.newImage("res/char.png")
 i_box = love.graphics.newImage("res/box.png")
 
 -------------------------------------------------------------------------------
--- button images
--------------------------------------------------------------------------------
-
-ib_uibutton1 = loadImage("res/ui/uibutton1.png")
-
-ib_uibutton2 = loadImage("res/ui/uibutton2.png")
-
--------------------------------------------------------------------------------
 -- others stuff
 -------------------------------------------------------------------------------
 
-
 i_deffloor = loadImage("res/floor/floor1.png")
-
-i__me = loadImage("res/_me.png") --//TODO temporary
 
 i__spid = loadImage("res/_spid.png") --//TODO temporary
 

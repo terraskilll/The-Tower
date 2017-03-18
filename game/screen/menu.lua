@@ -3,9 +3,11 @@ require("..engine.lclass")
 require("..editor.editor")
 
 require("..engine.input")
+require("..engine.ui.uires")
 require("..engine.ui.uigroup")
 require("..engine.ui.button.button")
 require("..engine.ui.selector.selector")
+require("..engine.ui.dialogs.confirmdialog")
 require("..engine.screen.screen")
 require("..engine.light.light")
 require("..engine.gameobject.gameobject")
@@ -17,6 +19,9 @@ require("..game.screen.play")
 
 class "MenuScreen" ("Screen")
 
+local localslotnumber = 0
+local selectedslotnumber = 0
+
 local mapShader = love.graphics.newShader( "engine/shaders/simplenormal.glsl" )
 
 function MenuScreen:MenuScreen( theGame )
@@ -27,23 +32,31 @@ function MenuScreen:MenuScreen( theGame )
   self.screenmusicname = "mainmenumusic"
   self.music = nil
 
+  --- ---
+
+  self.confirmDialog = nil
+
+  self.continue = false
+
+  --- menus ---
+
   self.mainMenu = UIGroup()
 
-  local startButton = Button(0, 0, "NOVO JOGO", ib_uibutton1, 0.375)
-  startButton:setAnchor(4, 15, 185)
+  local startButton = Button( 0, 0, "NOVO JOGO", ib_red1, 0.375 )
+  startButton:setAnchor( 4, 15, 185 )
   startButton.onButtonClick = self.startButtonClick
 
-  local continueButton = Button(0, 0, "CONTINUAR", ib_uibutton1, 0.375)
+  local continueButton = Button( 0, 0, "CONTINUAR", ib_red1, 0.375 )
   continueButton:setEnabled( self.game:getSaveManager():usedSlots() > 0 )
-  continueButton:setAnchor(4, 15, 130)
+  continueButton:setAnchor( 4, 15, 130 )
   continueButton.onButtonClick = self.continueButtonClick
 
-  local optionsButton = Button(0, 0, "OPÇÕES", ib_uibutton1, 0.375)
-  optionsButton:setAnchor(4, 15, 75)
+  local optionsButton = Button( 0, 0, "OPÇÕES", ib_red1, 0.375 )
+  optionsButton:setAnchor( 4, 15, 75 )
   optionsButton.onButtonClick = self.optionsButtonClick
 
-  local exitButton = Button(0, 0, "SAIR", ib_uibutton1, 0.375)
-  exitButton:setAnchor(4, 15, 20)
+  local exitButton = Button( 0, 0, "SAIR", ib_red1, 0.375 )
+  exitButton:setAnchor( 4, 15, 20 )
   exitButton.onButtonClick = self.exitButtonClick
 
   self.mainMenu:addButton( startButton )
@@ -55,7 +68,7 @@ function MenuScreen:MenuScreen( theGame )
 
   self.configMenu = UIGroup()
 
-  self.resolutionChange = Selector( 0, 0, "RESOLUÇÃO", ib_uibutton1, 0.375 )
+  self.resolutionChange = Selector( 0, 0, "RESOLUÇÃO", ib_red1, 0.375 )
   self.resolutionChange:setAnchor( 4, 15, 240 )
 
   self.resolutionChange:addOption( "1024 x 768", {1024, 768} )
@@ -67,7 +80,7 @@ function MenuScreen:MenuScreen( theGame )
   self.resolutionChange:setDefaultOptionIndex(2)
   self.resolutionChange.onSelectorChange  = self.selectorOnChange
 
-  self.fullscreenMode = Selector( 0, 0, "TELA CHEIA", ib_uibutton1, 0.375 )
+  self.fullscreenMode = Selector( 0, 0, "TELA CHEIA", ib_red1, 0.375 )
   self.fullscreenMode:setAnchor( 4, 15, 185 )
   self.fullscreenMode:addOption( "SIM", true )
   self.fullscreenMode:addOption( "NÃO", false )
@@ -75,16 +88,16 @@ function MenuScreen:MenuScreen( theGame )
   self.fullscreenMode:setDefaultOptionIndex( 2 )
   self.fullscreenMode.onSelectorChange  = self.selectorOnChange
 
-  self.applyOptionsButton = Button( 0, 0, "APLICAR", ib_uibutton1, 0.375 )
+  self.applyOptionsButton = Button( 0, 0, "APLICAR", ib_red1, 0.375 )
   self.applyOptionsButton:setEnabled( false )
   self.applyOptionsButton:setAnchor( 4, 15, 130 )
   self.applyOptionsButton.onButtonClick = self.applyOptionsButtonClick
 
-  self.creditsButton = Button( 0, 0, "CRÉDITOS", ib_uibutton1, 0.375 )
+  self.creditsButton = Button( 0, 0, "CRÉDITOS", ib_red1, 0.375 )
   self.creditsButton:setAnchor( 4, 15, 75)
   self.creditsButton.onButtonClick = self.creditsButtonClick
 
-  self.exitOptionsButton = Button( 0, 0, "VOLTAR", ib_uibutton1, 0.375 )
+  self.exitOptionsButton = Button( 0, 0, "VOLTAR", ib_red1, 0.375 )
   self.exitOptionsButton:setAnchor( 4, 15, 20 )
   self.exitOptionsButton.onButtonClick = self.exitOptionsButtonClick
 
@@ -98,19 +111,19 @@ function MenuScreen:MenuScreen( theGame )
 
   self.selectSlotMenu = UIGroup()
 
-  self.slot1Button = Button( 0, 0, "SLOT 1", ib_uibutton1, 0.375 )
+  self.slot1Button = Button( 0, 0, "SLOT 1", ib_red1, 0.375 )
   self.slot1Button:setAnchor( 4, 15, 240 )
   self.slot1Button.onButtonClick = self.slot1ButtonClick
 
-  self.slot2Button = Button( 0, 0, "SLOT 2", ib_uibutton1, 0.375 )
+  self.slot2Button = Button( 0, 0, "SLOT 2", ib_red1, 0.375 )
   self.slot2Button:setAnchor( 4, 15, 185 )
   self.slot2Button.onButtonClick = self.slot2ButtonClick
 
-  self.slot3Button = Button( 0, 0, "SLOT 3", ib_uibutton1, 0.375 )
+  self.slot3Button = Button( 0, 0, "SLOT 3", ib_red1, 0.375 )
   self.slot3Button:setAnchor( 4, 15, 130 )
   self.slot3Button.onButtonClick = self.slot3ButtonClick
 
-  local exitSelectSlotButton = Button( 0, 0, "VOLTAR", ib_uibutton1, 0.375 )
+  local exitSelectSlotButton = Button( 0, 0, "VOLTAR", ib_red1, 0.375 )
   exitSelectSlotButton:setAnchor( 4, 15, 20 )
   exitSelectSlotButton.onButtonClick = self.exitSelectSlotButtonClick
 
@@ -136,6 +149,8 @@ function MenuScreen:onEnter()
     self.music = music
   end
 
+  self.continue = false
+
   self.game:getCamera():setPosition(0, 0)
 end
 
@@ -148,7 +163,15 @@ end
 function MenuScreen:onKeyPress(key, scancode, isrepeat)
 
   if ( key == "return" or key == "kpenter" or key == "left" or key == "right") then
-    self.currentmenu:keyPressed( key, self )
+    if ( self.confirmDialog ) then
+      self.confirmDialog:keyPressed( key, self )
+    else
+      self.currentmenu:keyPressed( key, self )
+    end
+  end
+
+  if ( key == "j" ) then
+    self.confirmDialog = ConfirmDialog("TEM CERTEZA?", 0.375)
   end
 
 end
@@ -160,7 +183,29 @@ end
 function MenuScreen:update(dt)
   self:checkEditor()
 
-  self.currentmenu:update( dt )
+  if ( localslotnumber > 0 ) then
+    selectedslotnumber = localslotnumber
+    self:selectSlot( selectedslotnumber )
+    localslotnumber = 0
+  end
+
+  if ( self.confirmDialog ) then
+
+    self.confirmDialog:update( dt )
+
+    if ( self.confirmDialog:isDone() ) then
+      local option = self.confirmDialog:getOption()
+
+      self.confirmDialog = nil
+
+      if ( option == 1 ) then
+        self:startGame( selectedslotnumber )
+      end
+    end
+
+  else
+    self.currentmenu:update( dt )
+  end
 
   if ( ( self.resolutionChange:haveChanged() == true ) or ( self.fullscreenMode:haveChanged() == true ) ) then
     self.applyOptionsButton:setEnabled( true )
@@ -169,23 +214,24 @@ function MenuScreen:update(dt)
 end
 
 function MenuScreen:draw()
-
-  if (self.backgroundImage) then
-    self.backgroundImage:draw(self.light)
-  end
-
   self.currentmenu:draw()
+
+  if ( self.confirmDialog ) then
+    self.confirmDialog:draw()
+  end
 
 end
 
 function MenuScreen:joystickPressed(joystick, button)
-   self.currentmenu:joystickPressed( joystick, button, self )
+  if ( self.confirmDialog ) then
+    self.confirmDialog:joystickPressed( joystick, button, self )
+  else
+    self.currentmenu:joystickPressed( joystick, button, self )
+  end
 end
 
 function MenuScreen:startButtonClick( sender )
   sender.currentmenu:setVisible( false )
-
-  --//TODO check overwrite ("this will erase current progress. Are you sure?")
 
   sender.slot1Button:setEnabled( true )
   sender.slot2Button:setEnabled( true )
@@ -196,6 +242,8 @@ function MenuScreen:startButtonClick( sender )
   sender.currentmenu = sender.selectSlotMenu
   sender.currentmenu:selectFirst()
   sender.currentmenu:setVisible( true )
+
+  sender.continue = false
 end
 
 function MenuScreen:continueButtonClick( sender )
@@ -210,6 +258,8 @@ function MenuScreen:continueButtonClick( sender )
   sender.currentmenu = sender.selectSlotMenu
   sender.currentmenu:selectFirst()
   sender.currentmenu:setVisible( true )
+
+  sender.continue = true
 end
 
 function MenuScreen:exitButtonClick( sender )
@@ -221,8 +271,6 @@ function MenuScreen:optionsButtonClick( sender )
 end
 
 function MenuScreen:applyOptionsButtonClick( sender )
-  --//TODO save configuration and load it next time
-
   local resValues = sender.resolutionChange:getValue()
   sender.game:changeResolution( resValues[1], resValues[2], false)
   sender.game:saveConfiguration()
@@ -246,53 +294,65 @@ function MenuScreen:exitSelectSlotButtonClick( sender )
   sender.currentmenu = sender.mainMenu
   sender.currentmenu:selectFirst()
   sender.currentmenu:setVisible( true )
+
+  sender.continue = false
 end
 
 function MenuScreen:slot1ButtonClick( sender )
-  sender.currentmenu:setVisible( false )
-  sender.currentmenu = sender.mainMenu
-  sender.currentmenu:selectFirst()
-  sender.currentmenu:setVisible( true )
-
-  if ( sender.game:isNewGame() ) then
-    sender.game:getSaveManager():setSaveToSlot( sender.game:getSaveManager():createEmptySave(), 1 )
-  end
-
-  sender.game:selectSaveSlot( 1 )
-  sender.game:setCurrentScreen( "PlayScreen" )
+  sender:setStartSlot ( 1 )
 end
 
 function MenuScreen:slot2ButtonClick( sender )
-  sender.currentmenu:setVisible( false )
-  sender.currentmenu = sender.mainMenu
-  sender.currentmenu:selectFirst()
-  sender.currentmenu:setVisible( true )
-
-  if ( sender.game:isNewGame() ) then
-    sender.game:getSaveManager():setSaveToSlot( sender.game:getSaveManager():createEmptySave(), 2 )
-  end
-
-  sender.game:selectSaveSlot( 2 )
-  sender.game:setCurrentScreen( "PlayScreen" )
+  sender:setStartSlot ( 2 )
 end
 
 function MenuScreen:slot3ButtonClick( sender )
-  sender.currentmenu:setVisible( false )
-  sender.currentmenu = sender.mainMenu
-  sender.currentmenu:selectFirst()
-  sender.currentmenu:setVisible( true )
+  sender:setStartSlot ( 3 )
+end
 
-  if ( sender.game:isNewGame() ) then
-    sender.game:getSaveManager():setSaveToSlot( sender.game:getSaveManager():createEmptySave(), 3 )
+function MenuScreen:setStartSlot( slotnumber )
+  localslotnumber = slotnumber
+end
+
+function MenuScreen:selectSlot( slotnumber )
+  local slotused = self.game:getSaveManager():getSaveSlot( slotnumber ):isUsed()
+
+  if ( self.continue ) then
+    self:startGame( slotnumber )
+  else
+    if ( slotused ) then
+      self.confirmDialog = ConfirmDialog("SLOT já está em uso. Sobrescrever ?", "", 0.375 )
+    else
+      self:startGame( slotnumber )
+    end
+  end
+end
+
+function MenuScreen:startGame( saveslot )
+  self.currentmenu:setVisible( false )
+  self.currentmenu = self.mainMenu
+  self.currentmenu:selectFirst()
+  self.currentmenu:setVisible( true )
+
+  if ( self.game:isNewGame() ) then
+    self.game:getSaveManager():setSaveToSlot( self.game:getSaveManager():createEmptySave(), saveslot )
   end
 
-  sender.game:selectSaveSlot( 3 )
-  sender.game:setCurrentScreen( "PlayScreen" )
+  self.game:selectSaveSlot( saveslot )
+  self.game:setCurrentScreen( "PlayScreen" )
+
+  localslotnumber = 0
+
+  self.continue = false
 end
 
 function MenuScreen:onMousePress( x, y, button, scaleX, scaleY, istouch )
 
-  self.currentmenu:mousePressed( x, y, button, scaleX, scaleY, self )
+  if ( self.confirmDialog ) then
+    self.confirmDialog:mousePressed( x, y, button, scaleX, scaleY, self )
+  else
+    self.currentmenu:mousePressed( x, y, button, scaleX, scaleY, self )
+  end
 
   return false
 end
@@ -306,15 +366,17 @@ end
 
 function MenuScreen:onMouseMove( x, y, dx, dy, scaleX, scaleY )
 
-  self.currentmenu:mouseMoved( x, y, dx, dy, scaleX, scaleY, self )
+  if ( self.confirmDialog ) then
+    self.confirmDialog:mouseMoved( x, y, dx, dy, scaleX, scaleY, self )
+  else
+    self.currentmenu:mouseMoved( x, y, dx, dy, scaleX, scaleY, self )
+  end
 
   return false
 end
 
 function MenuScreen:checkEditor()
-  if ( Input:isKeyDown("lctrl") and Input:isKeyDown("f8") ) then
-
+  if ( Input:isKeyDown( "lctrl" ) and Input:isKeyDown( "f8" ) ) then
     self.game:setCurrentScreen( "EditorScreen" )
-
   end
 end

@@ -1,5 +1,6 @@
 
 require("..engine.globalconf")
+require("..engine.colors")
 require("..engine.input")
 require("..engine.utl.funcs")
 

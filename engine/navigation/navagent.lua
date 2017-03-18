@@ -12,8 +12,9 @@ and passes it to the owner, who can or cannot go there
 
 require("..engine.lclass")
 require("..engine.input")
-require("..engine.fsm/fsm")
+require("..engine.fsm.fsm")
 require("..engine.globalconf")
+require("..engine.colors")
 
 local Grid = require ("..engine.navigation/jumper.grid")
 local Pathfinder = require ("..engine.navigation/jumper.pathfinder")
@@ -198,7 +199,7 @@ function NavAgent:draw()
 
     self:drawPath()
 
-    love.graphics.setColor(glob.defaultColor)
+    love.graphics.setColor(colors.WHITE)
   end
 end
 

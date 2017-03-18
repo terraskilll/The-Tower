@@ -92,11 +92,11 @@ function ResourceList:drawResourceList()
   love.graphics.print( "Name", 200, 56 )
   love.graphics.print( "Type", 400, 56 )
   love.graphics.print( "Path", 600, 56 )
-  love.graphics.setColor( glob.defaultColor )
+  love.graphics.setColor( colors.WHITE )
 
   love.graphics.setColor( 255, 255, 255, 80 )
   love.graphics.rectangle( "fill", 190, (self.selIndex * 16) + 56, 1000, 18 )
-  love.graphics.setColor( glob.defaultColor )
+  love.graphics.setColor( colors.WHITE )
 
   if ( #allResources == 0) then
     return

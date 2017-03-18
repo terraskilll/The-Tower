@@ -2,6 +2,7 @@
 
 require("..engine.lclass")
 require("..engine.globalconf")
+require("..engine.colors")
 
 class "BoxCollider"
 
@@ -68,7 +69,7 @@ function BoxCollider:draw()
       self.width * self.scale,
       self.height * self.scale)
 
-    love.graphics.setColor(glob.defaultColor)
+    love.graphics.setColor(colors.WHITE)
   end
 end
 

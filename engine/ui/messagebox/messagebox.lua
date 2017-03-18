@@ -56,5 +56,5 @@ function MessageBox:draw()
     love.graphics.setColor( 200, 200, 100, 50 )
   end
 
-  love.graphics.setColor( glob.defaultColor )
+  love.graphics.setColor( colors.WHITE )
 end
