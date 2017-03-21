@@ -22,14 +22,15 @@ function Camera:update( dt )
     local targetPosition = self.target:getPosition()
     local screenWidth, screenHeight = love.graphics.getDimensions()
 
-    self:setPosition( targetPosition.x - screenWidth / 2, targetPosition.y - screenHeight / 2 )
+    --//TODO store screen width, use multiplication
+    self:setPosition( ( targetPosition.x ) - screenWidth / self.scaleX / 2, ( targetPosition.y ) - screenHeight / self.scaleY / 2 )
 
   end
 
 end
 
 function Camera:drawPosition( x, y )
-  love.graphics.print( "Camera: " .. self.positionX .. " | " .. self.positionY, x, y )
+  love.graphics.print( "Camera: " .. self.positionX .. "|" .. self.positionY .. " ~ " .. self.scaleX .. "|" .. self.scaleY, x, y )
 end
 
 function Camera:setTarget( newTarget )
@@ -79,12 +80,20 @@ function Camera:getPositionXY()
 end
 
 function Camera:setScale( newScaleX, newScaleY )
+  if ( newScaleX < 0.1 ) then
+    newScaleX = 0.1
+  end
+
+  if ( newScaleY < 0.1 ) then
+    newScaleY = 0.1
+  end
+
   self.scaleX = newScaleX or self.scaleX
   self.scaleY = newScaleY or self.scaleY
 end
 
 function Camera:getScale()
-  return self.scaleX , self.scaleY
+  return self.scaleX, self.scaleY
 end
 
 function Camera:mousePosition()
@@ -97,11 +106,17 @@ function Camera:getVisibleArea( startXOffset, startYOffset, endXOffset, endYOffs
   endXOffset   = endXOffset or 0
   endYOffset   = endYOffset or 0
 
+  --//TODO store screen dimensions
   local screenWidth, screenHeight = love.graphics.getDimensions()
 
   return
-    ( self.positionX + startXOffset * self.scaleX ),
-    ( self.positionY + startYOffset * self.scaleY ),
-    ( screenWidth + endXOffset * self.scaleX ),
-    ( screenHeight + endYOffset * self.scaleY )
+    ( self.positionX + startXOffset ),
+    ( self.positionY + startYOffset ),
+    ( screenWidth + endXOffset ),
+    ( screenHeight + endYOffset)
+
+    -- ( self.positionX + startXOffset * self.scaleX ),
+    -- ( self.positionY + startYOffset * self.scaleY ),
+    -- ( ( screenWidth + endXOffset ) / self.scaleX ),
+    -- ( ( screenHeight + endYOffset) / self.scaleY )
 end

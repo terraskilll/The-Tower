@@ -77,8 +77,13 @@ function Animation:start()
   self.running = true
 end
 
-function Animation:stop()
+function Animation:stop( frameNumber )
   self.running = false
+
+  if ( frameNumber ) then
+    self.currentFrameNumber = frameNumber
+    self.currentFrame       = self.frames[self.currentFrameNumber]
+  end
 end
 
 function Animation:addFrame( frameToAdd )

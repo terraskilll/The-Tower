@@ -446,11 +446,23 @@ function MapEditor:onMouseMove( x, y, dx, dy )
   end
 
   if ( self.middleisdown ) then
-    self.game:getCamera():move( -dx, -dy )
+    local zx, zy = self.game:getCamera():getScale()
+
+    self.game:getCamera():move( floorfun( -dx / zx ), floorfun( -dy / zy ) )
 
     self.mousewasdragged = true
   end
 
+end
+
+function MapEditor:onMouseWheelMoved( xm, ym )
+  local zx, zy = self.game:getCamera():getScale()
+
+  if ( ym > 0 ) then
+    self.game:getCamera():setScale( zx - 0.1, zy - 0.1 )
+  elseif  ( ym < 0 ) then
+    self.game:getCamera():setScale( zx + 0.1, zy + 0.1 )
+  end
 end
 
 function MapEditor:doTextInput ( t )

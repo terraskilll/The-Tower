@@ -26,6 +26,7 @@ keyCollisionEnter = function ( caller, otherCollider )
     if  ( objectHit ) then
       getGame():getAudioManager():playSound( "coin2audio", 0.8 )
       getGame():getInventory():addItem( "simplekey", 1 )
+      getGame():getMessageBox():show("Adquiriu uma Chave Simples")
       getGame():destroy( objectHit )
     end
   end

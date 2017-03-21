@@ -170,10 +170,6 @@ function MenuScreen:onKeyPress(key, scancode, isrepeat)
     end
   end
 
-  if ( key == "j" ) then
-    self.confirmDialog = ConfirmDialog("TEM CERTEZA?", 0.375)
-  end
-
 end
 
 function MenuScreen:onKeyRelease( key, scancode, isrepeat )

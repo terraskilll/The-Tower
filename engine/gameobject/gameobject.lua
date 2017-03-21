@@ -13,6 +13,8 @@ function GameObject:GameObject( instName, positionX, positionY )
   self.name = "Unnamed Game Object"
   self.tag  = "None"
 
+  self.property = nil
+
   self.position = Vec( positionX, positionY )
 
   self.layer  = 1
@@ -51,6 +53,14 @@ end
 
 function GameObject:setTag( tagToSet )
   self.tag = tagToSet
+end
+
+function GameObject:getProperty()
+  return self.property
+end
+
+function GameObject:setProperty( propertyToSet )
+  self.property = propertyToSet
 end
 
 function GameObject:getLayer()

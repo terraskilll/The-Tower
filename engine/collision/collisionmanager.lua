@@ -46,8 +46,6 @@ function CollisionManager:removeCollider( objectCollider, layer )
     end
   end
 
-  print ( index )
-
   if ( index > 0 ) then
     table.remove( self.layers[layer].colliders, index )
     self.layers[layer].collcount = self.layers[layer].collcount - 1

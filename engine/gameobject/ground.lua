@@ -1,5 +1,8 @@
 --[[
 a walkable part in a area
+
+
+--//DEPRECATED its a legacy, now the engine use layers
 ]]
 
 require("..engine.lclass")

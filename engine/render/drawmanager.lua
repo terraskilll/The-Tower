@@ -28,15 +28,15 @@ local lightShader = love.graphics.newShader("engine/shaders/lightspot.glsl")
 
 class "DrawManager"
 
-local function sortByY(o1, o2)
+local function sortByY( o1, o2 )
   return o1:getBoundingBox():getLowY() < o2:getBoundingBox():getLowY()
 end
 
-local function sortByZ(o1, o2)
+local function sortByZ( o1, o2 )
   return o1:getBoundingBox():getZ() < o2:getBoundingBox():getZ()
 end
 
-local function isInside(x, y, bounds)
+local function isInside( x, y, bounds )
   return (
     x > bounds[1] and
     y > bounds[2] and
@@ -320,19 +320,10 @@ function DrawManager:drawLayerNormal( layerToDraw )
 end
 
 function DrawManager:isInsideScreen( object )
-  local camX, camY, camW, camH = self.camera:getVisibleArea(-300, -300, 400, 400) -- arbitrary values?
+  local camX, camY, camW, camH = self.camera:getVisibleArea(-400, -400, 800, 800) -- arbitrary values?
   local objX, objY, objW, objH = object:getBoundingBox():getBounds()
 
-  --//TODO fix isInside when resolution is changed
-
-  --if ( object:getInstanceName() == "onetree") then
-  --  objX = objX * self.scaleX
-  --  objY = objY * self.scaleY
-
-    --print(objX .. " " .. objY .. " " .. objW .. " " .. objH)
-  --end
-
-  --print(camX .. " " .. camY .. " " .. camW .. " " .. camH)
+  --print( camX .. " " .. camY .. " " .. camW .. " " .. camH )
 
   --//TODO how to do if object is bigger than screen?
   -- check rectangleOverlap and https://love2d.org/forums/viewtopic.php?f=4&t=9281&hilit=field+of+view&sid=c46504dd91ead64328d64fd0359c84e8
@@ -340,10 +331,10 @@ function DrawManager:isInsideScreen( object )
   -- if at least one of the rectangle bounds of the object
   -- is inside the screen, the object is visible
   return (
-    isInside( objX, objY, {camX, camY, camW, camH} ) or
-    isInside( objX + objW, objY, {camX, camY, camW, camH} ) or
-    isInside( objX, objY + objH, {camX, camY, camW, camH} ) or
-    isInside( objX + objW, objY + objH, {camX, camY, camW, camH} )
+    isInside( objX, objY, { camX, camY, camW, camH } ) or
+    isInside( objX + objW, objY, { camX, camY, camW, camH } ) or
+    isInside( objX, objY + objH, { camX, camY, camW, camH } ) or
+    isInside( objX + objW, objY + objH, { camX, camY, camW, camH } )
   )
 
 end

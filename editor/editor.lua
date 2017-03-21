@@ -111,7 +111,7 @@ function Editor:textInput( t )
 end
 
 function Editor:onMousePress( x, y, button, istouch )
-  if (self.currentEditor ) then
+  if ( self.currentEditor ) then
 
     if ( self.currentEditor.onMousePress ) then
       self.currentEditor:onMousePress( x, y, button, istouch )
@@ -121,7 +121,7 @@ function Editor:onMousePress( x, y, button, istouch )
 end
 
 function Editor:onMouseRelease( x, y, button, istouch )
-  if (self.currentEditor ) then
+  if ( self.currentEditor ) then
 
     if ( self.currentEditor.onMouseRelease ) then
       self.currentEditor:onMouseRelease( x, y, button, istouch )
@@ -131,10 +131,20 @@ function Editor:onMouseRelease( x, y, button, istouch )
 end
 
 function Editor:onMouseMove( x, y, dx, dy )
-  if (self.currentEditor ) then
+  if ( self.currentEditor ) then
 
     if ( self.currentEditor.onMouseMove ) then
       self.currentEditor:onMouseMove( x, y, dx, dy )
+    end
+
+  end
+end
+
+function Editor:onMouseWheelMoved( xm, ym )
+  if ( self.currentEditor ) then
+
+    if ( self.currentEditor.onMouseWheelMoved ) then
+      self.currentEditor:onMouseWheelMoved( xm, ym )
     end
 
   end

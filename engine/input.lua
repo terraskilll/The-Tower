@@ -178,7 +178,13 @@ function Input:mouseMoved( x, y, dx, dy )
 end
 
 function Input:wheelMoved( xm, ym )
+	if not Input.overallListener:onMouseWheelMoved( xm, ym ) then
 
+		if ( Input.currentScreenListener.onMouseWheelMoved ) then
+			Input.currentScreenListener:onMouseWheelMoved( xm, ym )
+		end
+
+	end
 end
 
 function Input:mousePosition()

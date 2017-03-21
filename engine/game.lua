@@ -75,7 +75,6 @@ function Game:draw()
   if ( glob.devMode.showFPS ) then
     love.graphics.print( "Current FPS: " .. tostring( love.timer.getFPS() ), 10, 10 )
   end
-
 end
 
 function Game:onKeyPress( key, scancode, isrepeat )
@@ -98,6 +97,10 @@ function Game:onMouseRelease( x, y, button, scaleX, scaleY, istouch )
 end
 
 function Game:onMouseMove( x, y, dx, dy, scaleX, scaleY, istouch )
+  return false
+end
+
+function Game:onMouseWheelMoved( xm, ym )
   return false
 end
 
@@ -489,8 +492,8 @@ function Game:configure()
   --self.camera:setScale( 1280 / ww, 720 / wh ) -- new test
 
   self.drawManager = DrawManager( self.camera )
-  self.drawManager:setScale( ww / 1280, wh / 720 )
-  --self.drawManager:setScale( 1280 / ww, 720 / wh ) -- new test
+  --self.drawManager:setScale( ww / 1280, wh / 720 )
+  self.drawManager:setScale( 1280 / ww, 720 / wh ) -- new test
 
   self.messagebox = MessageBox()
 
@@ -516,6 +519,8 @@ function Game:changeResolution( resolutionWidth, resolutionHeight, setFullScreen
   config.gameScreenWidth  = resolutionWidth
   config.gameScreenHeight = resolutionHeight
   config.gameIsFullScreen = setFullScreen
+
+  self.messagebox = MessageBox()
 end
 
 function Game:saveConfiguration()

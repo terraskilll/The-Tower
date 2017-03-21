@@ -275,6 +275,16 @@ function MapList:onMouseMove( x, y, dx, dy )
   end
 end
 
+function MapList:onMouseWheelMoved( xm, ym )
+  if ( self.mapEditor ) then
+
+    if ( self.mapEditor.onMouseWheelMoved ) then
+      self.mapEditor:onMouseWheelMoved( xm, ym )
+    end
+
+  end
+end
+
 function MapList:removeSelected()
   local delIndex = self.selIndex + ( self.pageIndex - 1 ) * 40
 
