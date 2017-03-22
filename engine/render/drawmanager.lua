@@ -320,7 +320,7 @@ function DrawManager:drawLayerNormal( layerToDraw )
 end
 
 function DrawManager:isInsideScreen( object )
-  local camX, camY, camW, camH = self.camera:getVisibleArea(-400, -400, 800, 800) -- arbitrary values?
+  local camX, camY, camW, camH = self.camera:getVisibleArea( -400, -400, 800, 800 ) -- arbitrary values?
   local objX, objY, objW, objH = object:getBoundingBox():getBounds()
 
   --print( camX .. " " .. camY .. " " .. camW .. " " .. camH )

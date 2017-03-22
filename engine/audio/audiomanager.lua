@@ -39,8 +39,13 @@ function AudioManager:changeMusicVolume( musicName, newVolume )
   self.musics[musicName].volume = newVolume
 end
 
-function AudioManager:playMusic( musicName )
+function AudioManager:playMusic( musicName, looping )
+  if ( looping  == nil) then
+    looping = true
+  end
+
   self.musics[musicName].audio:setVolume( self.musics[musicName].volume )
+  self.musics[musicName].audio:setLooping( looping )
   love.audio.play( self.musics[musicName].audio )
 end
 

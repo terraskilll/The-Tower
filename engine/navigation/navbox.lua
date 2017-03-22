@@ -15,12 +15,9 @@ function NavBox:NavBox( x, y, w, h, offX, offY, s )
   self.offsetY   = offY
   self.color     = { 175, 100, 50, 75 }
   self.scale     = s or 1
-
 end
 
 function NavBox:draw()
-  --print ( self.positionX )
-
   if ( glob.devMode.drawNavMesh ) then
 
     love.graphics.setColor( self.color[1], self.color[2], self.color[3], self.color[4] )

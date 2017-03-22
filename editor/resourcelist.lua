@@ -179,10 +179,12 @@ function ResourceList:addMode()
 end
 
 function ResourceList:editMode()
+  local resindex = self.selIndex + ( self.pageIndex - 1 ) * 40
+
   self.tempData  = {}
   self.mode      = 2
   self.inputMode = 1
-  self.textInput = TextInput( "Resource Name:", allResources[self.selIndex][1] )
+  self.textInput = TextInput( "Resource Name:", allResources[resindex][1] )
 end
 
 function ResourceList:removeSelected()
@@ -203,13 +205,15 @@ function ResourceList:updateAddEdit( dt )
   if ( self.textInput:isFinished() ) then
     self.inputMode = self.inputMode + 1
 
+    local resindex = self.selIndex + ( self.pageIndex - 1 ) * 40
+
     if ( self.inputMode == 2 ) then
       self.tempData[1] = self.textInput:getText()
 
       if ( self.mode == 1 ) then
         self.textInput = TextInput("Resource Type (image or audio):")
       else
-        self.textInput = TextInput("Resource Type (image or audio):", allResources[self.selIndex][2])
+        self.textInput = TextInput("Resource Type (image or audio):", allResources[resindex][2])
       end
 
     end
@@ -220,7 +224,7 @@ function ResourceList:updateAddEdit( dt )
       if ( self.mode == 1 ) then
         self.textInput = TextInput("Path to Resource (relative):")
       else
-        self.textInput = TextInput("Path to Resource (relative):", allResources[self.selIndex][3])
+        self.textInput = TextInput("Path to Resource (relative):", allResources[resindex][3])
       end
 
     end
@@ -228,10 +232,12 @@ function ResourceList:updateAddEdit( dt )
     if ( self.inputMode == 4 ) then -- have everything
       self.tempData[3] = self.textInput:getText()
 
+      local resindex = self.selIndex + ( self.pageIndex - 1 ) * 40
+
       if ( self.mode == 1 ) then
         table.insert( allResources, self.tempData )
       else
-        allResources[self.selIndex] = self.tempData
+        allResources[resindex] = self.tempData
       end
 
       self.tempData  = nil

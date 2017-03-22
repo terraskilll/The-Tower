@@ -44,7 +44,7 @@ function Animation:getResourceName()
 end
 
 function Animation:update( dt )
-  if ( not self.running ) then
+  if ( not self.running ) or ( #self.frames < 2 )  then
     return
   end
 

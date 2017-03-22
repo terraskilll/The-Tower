@@ -36,6 +36,10 @@ end
 
 function Area:addObject( objectToAdd )
 
+  if ( objectToAdd:getInstanceName() == "obj17") then
+    print( self.name .. " " .. objectToAdd:getInstanceName() )
+  end
+
   table.insert( self.objects, objectToAdd )
 
   if ( self.navmesh ) then

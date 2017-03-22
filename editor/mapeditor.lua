@@ -131,10 +131,13 @@ end
 
 function MapEditor:onEnter()
   print("Entered MapEditor")
+  self.game:getDrawManager():enableVisibiltyTest( false )
 end
 
 function MapEditor:onExit()
   self.game:getCamera():setPosition( 0, 0 )
+
+  self.game:getDrawManager():enableVisibiltyTest( true )
 end
 
 function MapEditor:update( dt )

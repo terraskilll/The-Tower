@@ -4,7 +4,7 @@ local utf8 = require("utf8")
 
 class "TextInput"
 
-function TextInput:TextInput(inputCaption, initialText)
+function TextInput:TextInput( inputCaption, initialText )
   self.caption = inputCaption
   self.text    = initialText or ""
 
@@ -13,11 +13,11 @@ end
 
 function TextInput:draw()
 
-  love.graphics.setColor(0, 255, 100, 255)
-  love.graphics.print(self.caption, 20, 20)
-  love.graphics.setColor(colors.WHITE)
+  love.graphics.setColor( 0, 255, 100, 255 )
+  love.graphics.print( self.caption, 20, 20 )
+  love.graphics.setColor( colors.WHITE )
 
-  love.graphics.print(self.text, 20, 40)
+  love.graphics.print( self.text, 20, 40 )
 end
 
 function TextInput:update(dt)
@@ -28,7 +28,7 @@ function TextInput:getText()
   return self.text
 end
 
-function TextInput:input(t)
+function TextInput:input( t )
   self.text = self.text .. t
 end
 
@@ -49,6 +49,14 @@ function TextInput:keypressed( key )
 
   if key == "return" or key == "kpenter" then
     self.finished = true
+  end
+
+  if ( key == "v" and Input:isKeyDown("lctrl") ) then
+    self.text = self.text .. love.system.getClipboardText()
+  end
+
+  if ( ( key == "backspace" ) and ( Input:isKeyDown("lctrl") ) ) then
+    self.text = ""
   end
 
 end

@@ -23,7 +23,7 @@ function MessageBox:MessageBox()
   self.width  = w - 40
   self.height = h - 40
 
-  self.message = nil
+  self.message = ""
 
   self.showing = false
 
@@ -42,9 +42,10 @@ end
 
 function MessageBox:update( dt )
 
-  if ( self.duration >= 0 ) then
+  if ( self.duration > 0 ) then
     self.duration = self.duration - dt
   else
+    self.message = ""
     self.showing = false
   end
 

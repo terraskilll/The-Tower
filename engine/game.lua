@@ -329,6 +329,8 @@ function Game:loadMap( mapname, mapfilename )
     for _,oo in pairs( objects ) do
       self:getCollisionManager():addCollider( oo:getCollider(), oo:getLayer() )
       self:register( oo )
+
+      oo: loadScript()
     end
 
   end
@@ -512,6 +514,8 @@ function Game:changeResolution( resolutionWidth, resolutionHeight, setFullScreen
   end
 
   love.window.setMode( resolutionWidth, resolutionHeight, { fullscreen = setFullScreen } )
+
+  resolutionWidth, resolutionHeight = love.graphics.getDimensions()
 
   self.camera:setScale( resolutionWidth / 1280, resolutionHeight / 720 )
   self.drawManager:setScale( resolutionWidth / 1280, resolutionHeight / 720 )

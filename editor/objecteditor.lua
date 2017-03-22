@@ -345,8 +345,6 @@ function ObjectEditor:keypressgeneral( key )
 
     local nb = self.object.navboxdata
 
-    --local nb = NavBox(1,2,3,4,5,6,7)
-
     if ( self.object.quad ) then
       self.object.navbox = NavBox( nb[1], nb[2], self.object.quaddata[3], self.object.quaddata[4], nb[5], nb[6], nb[7] )
     else
@@ -368,7 +366,7 @@ function ObjectEditor:keypressgeneral( key )
 
     if ( self.object.colltype == "box" ) then
 
-      if ( self.object.quad ~= nil) then
+      if ( self.object.quad ) then
         self.object.collider = BoxCollider(cd[1], cd[2], self.object.quaddata[3], self.object.quaddata[4], cd[5], cd[6], cd[7])
       else
         self.object.collider = BoxCollider(cd[1], cd[2], cd[3], cd[4], cd[5], cd[6], cd[7])

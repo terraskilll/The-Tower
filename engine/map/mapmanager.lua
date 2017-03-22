@@ -120,7 +120,6 @@ function MapManager:loadMap( mapName, mapFileName )
         if ( ( objects[i].script ~= nil ) and ( objects[i].script ~= "" ) ) then
           local scname, scpath = self.game:getScriptManager():getScriptByName( objects[i].script, true )
           object:setScript( scname, scpath )
-          object:loadScript()
         end
 
         area:addObject( object )

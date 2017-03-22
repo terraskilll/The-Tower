@@ -57,7 +57,7 @@ function ObjectList:load()
 end
 
 function ObjectList:onEnter()
-  print("Entered ObjectList")
+  print( "Entered ObjectList" )
 
   self:load()
   self:refreshList()
@@ -67,13 +67,13 @@ function ObjectList:onExit()
 
 end
 
-function ObjectList:update(dt)
+function ObjectList:update( dt )
   if ( self.mode == 1 or self.mode == 2 ) then
     self:updateAddEdit( dt )
     return
   end
 
-  if ( self.objectEditor ~= nil ) then
+  if ( self.objectEditor ) then
     self.objectEditor:update( dt )
     return
   end
@@ -100,25 +100,25 @@ end
 
 function ObjectList:drawObjectList()
 
-  love.graphics.setColor(0, 255, 100, 255)
-  love.graphics.print("Name", 200, 56)
-  love.graphics.setColor(colors.WHITE)
+  love.graphics.setColor( 0, 255, 100, 255 )
+  love.graphics.print( "Name", 200, 56 )
+  love.graphics.setColor( colors.WHITE )
 
   if ( #allObjects == 0) then
     return
   end
 
-  love.graphics.setColor(255, 255, 255, 80)
-  love.graphics.rectangle("fill", 190, (self.selIndex * 16) + 56, 1000, 18)
-  love.graphics.setColor(colors.WHITE)
+  love.graphics.setColor( 255, 255, 255, 80 )
+  love.graphics.rectangle( "fill", 190, ( self.selIndex * 16 ) + 56, 1000, 18)
+  love.graphics.setColor( colors.WHITE )
 
   for i = self.listStart, self.listEnd do
-    love.graphics.print(allObjects[i][1], 200, ( (i - self.listStart + 1) * 16) + 56)
+    love.graphics.print( allObjects[i][1], 200, ( ( i - self.listStart + 1 ) * 16) + 56 )
   end
 
 end
 
-function ObjectList:updateAddEdit(dt)
+function ObjectList:updateAddEdit( dt )
   if ( self.textInput:isFinished() ) then
     self.inputMode = self.inputMode + 1
 
@@ -127,10 +127,12 @@ function ObjectList:updateAddEdit(dt)
     if ( self.inputMode == 2 ) then -- have everything
       self.tempData[2] = {}
 
+      local objindex = self.selIndex + ( self.pageIndex - 1 ) * 40
+
       if ( self.mode == 1 ) then
-        table.insert(allObjects, self.tempData)
+        table.insert( allObjects, self.tempData )
       else
-        allObjects[self.selIndex] = self.tempData
+        allObjects[objindex] = self.tempData
       end
 
       self.tempData  = nil
@@ -209,7 +211,7 @@ end
 function ObjectList:removeSelected()
   local delIndex = self.selIndex + ( self.pageIndex - 1 ) * 40
 
-  table.remove(allObjects, delIndex)
+  table.remove( allObjects, delIndex )
 
   self:refreshList()
 end
@@ -234,10 +236,12 @@ function ObjectList:addMode()
 end
 
 function ObjectList:editMode()
+  local objIndex = self.selIndex + ( self.pageIndex - 1 ) * 40
+
   self.tempData  = {}
   self.mode      = 2
   self.inputMode = 1
-  self.textInput = TextInput("Object Name:", allObjects[self.selIndex][1])
+  self.textInput = TextInput("Object Name:", allObjects[objIndex][1])
 end
 
 function ObjectList:editSelected()

@@ -71,11 +71,13 @@ function MenuScreen:MenuScreen( theGame )
   self.resolutionChange = Selector( 0, 0, "RESOLUÇÃO", ib_red1, 0.375 )
   self.resolutionChange:setAnchor( 4, 15, 240 )
 
-  self.resolutionChange:addOption( "1024 x 768", {1024, 768} )
-  self.resolutionChange:addOption( "1280 x 720", {1280, 720} )
-  self.resolutionChange:addOption( "1600 x 900", {1600, 900} )
-  self.resolutionChange:addOption( "1440 x 960", {1440, 960} )
-  self.resolutionChange:addOption( "1920 x 1080", {1920, 1080} )
+  self.resolutionChange:addOption( "Desktop", { 0, 0 } )
+  self.resolutionChange:addOption( "1024 x 768", { 1024, 768 } )
+  self.resolutionChange:addOption( "1280 x 720", { 1280, 720 } )
+  self.resolutionChange:addOption( "1280 x 800", { 1280, 800 } )
+  self.resolutionChange:addOption( "1600 x 900", { 1600, 900 } )
+  self.resolutionChange:addOption( "1440 x 960", { 1440, 960 } )
+  self.resolutionChange:addOption( "1920 x 1080", { 1920, 1080 } )
 
   self.resolutionChange:setDefaultOptionIndex(2)
   self.resolutionChange.onSelectorChange  = self.selectorOnChange

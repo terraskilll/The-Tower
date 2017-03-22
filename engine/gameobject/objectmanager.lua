@@ -108,12 +108,13 @@ function ObjectManager:loadObject( objectName, instanceName, posx, posy )
 
     local collider = nil
 
-    local cd = objdata.colldata
+    -- local cd = objdata.colldata
+    local cd = objdata.collider
 
     if ( objdata.colltype == "box" ) then
-      collider = BoxCollider( posx, posy, cd[3], cd[4], cd[5], cd[6], cd[7] )
+      collider = BoxCollider( posx, posy, cd.width, cd.height, cd.offsetX, cd.offsetY, cd.scale )
     else
-      collider = CircleCollider( posx, posy, cd[8], cd[5], cd[6], cd[7] )
+      collider = CircleCollider( posx, posy, cd.radius, cd.offsetX, cd.offsetY, cd.scale )
     end
 
     object:setCollider( collider )
