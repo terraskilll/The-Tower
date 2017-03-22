@@ -11,10 +11,17 @@ class "AudioManager"
 function AudioManager:AudioManager( thegame )
   self.game = thegame
 
+  self.mute      = false
   self.volume    = 1
   self.sfxVolume = 1
   self.musics    = {}
   self.sounds    = {}
+
+  self.playing = nil
+end
+
+function AudioManager:muted( trueToMute )
+  self.mute = trueToMute
 end
 
 ---- MUSIC ---------------------------------------------------------------------
@@ -44,9 +51,22 @@ function AudioManager:playMusic( musicName, looping )
     looping = true
   end
 
+  if ( self.playing == musicName ) then
+    return
+  else
+    self:stopMusic( self.playing )
+  end
+
   self.musics[musicName].audio:setVolume( self.musics[musicName].volume )
+
+  if ( self.mute ) then
+    self.musics[musicName].audio:setVolume( 0 )
+  end
+
   self.musics[musicName].audio:setLooping( looping )
   love.audio.play( self.musics[musicName].audio )
+
+  self.playing = musicName
 end
 
 function AudioManager:stopMusic( musicName )
@@ -55,6 +75,8 @@ function AudioManager:stopMusic( musicName )
   else
     love.audio.stop()
   end
+
+  self.playing = nil
 end
 
 ---- AUDIO SFX -----------------------------------------------------------------
@@ -85,6 +107,11 @@ end
 
 function AudioManager:playSound( soundName, volume )
   volume = volume or self.sounds[soundName].volume
+
+  if ( self.mute ) then
+    volume = 0
+  end
+
   self.sounds[soundName].audio:setVolume( volume )
   love.audio.play( self.sounds[soundName].audio )
 end

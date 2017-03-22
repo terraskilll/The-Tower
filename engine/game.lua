@@ -441,23 +441,20 @@ end
 function Game:configure()
   self.screens = {}
 
-  self.gameobjects = {}
-
+  self.gameobjects    = {}
   self.addedObjects   = {}
   self.deletedObjects = {}
 
   self.currentMap = nil
 
   self.savegame = nil
-
   self.saveslot = 0
 
   self.newgame = true
 
   self:loadConfiguration()
 
-  -- window configuration
-  if (config.setFullScreen == nil) then
+  if ( config.setFullScreen == nil ) then
     config.setFullScreen = false
   end
 
@@ -490,12 +487,10 @@ function Game:configure()
   self.inventory:reset()
 
   self.camera = Camera()
-  self.camera:setScale( ww / 1280, wh / 720 ) -- old version
-  --self.camera:setScale( 1280 / ww, 720 / wh ) -- new test
+  self.camera:setScale( ww / 1280, wh / 720 )
 
   self.drawManager = DrawManager( self.camera )
-  --self.drawManager:setScale( ww / 1280, wh / 720 )
-  self.drawManager:setScale( 1280 / ww, 720 / wh ) -- new test
+  self.drawManager:setScale( 1280 / ww, 720 / wh )
 
   self.messagebox = MessageBox()
 

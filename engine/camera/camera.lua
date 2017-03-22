@@ -4,6 +4,10 @@ require("..engine.lclass")
 
 -- no rotation support for camera
 
+local floorfun = math.floor
+
+local camSpeed = 6
+
 class "Camera"
 
 function Camera:Camera()
@@ -11,6 +15,8 @@ function Camera:Camera()
   self.positionY = 0
   self.scaleX    = 1
   self.scaleY    = 1
+
+  self.screenw, self.screenh = love.graphics.getDimensions()
 
   self.target = nil
 end
@@ -22,8 +28,11 @@ function Camera:update( dt )
     local targetPosition = self.target:getPosition()
     local screenWidth, screenHeight = love.graphics.getDimensions()
 
-    --//TODO store screen width, use multiplication
-    self:setPosition( ( targetPosition.x ) - screenWidth / self.scaleX / 2, ( targetPosition.y ) - screenHeight / self.scaleY / 2 )
+    -- https://love2d.org/forums/viewtopic.php?f=4&t=2781&start=10
+    local ptx = self.positionX - ( self.positionX - ( targetPosition.x - self.screenw * 0.5 ) ) * dt * camSpeed
+    local pty = self.positionY - ( self.positionY - ( targetPosition.y - self.screenh * 0.5 ) ) * dt * camSpeed
+
+    self:setPosition( ptx, pty )
 
   end
 
@@ -67,7 +76,9 @@ function Camera:scale( changeScaleX, changeScaleY )
   changeScaleX = changeScaleX or 1
 
   self.scaleX  = self.scaleX * changeScaleX
-  self.scaleY  = self.scaleY * (changeScaleY or changeScaleX)
+  self.scaleY  = self.scaleY * ( changeScaleY or changeScaleX )
+
+  self.screenw, self.screenh = love.graphics.getDimensions()
 end
 
 function Camera:setPosition( newX, newY )
@@ -90,6 +101,8 @@ function Camera:setScale( newScaleX, newScaleY )
 
   self.scaleX = newScaleX or self.scaleX
   self.scaleY = newScaleY or self.scaleY
+
+  self.screenw, self.screenh = love.graphics.getDimensions()
 end
 
 function Camera:getScale()
@@ -106,17 +119,9 @@ function Camera:getVisibleArea( startXOffset, startYOffset, endXOffset, endYOffs
   endXOffset   = endXOffset or 0
   endYOffset   = endYOffset or 0
 
-  --//TODO store screen dimensions
-  local screenWidth, screenHeight = love.graphics.getDimensions()
-
   return
     ( self.positionX + startXOffset ),
     ( self.positionY + startYOffset ),
-    ( screenWidth + endXOffset ),
-    ( screenHeight + endYOffset)
-
-    -- ( self.positionX + startXOffset * self.scaleX ),
-    -- ( self.positionY + startYOffset * self.scaleY ),
-    -- ( ( screenWidth + endXOffset ) / self.scaleX ),
-    -- ( ( screenHeight + endYOffset) / self.scaleY )
+    ( self.screenw + endXOffset ),
+    ( self.screenh + endYOffset)
 end

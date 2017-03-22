@@ -11,7 +11,7 @@ require("..game.actors.player.states.walkingstate")
 
 local Vec = require("..engine.math.vector")
 
-local i__me =  loadImage("res/_me.png") --//TODO temporary
+local i__me = loadImage("res/_me.png") --//TODO temporary
 
 class "Player" ( "Actor" )
 
@@ -106,13 +106,13 @@ function Player:configure()
   -- Collider, NavAgent, BoundingBox
   -------------------------------------------
 
-  self:setNavAgent( NavAgent(self, self.position.x, self.position.y, 10, 0, 12), 150 )
+  self:setNavAgent( NavAgent( self, self.position.x, self.position.y, 10, 0, 12 ), 200 )
 
-  self.collider = CircleCollider(self.position.x, self.position.y, 12, 0, 10)
+  self.collider = CircleCollider( self.position.x, self.position.y, 12, 0, 10 )
   --self.collider = BoxCollider(self.position.x, self.position.y, 20, 22, 23, 42)
   self.collider:setOwner( self )
 
-  self.boundingbox = BoundingBox(self.position.x, self.position.y, 32, 16, 0, -16, 10)
+  self.boundingbox = BoundingBox( self.position.x, self.position.y, 32, 16, 0, -16, 10 )
 end
 
 function Player:onCollisionEnter( otherCollider )

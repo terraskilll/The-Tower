@@ -21,6 +21,8 @@ class "TheTower" ("Game")
 function TheTower:TheTower()
   self:configure()
 
+  self.audioManager:muted( true )
+
   self:addScreen( "EditorScreen", Editor( self ) )
 
   self:addScreen( "MenuScreen", MenuScreen( self ) )
@@ -30,5 +32,6 @@ function TheTower:TheTower()
 
   --//TODO change to SplashScreen
   --self:setCurrentScreen( "PlayScreen" )
-  self:setCurrentScreen( "MenuScreen" )
+  --self:setCurrentScreen( "MenuScreen" )
+  self:setCurrentScreen( "SplashScreen" )
 end

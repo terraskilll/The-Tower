@@ -1,5 +1,7 @@
 require("..engine.lclass")
 
+require("..game.scripts.testmap.openenddoor")
+
 local gameobject = nil
 
 local used = false
@@ -22,6 +24,8 @@ usebluekeyCollisionEnter = function ( caller, otherCollider )
 
   if ( getGame():getInventory():consumeItem( "bluekey" ) ) then
     getGame():getMessageBox():show( "Usou a Chave Azul" )
+    getGame():getSaveGame():addEventKey( "bluekeyopen", 1 )
+    openEndDoor()
     used = true
   else
     getGame():getMessageBox():show( "Falta a Chave Azul" )
