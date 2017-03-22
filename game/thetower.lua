@@ -21,7 +21,7 @@ class "TheTower" ("Game")
 function TheTower:TheTower()
   self:configure()
 
-  self.audioManager:muted( true )
+  --self.audioManager:muted( true )
 
   self:addScreen( "EditorScreen", Editor( self ) )
 

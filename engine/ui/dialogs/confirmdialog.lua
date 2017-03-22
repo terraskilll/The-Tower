@@ -29,9 +29,9 @@ function ConfirmDialog:ConfirmDialog( textLine1, textLine2, scale )
   self.uigroup = UIGroup()
   self.uigroup:setTraversalMode( 2 )
 
-  self.buttonYes = Button( self.positionx + 25, sh / 2 + 60, "SIM", ib_red1, scale )
+  self.buttonYes = Button( self.positionx + 25, sh * 0.5 + 60, "SIM", ib_red1, scale )
   self.buttonYes.onButtonClick = self.confirm
-  self.buttonNo  = Button( self.positionx + self.width - ( 760 * scale ), sh / 2 + 60, "NÃO", ib_yellow1, scale )
+  self.buttonNo  = Button( self.positionx + self.width - ( 760 * scale ), sh * 0.5 + 60, "NÃO", ib_yellow1, scale )
   self.buttonNo.onButtonClick = self.cancel
 
   self.uigroup:addButton( self.buttonYes )

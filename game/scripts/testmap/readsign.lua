@@ -2,22 +2,23 @@ require("..engine.lclass")
 require("..engine.collision.boxcollider")
 require("..engine.collision.circlecollider")
 
-local gameobject = nil
-
 local read = false
 
 scriptsetup = function( object )
-  gameobject = object
+  object.onCollisionEnter = signCollisionEnter
 
-  gameobject.onCollisionEnter = keyCollisionEnter
+  local resname, restype, respath = getGame():getResourceManager():getResourceByName( "animador_a" )
+  local audio = getGame():getResourceManager():loadAudio( respath )
+  getGame():getAudioManager():addSound( "animador_a", audio, 0.4 )
 end
 
-keyCollisionEnter = function ( caller, otherCollider )
+signCollisionEnter = function ( caller, otherCollider )
 
   if ( otherCollider:getOwner():getInstanceName() == "PLAYER" ) then
 
     if  ( not read ) then
       getGame():getMessageBox():show( "\"Abandon All Hope, Ye Who Enter Here\"" , 6 )
+      getGame():getAudioManager():playSound( "animador_a" )
       read = true
     end
 

@@ -193,7 +193,7 @@ function ObjectEditor:updateGetResource( dt )
 
       self.object.navboxdata = { 0, 0, w, h, 0, 0, 1 }
 
-      self.object.colldata = { 0, 0, w, h, 0, 0, 1, w / 2 } -- last parameter is radius for circle
+      self.object.colldata = { 0, 0, w, h, 0, 0, 1, w * 0.5 } -- last parameter is radius for circle
 
       self.object.colltype = "box"
     end
@@ -612,9 +612,9 @@ function ObjectEditor:keypressEditCollider ( key )
     local w, h = self.image:getWidth(), self.image:getHeight()
 
     if ( self.object.quad ) then
-      self.object.colldata = {0, 0, self.object.quaddata[3], self.object.quaddata[4], 0, 0, 1, self.object.quaddata[3] / 2 } -- last parameter is radius for circle
+      self.object.colldata = { 0, 0, self.object.quaddata[3], self.object.quaddata[4], 0, 0, 1, self.object.quaddata[3] * 0.5 } -- last parameter is radius for circle
     else
-      self.object.colldata = {0, 0, w, h, 0, 0, 1, w / 2} -- last parameter is radius for circle
+      self.object.colldata = { 0, 0, w, h, 0, 0, 1, w * 0.5 } -- last parameter is radius for circle
     end
 
   end

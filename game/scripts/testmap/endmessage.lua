@@ -12,10 +12,12 @@ scriptsetup = function( object )
   gameobject.onCollisionEnter = endCollisionEnter
 
   local resname, restype, respath = getGame():getResourceManager():getResourceByName( "victorytheme" )
-
   local audio = getGame():getResourceManager():loadAudio( respath )
+  getGame():getAudioManager():addMusic( "victorytheme", audio, 0.9 )
 
-  getGame():getAudioManager():addMusic( "victorytheme", audio, 0.5 )
+  local resname2, restype2, respath2 = getGame():getResourceManager():getResourceByName( "ufa_a" )
+  local audio2 = getGame():getResourceManager():loadAudio( respath2 )
+  getGame():getAudioManager():addSound( "ufa_a", audio2, 0.4 )
 end
 
 endCollisionEnter = function ( caller, otherCollider )
@@ -30,6 +32,7 @@ endCollisionEnter = function ( caller, otherCollider )
     getGame():getMessageBox():show( "\"FIM\"" , 10 )
     getGame():getAudioManager():stopMusic()
     getGame():getAudioManager():playMusic( "victorytheme", false ) -- does not loop
+    getGame():getAudioManager():playSound( "ufa_a" )
   end
 
 end

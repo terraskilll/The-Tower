@@ -23,9 +23,6 @@ book1CollisionEnter = function ( caller, otherCollider )
     getGame():getMessageBox():show( "Pegou um livro: \"A Insustentável Leveza do C\"" )
     getGame():destroy( objectHit )
     getGame():getSaveGame():addEventKey( "got" .. objectHit:getInstanceName(), 1 )
-
-    --//TODO add snarky comment
-
   end
 
 end

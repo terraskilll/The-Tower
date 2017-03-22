@@ -50,7 +50,7 @@ function FieldOfView:check( targetPosition )
 end
 
 function FieldOfView:update( dt )
-  local r = radfun( self.angle ) / 2
+  local r = radfun( self.angle ) * 0.5
 
   self.tl = rotateVec( self.viewDirection, -r ):normalize() * self.distance + self.position
   self.tr = rotateVec( self.viewDirection, r ):normalize() * self.distance + self.position

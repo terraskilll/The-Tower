@@ -1,11 +1,11 @@
 require("..engine.lclass")
 
-local gameobject = nil
-
 scriptsetup = function( object )
-  gameobject = object
+  object.onCollisionEnter = book2CollisionEnter
 
-  gameobject.onCollisionEnter = book2CollisionEnter
+  local resname, restype, respath = getGame():getResourceManager():getResourceByName( "vale_a" )
+  local audio = getGame():getResourceManager():loadAudio( respath )
+  getGame():getAudioManager():addSound( "vale_a", audio, 0.4 )
 end
 
 book2CollisionEnter = function ( caller, otherCollider )
@@ -23,9 +23,7 @@ book2CollisionEnter = function ( caller, otherCollider )
     getGame():getMessageBox():show( "Pegou um livro: \"Toda Mafalda\"" )
     getGame():destroy( objectHit )
     getGame():getSaveGame():addEventKey( "got" .. objectHit:getInstanceName(), 1 )
-
-    --//TODO add snarky comment
-
+    getGame():getAudioManager():playSound( "vale_a" )
   end
 
 end

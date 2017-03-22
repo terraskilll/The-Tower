@@ -25,7 +25,7 @@
 
 local sqrt = math.sqrt
 
-local Vec = { x = 0, y = 0}
+local Vec = { x = 0, y = 0 }
 Vec.__index = Vec
 Vec.__tostring = function(self)
   return ('Vec [%.2f,%.2f]'):format(self.x,self.y)

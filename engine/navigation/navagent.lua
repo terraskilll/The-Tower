@@ -16,6 +16,8 @@ require("..engine.fsm.fsm")
 require("..engine.globalconf")
 require("..engine.colors")
 
+local atan2fun = math.atan2
+
 local Grid = require ("..engine.navigation/jumper.grid")
 local Pathfinder = require ("..engine.navigation/jumper.pathfinder")
 
@@ -31,6 +33,8 @@ function NavAgent:NavAgent( agentOwner, posX, posY, agentRadius, offX, offY )
   self.offsetX   = offX or 0
   self.offsetY   = offY or 0
   self.speed     = 100
+
+  self.facing    = 0 -- angle the agent is currently facing
 
   self.navmesh = nil
   self.navmap  = nil
@@ -86,22 +90,24 @@ function NavAgent:update( dt, axisVector, collisionManager )
 
   local movement = axisVector * dt * self.speed
 
+  self.facing = atan2fun( movement:getNormalized().x, movement:getNormalized().y )
+
   -- check if agent got into another navmesh
   local changedNavMesh = self.map:checkChangedNavMesh( offsettedPosition, movement )
 
   if ( changedNavMesh ~= nil ) and ( changedNavMesh ~= self.navmesh ) then
 
-      if ( changedNavMesh:isMobile() ) then
-        changedNavMesh:getOwner():addObjectOver( self.owner:getInstanceName(), self.owner )
-      end
+    if ( changedNavMesh:isMobile() ) then
+      changedNavMesh:getOwner():addObjectOver( self.owner:getInstanceName(), self.owner )
+    end
 
-      if ( self.navmesh:isMobile() ) then
-        self.navmesh:getOwner():removeObjectOver( self.owner:getInstanceName() )
-      end
+    if ( self.navmesh:isMobile() ) then
+      self.navmesh:getOwner():removeObjectOver( self.owner:getInstanceName() )
+    end
 
-      self.navmesh = changedNavMesh
+    self.navmesh = changedNavMesh
 
-      self.owner:setArea( self.navmesh:getOwner() )
+    self.owner:setArea( self.navmesh:getOwner() )
 
   end
 
@@ -122,6 +128,10 @@ function NavAgent:update( dt, axisVector, collisionManager )
   self.owner:changePosition( collisionCheckedMov )
 end
 
+function NavAgent:getFacing()
+  return self.facing
+end
+
 function NavAgent:findPathTo( targetPosition )
   self.path = {}
 
@@ -134,11 +144,8 @@ function NavAgent:findPathTo( targetPosition )
   local p = pathfinder:getPath( agentCol, agentRow, targetCol, targetRow )
 
   if ( p ) then
-
     for node, count in p:nodes() do
-
       table.insert( self.path, { row = node.y, col = node.x } )
-
     end
 
     table.remove( self.path, 1 )
@@ -146,7 +153,6 @@ function NavAgent:findPathTo( targetPosition )
     self.nextpoint = self:nextPointInPath()
 
     self.walkPath = true
-
   end
 
 end

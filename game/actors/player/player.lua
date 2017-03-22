@@ -41,6 +41,8 @@ function Player:update( dt, game )
   local xyVec = Input:getAxis()
 
   self.navagent:update( dt, xyVec, game:getCollisionManager() )
+
+  --print( self.navagent:getFacing() )
 end
 
 function Player:draw()

@@ -1,11 +1,11 @@
 require("..engine.lclass")
 
-local gameobject = nil
-
 scriptsetup = function( object )
-  gameobject = object
+  object.onCollisionEnter = photo2CollisionEnter
 
-  gameobject.onCollisionEnter = photo2CollisionEnter
+  local resname, restype, respath = getGame():getResourceManager():getResourceByName( "naoserve_a" )
+  local audio = getGame():getResourceManager():loadAudio( respath )
+  getGame():getAudioManager():addSound( "naoserve_a", audio, 0.4 )
 end
 
 photo2CollisionEnter = function ( caller, otherCollider )
@@ -23,8 +23,7 @@ photo2CollisionEnter = function ( caller, otherCollider )
     getGame():getMessageBox():show( "Achou um colecionável (Foto)" )
     getGame():destroy( objectHit )
     getGame():getSaveGame():addEventKey( "got" .. objectHit:getInstanceName(), 1 )
-
-    --//TODO add snarky comment
+    getGame():getAudioManager():playSound( "naoserve_a" )
   end
 
 end

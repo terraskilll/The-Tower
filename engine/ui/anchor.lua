@@ -38,21 +38,21 @@ function getAnchoredPosition(anchor, positionX, positionY, offsetX, offsetY, ele
   elementWidth = elementWidth * elementScale
   elementHeight = elementHeight * elementScale
 
-  local halfElementW = elementWidth / 2
-  local halfElementH = elementHeight / 2
+  local halfElementW = elementWidth * 0.5
+  local halfElementH = elementHeight * 0.5
 
   local finalPositionX = 0
   local finalPositionY = 0
 
   if ( anchor == 0 ) then -- center
 
-      finalPositionX = (screenWidth / 2) - halfElementW + offsetX + positionX
-      finalPositionY = (screenHeight / 2) - halfElementH + offsetY + positionY
+      finalPositionX = (screenWidth * 0.5) - halfElementW + offsetX + positionX
+      finalPositionY = (screenHeight * 0.5) - halfElementH + offsetY + positionY
 
     elseif ( anchor == 1 ) then -- east
 
       finalPositionX = screenWidth - elementWidth - offsetX + positionX
-      finalPositionY = (screenHeight / 2) - halfElementH + positionY
+      finalPositionY = (screenHeight * 0.5) - halfElementH + positionY
 
     elseif ( anchor == 2 ) then -- southeast
 
@@ -61,7 +61,7 @@ function getAnchoredPosition(anchor, positionX, positionY, offsetX, offsetY, ele
 
     elseif ( anchor == 3 ) then -- south
 
-      finalPositionX = (screenWidth / 2) - halfElementW + positionX
+      finalPositionX = (screenWidth * 0.5) - halfElementW + positionX
       finalPositionY = screenHeight - elementHeight - offsetY + positionY
 
     elseif ( anchor == 4 ) then -- southwest
@@ -72,7 +72,7 @@ function getAnchoredPosition(anchor, positionX, positionY, offsetX, offsetY, ele
     elseif ( anchor == 5 ) then -- west
 
       finalPositionX = offsetX + positionX
-      finalPositionY = (screenHeight / 2) - halfElementH + positionY
+      finalPositionY = (screenHeight * 0.5) - halfElementH + positionY
 
     elseif ( anchor == 6 ) then -- northwest
 
@@ -81,7 +81,7 @@ function getAnchoredPosition(anchor, positionX, positionY, offsetX, offsetY, ele
 
     elseif ( anchor == 7 ) then -- north
 
-      finalPositionX = (screenWidth / 2) - halfElementW + positionX
+      finalPositionX = (screenWidth * 0.5) - halfElementW + positionX
       finalPositionY = offsetY + positionY
 
     elseif ( anchor == 8 ) then -- northeast

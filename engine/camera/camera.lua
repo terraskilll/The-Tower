@@ -5,8 +5,9 @@ require("..engine.lclass")
 -- no rotation support for camera
 
 local floorfun = math.floor
+local absfun   = math.abs
 
-local camSpeed = 6
+local camSpeed = 4
 
 class "Camera"
 
@@ -29,8 +30,20 @@ function Camera:update( dt )
     local screenWidth, screenHeight = love.graphics.getDimensions()
 
     -- https://love2d.org/forums/viewtopic.php?f=4&t=2781&start=10
-    local ptx = self.positionX - ( self.positionX - ( targetPosition.x - self.screenw * 0.5 ) ) * dt * camSpeed
-    local pty = self.positionY - ( self.positionY - ( targetPosition.y - self.screenh * 0.5 ) ) * dt * camSpeed
+    local ptx = ( self.positionX - ( targetPosition.x - self.screenw * 0.5 ) ) * dt * camSpeed
+    local pty = ( self.positionY - ( targetPosition.y - self.screenh * 0.5 ) ) * dt * camSpeed
+
+    if ( absfun(ptx) > 1 ) then
+      ptx = self.positionX - ptx
+    else
+      ptx = self.positionX
+    end
+
+    if ( absfun(pty) > 1 ) then
+      pty = self.positionY - pty
+    else
+      pty = self.positionY
+    end
 
     self:setPosition( ptx, pty )
 

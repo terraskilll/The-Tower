@@ -854,7 +854,7 @@ function MapEditor:changeIncModifier( key )
     elseif ( self.incModifier == 4 ) then
       self.incModifier = 1
     else
-      self.incModifier = self.incModifier / 2
+      self.incModifier = self.incModifier * 0.5
     end
 
   end
@@ -1366,7 +1366,7 @@ function MapEditor:drawGrid()
 
   --local cx, cy = self.game:getCamera():getPositionXY()
 
-  --local sx, sy = sw / 2 + cx, sh / 2 + cy
+  --local sx, sy = sw * 0.5 + cx, sh * 0.5 + cy
 
   love.graphics.setColor( 0, 255, 0, 40 )
 

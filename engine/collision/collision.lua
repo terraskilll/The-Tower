@@ -63,20 +63,20 @@ collision = {
     local circlex, circley = circlecollider:getCenter()
     local circler = circlecollider:getRadius()
 
-    local distX = absfun( circlex - boxx - boxw / 2 )
-    local distY = absfun( circley - boxy - boxh / 2 )
+    local distX = absfun( circlex - boxx - boxw * 0.5 )
+    local distY = absfun( circley - boxy - boxh * 0.5 )
 
-    if ( distX > ( boxw / 2 + circler ) ) then return false end
+    if ( distX > ( boxw * 0.5 + circler ) ) then return false end
 
-    if ( distY > ( boxh / 2 + circler ) ) then return false end
+    if ( distY > ( boxh * 0.5 + circler ) ) then return false end
 
-    if ( distX <= ( boxw / 2 ) ) then return true end
+    if ( distX <= ( boxw * 0.5 ) ) then return true end
 
-    if ( distY <= ( boxh / 2 ) ) then return true end
+    if ( distY <= ( boxh * 0.5 ) ) then return true end
 
-    local dx = distX - ( boxw / 2 )
+    local dx = distX - ( boxw * 0.5 )
 
-    local dy = distY - ( boxh / 2 )
+    local dy = distY - ( boxh * 0.5 )
 
     return ( ( dx * dx + dy * dy ) <= ( circler * circler ) )
   end
