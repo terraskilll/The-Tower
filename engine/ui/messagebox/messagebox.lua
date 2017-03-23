@@ -38,6 +38,8 @@ function MessageBox:show( messageStr, duration )
   self.duration = duration
 
   self.showing = true
+
+  self.font = love.graphics.newFont( 18 )
 end
 
 function MessageBox:update( dt )
@@ -70,7 +72,7 @@ function MessageBox:draw()
 
   --- TEXT ---
 
-  love.graphics.setNewFont( 18 )
+  love.graphics.setFont( self.font )
 
   love.graphics.setColor( 0, 0, 0, 200 )
   love.graphics.printf( self.message, 2, self.bottom + 2, self.screenw, "center" )
@@ -78,6 +80,5 @@ function MessageBox:draw()
   love.graphics.setColor( 255, 255, 235, 255 )
   love.graphics.printf( self.message, 0, self.bottom, self.screenw, "center" )
 
-  love.graphics.setNewFont( glob.defaultFontSize )
   love.graphics.setColor( colors.WHITE )
 end

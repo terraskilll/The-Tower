@@ -42,7 +42,6 @@ function Editor:Editor( thegame )
   self.currentEditor = nil
 
   self.bgcolorindex = 1
-
 end
 
 function Editor:update( dt )
@@ -73,6 +72,11 @@ end
 
 function Editor:onEnter()
   print("Entered Editor")
+
+  self.font = love.graphics.newFont( glob.defaultFontSize )
+  love.graphics.setFont( self.font )
+
+  self.game:getAudioManager():stopMusic()
 end
 
 function Editor:onExit()

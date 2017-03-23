@@ -9,9 +9,9 @@ It's my final project in a Game Programming Course at [PUCPR] (http://www.pucpr.
 * Both controller and keyboard support
 * Game resource management (images and audio)
 * Editors for simple objects, animations and maps
-* 2D collision, with box and circle colliders, and possibly collision trigger events
+* 2D collision, with box and circle colliders, and collision trigger events
 * Reasonable fast rendering, allowing many objects in scene (up to 10000, in initial tests)
 * Simple lighting model, with light spots (lamps), shaded objects (normal maps) and casting shadows
 * Automatic movement and navigation maps for IA elements (enemies)
-* Trigger events
+* Simple scripting system
 * Static cutscenes with editors (basically, image transitions and background sound/music)

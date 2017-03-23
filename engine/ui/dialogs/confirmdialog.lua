@@ -38,6 +38,8 @@ function ConfirmDialog:ConfirmDialog( textLine1, textLine2, scale )
   self.uigroup:addButton( self.buttonNo )
   self.uigroup:selectFirst()
 
+  self.font = love.graphics.newFont( 80 * self.scale )
+
   option = 0
 
   done = false
@@ -64,7 +66,7 @@ function ConfirmDialog:draw()
 
   love.graphics.rectangle( "fill", self.positionx, self.positiony, self.width, self.height, 4, 4 )
 
-  love.graphics.setNewFont( 80 * self.scale )
+  love.graphics.setFont( self.font )
 
   love.graphics.setColor( colors.WHITE )
 
@@ -74,13 +76,11 @@ function ConfirmDialog:draw()
   self.uigroup:draw()
 
   love.graphics.setColor( colors.WHITE )
-  love.graphics.setNewFont( glob.defaultFontSize )
 end
 
 function ConfirmDialog:drawRectangleOverScreen( sw, sh )
   love.graphics.setColor( 10, 10, 10, 200 )
   love.graphics.rectangle( "fill", 0, 0, sw, sh )
-  love.graphics.setNewFont( glob.defaultFontSize )
 end
 
 function ConfirmDialog:keyPressed( key, sender )

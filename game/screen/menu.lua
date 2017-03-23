@@ -74,7 +74,7 @@ function MenuScreen:MenuScreen( theGame )
   self.resolutionChange:addOption( "Desktop", { 0, 0 } )
   self.resolutionChange:addOption( "1024 x 768", { 1024, 768 } )
   self.resolutionChange:addOption( "1280 x 720", { 1280, 720 } )
-  self.resolutionChange:addOption( "1280 x 800", { 1280, 800 } )
+  self.resolutionChange:addOption( "1366 x 768", { 1366, 768 } )
   self.resolutionChange:addOption( "1600 x 900", { 1600, 900 } )
   self.resolutionChange:addOption( "1440 x 960", { 1440, 960 } )
   self.resolutionChange:addOption( "1920 x 1080", { 1920, 1080 } )
@@ -140,6 +140,10 @@ function MenuScreen:MenuScreen( theGame )
 end
 
 function MenuScreen:onEnter()
+  self.image = love.graphics.newImage( "res/thetower.png" )
+
+  self:updateDimensions()
+
   local resname, restype, respath = self.game:getResourceManager():getResourceByName( self.screenmusicname )
 
   if ( respath ) then
@@ -162,7 +166,7 @@ function MenuScreen:onExit()
   end
 end
 
-function MenuScreen:onKeyPress(key, scancode, isrepeat)
+function MenuScreen:onKeyPress( key, scancode, isrepeat )
 
   if ( key == "return" or key == "kpenter" or key == "left" or key == "right") then
     if ( self.confirmDialog ) then
@@ -212,12 +216,25 @@ function MenuScreen:update(dt)
 end
 
 function MenuScreen:draw()
+  if ( self.image ) then
+    love.graphics.draw( self.image, self.screenwidth - self.imagewidth * self.imagescale, 0, 0, self.imagescale, self.imagescale )
+  end
+
   self.currentmenu:draw()
 
   if ( self.confirmDialog ) then
     self.confirmDialog:draw()
   end
 
+end
+
+function MenuScreen:updateDimensions()
+  self.screenwidth, self.screenheight = love.graphics.getDimensions()
+
+  if ( self.image ) then
+    self.imagewidth, self.imageheight = self.image:getDimensions()
+    self.imagescale = self.screenheight / self.imageheight
+  end
 end
 
 function MenuScreen:joystickPressed(joystick, button)
@@ -270,8 +287,9 @@ end
 
 function MenuScreen:applyOptionsButtonClick( sender )
   local resValues = sender.resolutionChange:getValue()
-  sender.game:changeResolution( resValues[1], resValues[2], false)
+  sender.game:changeResolution( resValues[1], resValues[2], false )
   sender.game:saveConfiguration()
+  sender:updateDimensions()
 end
 
 function MenuScreen:creditsButtonClick( sender )

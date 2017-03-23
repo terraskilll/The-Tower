@@ -30,6 +30,8 @@ function Button:Button( positionX, positionY, buttonText, buttonImage, buttonSca
   self.anchor   = nil
 
   self.onButtonClick = nil
+
+  self.font = love.graphics.newFont( 80 * self.scale )
 end
 
 function Button:update(dt)
@@ -52,8 +54,7 @@ function Button:draw()
 end
 
 function Button:drawText()
-  love.graphics.setNewFont( 80 * self.scale )
-
+  love.graphics.setFont( self.font )
   --// shader does not like transparency in text =(
   local a = 255
 
@@ -66,8 +67,6 @@ function Button:drawText()
   love.graphics.setColor( 255, 255, 255, a )
   love.graphics.print( self.text, x + 96 * self.scale, y + 5 * self.scale )
   love.graphics.setColor( 255, 255, 255, 255 )
-
-  love.graphics.setNewFont( glob.defaultFontSize )
 end
 
 function Button:setSelected( isSelected )
@@ -108,7 +107,7 @@ end
 
 function Button:onClick( sender )
 
-  if ( self.onButtonClick ~= nil ) then
+  if ( self.onButtonClick ) then
     self:onButtonClick( sender )
   end
 

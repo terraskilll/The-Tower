@@ -38,6 +38,8 @@ function Selector:Selector( positionX, positionY, captionText, selectorImage, se
   self.currentValue  = nil
 
   self.onSelectorChange = nil
+
+  self.font = love.graphics.newFont( 80 * self.scale )
 end
 
 function Selector:update( dt )
@@ -95,7 +97,8 @@ function Selector:getPositionByAnchor()
 end
 
 function Selector:drawText()
-  love.graphics.setNewFont( 80 * self.scale )
+  love.graphics.setFont( self.font )
+  --love.graphics.setNewFont( 80 * self.scale )
 
   --// shader does not like transparency in text =(
   local a = 255
@@ -110,8 +113,6 @@ function Selector:drawText()
   love.graphics.print(self.caption, x + 96 * self.scale, y + 5 * self.scale)
   love.graphics.print(self.currentOption, x + 800 * self.scale, y + 5 * self.scale)
   love.graphics.setColor( 255, 255, 255, 255)
-
-  love.graphics.setNewFont( glob.defaultFontSize )
 end
 
 function Selector:setAnchor( anchorPoint, offX, offY )
@@ -166,7 +167,7 @@ function Selector:unchange()
 end
 
 function Selector:onChange( sender )
-  if ( self.onSelectorChange ~= nil ) then
+  if ( self.onSelectorChange ) then
     self:onSelectorChange( sender,  self.currentValue)
   end
 end
@@ -187,6 +188,22 @@ function Selector:getValue()
   return self.currentValue
 end
 
+function Selector:onClick( sender )
+  self:selectNext()
+end
+
 function Selector:isMouseOver( x, y )
-  return false
+  local xi, yi = self.position.x, self.position.y
+
+  if ( self.anchor ) then
+    xi, yi = self:getPositionByAnchor()
+  end
+
+  local isover =
+    xi <= x and
+    yi <= y and
+    xi + self.width * self.scale >= x and
+    yi + self.height * self.scale >= y
+
+  return isover
 end

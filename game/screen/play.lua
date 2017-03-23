@@ -136,6 +136,33 @@ function PlayScreen:joystickPressed( joystick, button )
 
 end
 
+function PlayScreen:onMousePress( x, y, button, scaleX, scaleY, istouch )
+
+  if ( self.paused ) then
+    self.pauseMenu:mousePressed( x, y, button, scaleX, scaleY, self )
+  end
+
+  return false
+end
+
+function PlayScreen:onMouseRelease( x, y, button, scaleX, scaleY, istouch )
+
+  if ( self.paused ) then
+    self.pauseMenu:mouseReleased( x, y, button, scaleX, scaleY, self )
+  end
+
+  return false
+end
+
+function PlayScreen:onMouseMove( x, y, dx, dy, scaleX, scaleY )
+
+  if ( self.paused ) then
+    self.pauseMenu:mouseMoved( x, y, dx, dy, scaleX, scaleY, self )
+  end
+
+  return false
+end
+
 function PlayScreen:changeMap( newMap, newArea, newSpawnPoint )
 
   self.game:changeMap( newMap, newArea, newSpawnPoint )
@@ -163,7 +190,6 @@ function PlayScreen:createMenu()
   self.pauseMenu:addButton( exitButton )
 
   self.pauseMenu:setVisible( false )
-
 end
 
 function PlayScreen:checkPause()
