@@ -52,7 +52,6 @@ function SimpleObject:getKind()
 end
 
 function SimpleObject:update( dt )
-  --//TODO call update in game for SimpleObjects
   if ( self.animation ) then
     self.animation:update( dt )
   end
@@ -60,7 +59,6 @@ function SimpleObject:update( dt )
   if ( self.scriptupdate ) then
     self:scriptupdate( dt )
   end
-
 end
 
 function SimpleObject:draw()

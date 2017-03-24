@@ -1,18 +1,13 @@
 local Vec = require("..engine.math.vector")
 
-local opening = 0
-
-local targetx   = nil
-
+local opening    = 0
+local targetx    = nil
 local gameobject = nil
-
-local absfun = math.abs
+local absfun     = math.abs
 
 scriptsetup = function( object )
   gameobject = object
-
   object.scriptupdate  = dooraUpdate
-
   targetx = object:getPosition().x - 60
 end
 
@@ -31,7 +26,6 @@ dooraUpdate = function( caller, dt )
 
     if ( prop == 1 ) then
       opening = 1
-      --//TODO open sound?
     end
   end
 end

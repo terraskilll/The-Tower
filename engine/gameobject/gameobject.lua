@@ -88,7 +88,6 @@ function GameObject:setPosition( positionToSet )
 end
 
 function GameObject:setScript( scriptName, scriptPath )
-
   if ( scriptName == nil or scriptName == "" ) then
     self.scriptname = nil
     self.scriptpath = nil
@@ -96,15 +95,9 @@ function GameObject:setScript( scriptName, scriptPath )
     self.scriptname = scriptName
     self.scriptpath = scriptPath
   end
-
-end
-
-function GameObject:getScript()
-  return self.scriptname, self.scriptpath
 end
 
 function GameObject:loadScript()
-
   --//TODO test loadScript
   if ( self.scriptpath ) then
     local script = require( self.scriptpath )
@@ -112,13 +105,16 @@ function GameObject:loadScript()
 
     self.scriptloaded = true
   end
-
 end
 
 function GameObject:unloadScript()
   if ( self.scriptloaded ) then
     package.loaded[self.scriptpath] = nil
   end
+end
+
+function GameObject:getScript()
+  return self.scriptname, self.scriptpath
 end
 
 function GameObject:update( dt )

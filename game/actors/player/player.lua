@@ -15,7 +15,8 @@ local i__me = loadImage("res/_me.png") --//TODO temporary
 
 class "Player" ( "Actor" )
 
-function Player:Player( playerName, instName, positionX, positionY )
+function Player:Player( thegame, playerName, instName, positionX, positionY )
+  self.game         = thegame
   self.instancename = instName
 
   self.name      = playerName
@@ -32,6 +33,8 @@ function Player:Player( playerName, instName, positionX, positionY )
   self.boundingbox = nil
   self.collider    = nil
 
+  self.animation = nil
+
   self:configure()
 end
 
@@ -41,6 +44,8 @@ function Player:update( dt, game )
   local xyVec = Input:getAxis()
 
   self.navagent:update( dt, xyVec, game:getCollisionManager() )
+
+  self.animation:update( dt )
 
   --print( self.navagent:getFacing() )
 end
@@ -53,7 +58,9 @@ function Player:draw()
   --love.graphics.circle( "line", x, y, 20, 4 )
   --love.graphics.circle( "line", x, y, 2 )
 
-  love.graphics.draw(i__me, x, y, 0, 0.75, 0.75, 32, 32)
+  --love.graphics.draw( i__me, x, y, 0, 0.75, 0.75, 32, 32 )
+
+  self.animation:draw( x - 18, y - 21 )
 
   self.collider:draw()
   self.navagent:draw()
@@ -91,6 +98,9 @@ end
 function Player:configure()
   self.fsm = FSM()
 
+  self.animation = self.game:getAnimationManager():loadAnimation( "char2" )
+  self.animation:start()
+
   --local walkingstate = WalkingState()
 
   --self.fsm:pushState(walkingstate)
@@ -108,7 +118,7 @@ function Player:configure()
   -- Collider, NavAgent, BoundingBox
   -------------------------------------------
 
-  self:setNavAgent( NavAgent( self, self.position.x, self.position.y, 10, 0, 12 ), 200 )
+  self:setNavAgent( NavAgent( self, self.position.x, self.position.y, 10, 0, 12 ), 250 )
 
   self.collider = CircleCollider( self.position.x, self.position.y, 12, 0, 10 )
   --self.collider = BoxCollider(self.position.x, self.position.y, 20, 22, 23, 42)

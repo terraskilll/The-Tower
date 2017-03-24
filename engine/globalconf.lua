@@ -6,8 +6,8 @@ glob = {
 
   --//TODO revisit default configurations
   devMode = {
-    active           = false,
-    showFPS          = false,
+    active           = true,
+    showFPS          = true,
     drawColliders    = true,
     drawNavMesh      = true,
     drawNavMap       = false,

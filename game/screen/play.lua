@@ -109,7 +109,7 @@ function PlayScreen:onKeyPress( key, scancode, isrepeat )
     self.game:getMessageBox():show("A Simple message")
   end
 
-  if ( key == "'") then --//TODO invert with escape
+  if ( key == "'" ) then --//TODO invert with escape
     self:checkPause()
   end
 
@@ -124,14 +124,14 @@ end
 
 function PlayScreen:joystickPressed( joystick, button )
 
-  if ( button == 8 ) then
-    self:checkPause()
-  end
-
   if ( self.paused ) then
     self:handleInPauseMenu( joystick, button, self )
   else
     self:handleInGame( joystick, button, self )
+  end
+
+  if ( button == 8 ) then
+    self:checkPause()
   end
 
 end

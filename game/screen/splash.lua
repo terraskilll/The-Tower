@@ -25,7 +25,7 @@ function SplashScreen:onEnter()
   self.cx = self.sw / self.ww
   self.cy = self.sh / self.hh
 
-  self.timer = 0.5 --//TODO change to 6
+  self.timer = 6 --//TODO change to 6
 
   self.alphain  = 0
   self.alphaout = 255

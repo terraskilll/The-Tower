@@ -494,7 +494,7 @@ function Game:configure()
 
   self.messagebox = MessageBox()
 
-  self.player = Player( "PLAYER", "PLAYER", 0, 0 )
+  self.player = Player( self, "PLAYER", "PLAYER", 0, 0 )
 
   Input.overallListener = Game
   Input.camera = self.camera
