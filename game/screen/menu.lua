@@ -59,10 +59,15 @@ function MenuScreen:MenuScreen( theGame )
   exitButton:setAnchor( 4, 15, 20 )
   exitButton.onButtonClick = self.exitButtonClick
 
+  local editorButton = Button( 0, 0, "EDITOR", ib_red1, 0.375 )
+  editorButton:setAnchor( 6, 15, 20 )
+  editorButton.onButtonClick = self.editorButtonClick
+
   self.mainMenu:addButton( startButton )
   self.mainMenu:addButton( continueButton )
   self.mainMenu:addButton( optionsButton )
   self.mainMenu:addButton( exitButton )
+  self.mainMenu:addButton( editorButton )
 
   -- options menu
 
@@ -312,6 +317,10 @@ function MenuScreen:exitSelectSlotButtonClick( sender )
   sender.currentmenu:setVisible( true )
 
   sender.continue = false
+end
+
+function MenuScreen:editorButtonClick( sender )
+  sender.game:setCurrentScreen( "EditorScreen" )
 end
 
 function MenuScreen:slot1ButtonClick( sender )

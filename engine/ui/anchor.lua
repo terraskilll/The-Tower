@@ -77,7 +77,7 @@ function getAnchoredPosition(anchor, positionX, positionY, offsetX, offsetY, ele
     elseif ( anchor == 6 ) then -- northwest
 
       finalPositionX = offsetX + positionX
-      finalPositionY = offsetY + self.position.y
+      finalPositionY = offsetY + positionY
 
     elseif ( anchor == 7 ) then -- north
 

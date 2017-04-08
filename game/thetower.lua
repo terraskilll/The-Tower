@@ -30,7 +30,7 @@ function TheTower:TheTower()
   self:addScreen( "SplashScreen", SplashScreen( self ) )
   self:addScreen( "CreditsScreen", CreditsScreen( self ) )
 
-  --//TODO change to SplashScreen
+  --//TODO keep to SplashScreen
   --self:setCurrentScreen( "PlayScreen" )
   --self:setCurrentScreen( "MenuScreen" )
   self:setCurrentScreen( "SplashScreen" )
